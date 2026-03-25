@@ -1,0 +1,45 @@
+# Android 官方推荐的 .gitignore 配置
+
+# Built artifacts
+bin/
+gen/
+out/
+.gradle/
+build/
+app/build/
+app/release/
+release/
+
+# Kotlin
+.kotlin/
+
+# Android Studio / IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Local configuration file (contains local paths to SDK, etc.)
+local.properties
+
+# Log files
+*.log
+
+# Keystore files (NEVER PUSH THESE)
+*.jks
+*.keystore
+
+# Google Services (if applicable)
+# google-services.json
+
+# Screenshots
+screenshots/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
