@@ -6,9 +6,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -44,7 +45,9 @@ fun SettingsScreen(
     val chatModelList = viewModel.chatModelList
     val visionModelList = viewModel.visionModelList
     val imageModelList = viewModel.imageModelList
-    val isFetching by viewModel.isFetchingModels
+    val isFetchingChat by viewModel.isFetchingChat.collectAsState()
+    val isFetchingVision by viewModel.isFetchingVision.collectAsState()
+    val isFetchingImage by viewModel.isFetchingImage.collectAsState()
     val errorMessage by viewModel.errorMessage
     val context = LocalContext.current
     
@@ -95,7 +98,7 @@ fun SettingsScreen(
             onModelChange = { viewModel.updateChatModel(it) },
             defaultModels = chatModelList,
             onFetchModels = { viewModel.fetchModels(0) },
-            isFetching = isFetching,
+            isFetching = isFetchingChat,
             onPresetSelected = { viewModel.applyPreset(it, 0) },
             providerType = viewModel.chatProvider.value,
             onProviderTypeChange = { viewModel.updateChatProvider(it) },
@@ -114,7 +117,7 @@ fun SettingsScreen(
             onModelChange = { viewModel.updateVisionModel(it) },
             defaultModels = visionModelList,
             onFetchModels = { viewModel.fetchModels(1) },
-            isFetching = isFetching,
+            isFetching = isFetchingVision,
             onPresetSelected = { viewModel.applyPreset(it, 1) },
             providerType = viewModel.visionProvider.value,
             onProviderTypeChange = { viewModel.updateVisionProvider(it) },
@@ -133,7 +136,7 @@ fun SettingsScreen(
             onModelChange = { viewModel.updateImageModel(it) },
             defaultModels = imageModelList,
             onFetchModels = { viewModel.fetchModels(2) },
-            isFetching = isFetching,
+            isFetching = isFetchingImage,
             onPresetSelected = { viewModel.applyPreset(it, 2) },
             providerType = viewModel.imageProvider.value,
             onProviderTypeChange = { viewModel.updateImageProvider(it) },
@@ -349,30 +352,31 @@ fun ApiConfigCard(
                     singleLine = true
                 )
                 if (isArk) {
-                    Text(
-                        "注意：豆包接口必须填写 接入点 ID 而非模型名称。",
-                        fontSize = 10.sp,
-                        color = Color.Red,
-                        modifier = Modifier.padding(start = 4.dp)
-                    )
+                    Surface(
+                        color = Color.Red.copy(alpha = 0.1f),
+                        shape = RoundedCornerShape(4.dp),
+                        modifier = Modifier.padding(top = 4.dp)
+                    ) {
+                        Text(
+                            "🚨 豆包 (Ark) 必读：请填写 接入点 ID (如 ep-xxx) 而非模型名。请确保已部署 vision 模型。",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Red,
+                            modifier = Modifier.padding(8.dp)
+                        )
+                    }
                 }
             }
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.Center
             ) {
                 NeoButton(
                     text = if (isFetching) "..." else "⚡ 测试连接",
                     onClick = onTestConnection,
                     backgroundColor = Color(0xFF93C5FD),
-                    modifier = Modifier.weight(1f)
-                )
-                NeoButton(
-                    text = "🔍 获取模型",
-                    onClick = onFetchModels,
-                    backgroundColor = Color(0xFFFDE68A),
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
 

@@ -13,6 +13,7 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.CancellationException
 
+import androidx.core.graphics.createBitmap
 import androidx.core.graphics.scale
 import androidx.core.net.toUri
 import android.util.Log
@@ -25,6 +26,11 @@ import java.net.SocketTimeoutException
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.LinearGradient
+import android.graphics.Paint
+import android.graphics.Shader
 import android.util.Base64
 
 class AiRepository(private val context: Context, private val settings: SettingsRepository) {
@@ -38,7 +44,7 @@ class AiRepository(private val context: Context, private val settings: SettingsR
         imageUri: String? = null
     ): Result<T> = withContext(Dispatchers.IO) {
         try {
-            val model = if (isVision) settings.visionModel else settings.chatModel
+            val model = (if (isVision) settings.visionModel else settings.chatModel).lowercase().trim()
             val baseUrl = if (isVision) settings.visionBaseUrl else settings.chatBaseUrl
             val apiKey = if (isVision) settings.visionApiKey else settings.chatApiKey
 
@@ -49,23 +55,55 @@ class AiRepository(private val context: Context, private val settings: SettingsR
 
             val api = ApiClient.getService(baseUrl, apiKey)
             
-            val content: Any = if (isVision && imageUri != null) {
+            // Construct messages based on provider and task type
+            val messages = if (isVision && imageUri != null) {
                 val base64 = uriToBase64(imageUri)
-                listOf(
-                    ChatContentPart(type = "text", text = userPrompt),
-                    ChatContentPart(type = "image_url", imageUrl = ImageUrlPart(url = "data:image/jpeg;base64,$base64"))
-                )
+                if (base64.isNullOrEmpty()) {
+                    return@withContext Result.failure(Exception("图片编码失败，请检查文件是否存在"))
+                }
+                
+                val isArk = baseUrl.contains("volces.com") || baseUrl.contains("ark")
+                
+                if (isArk) {
+                    // Both require merging system instructions into user message.
+                    // Keep standard OpenAI names for the HTTP API.
+                    val textType = "text"
+                    val imageType = "image_url"
+                    
+                    listOf(
+                        ChatMessage("user", listOf(
+                            ChatContentPart(type = textType, text = "$systemMsg\n\n$userPrompt"),
+                            ChatContentPart(type = imageType, imageUrl = ImageUrlPart(url = "data:image/jpeg;base64,$base64"))
+                        ))
+                    )
+                } else {
+                    // Standard OpenAI compatible format for other providers (GPT-4o, DeepSeek, etc.)
+                    listOf(
+                        ChatMessage("system", systemMsg),
+                        ChatMessage("user", listOf(
+                            ChatContentPart(type = "text", text = userPrompt),
+                            ChatContentPart(type = "image_url", imageUrl = ImageUrlPart(url = "data:image/jpeg;base64,$base64"))
+                        ))
+                    )
+                }
             } else {
-                userPrompt
+                // Non-vision or missing image: standard system/user sequence
+                listOf(
+                    ChatMessage("system", systemMsg),
+                    ChatMessage("user", userPrompt)
+                )
             }
 
+            // For vision tasks with Zhipu, we avoid sending temperature/max_tokens as they might cause 400
+            val isZhipuVision = isVision && (baseUrl.contains("bigmodel.cn") || baseUrl.contains("zhipuai"))
             val request = ChatRequest(
                 model = model,
-                messages = listOf(
-                    ChatMessage("system", systemMsg),
-                    ChatMessage("user", content)
-                )
+                messages = messages,
+                temperature = if (isZhipuVision) null else 0.7f,
+                maxTokens = if (isZhipuVision) null else 2000,
+                stream = if (isZhipuVision) null else false
             )
+
             val response = api.getChatCompletion(request)
             if (response.isSuccessful) {
                 val rawContent = response.body()?.choices?.firstOrNull()?.message?.content?.toString() ?: ""
@@ -73,8 +111,15 @@ class AiRepository(private val context: Context, private val settings: SettingsR
                 Result.success(gson.fromJson(cleanJson, clazz))
             } else {
                 val errorBody = response.errorBody()?.string() ?: ""
-                Log.e("AiRepository", "API Error: ${response.code()}, Body: $errorBody")
-                Result.failure(Exception("API Error: ${response.code()} - $errorBody"))
+                Log.e("AiRepository", "API Error (${response.code()}): $errorBody")
+                
+                // Add more context to 400 error for debugging
+                val userError = if (response.code() == 400) {
+                    "参数错误 (400): 请检查模型名 $model 是否正确支持识图，或尝试在设置中换一个视觉模型。详细：$errorBody"
+                } else {
+                    "API Error: ${response.code()} - $errorBody"
+                }
+                Result.failure(Exception(userError))
             }
         } catch (e: Exception) {
             Log.e("AiRepository", "Exception in callAi: ${e.message}", e)
@@ -95,6 +140,8 @@ class AiRepository(private val context: Context, private val settings: SettingsR
         val request = ChatRequest(
             model = model,
             messages = messages,
+            temperature = 0.7f,
+            maxTokens = 2000,
             stream = true
         )
 
@@ -146,7 +193,10 @@ class AiRepository(private val context: Context, private val settings: SettingsR
             val api = ApiClient.getService(baseUrl, apiKey)
             val request = ChatRequest(
                 model = model,
-                messages = messages
+                messages = messages,
+                temperature = 0.7f,
+                maxTokens = 2000,
+                stream = false
             )
             val response = api.getChatCompletion(request)
             if (response.isSuccessful) {
@@ -213,31 +263,73 @@ class AiRepository(private val context: Context, private val settings: SettingsR
         }
     }
 
-    suspend fun testConnection(baseUrl: String, apiKey: String, model: String): Result<Unit> = withContext(Dispatchers.IO) {
+    suspend fun testConnection(baseUrl: String, apiKey: String, model: String, isVision: Boolean = false): Result<Unit> = withContext(Dispatchers.IO) {
         try {
-            if (baseUrl.isEmpty() || apiKey.apiKey().isBlank()) {
+            if (baseUrl.isEmpty() || apiKey.isBlank()) {
                 return@withContext Result.failure(Exception("请提供有效的地址和 Key"))
             }
 
             val api = ApiClient.getService(baseUrl, apiKey)
+            
+            val isArk = baseUrl.contains("volces.com") || baseUrl.contains("ark")
+            
+            val messages = if (isVision) {
+                // Dynamically generate a 100x100 gradient JPEG to ensure it looks like a real image
+                val bitmap = createBitmap(100, 100, Bitmap.Config.RGB_565)
+                val canvas = Canvas(bitmap)
+                val paint = Paint()
+                paint.shader = LinearGradient(0f, 0f, 100f, 100f, Color.GREEN, Color.BLUE, Shader.TileMode.CLAMP)
+                canvas.drawRect(0f, 0f, 100f, 100f, paint)
+                
+                val outputStream = ByteArrayOutputStream()
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream)
+                val dynamicBase64 = Base64.encodeToString(outputStream.toByteArray(), Base64.NO_WRAP)
+                bitmap.recycle()
+                
+                val testPrompt = "这是一张待识别的食材图片。"
+                
+                if (isArk) {
+                    listOf(
+                        ChatMessage("user", listOf(
+                            ChatContentPart(type = "text", text = testPrompt),
+                            ChatContentPart(type = "image_url", imageUrl = ImageUrlPart(url = "data:image/jpeg;base64,$dynamicBase64"))
+                        ))
+                    )
+                } else {
+                    // Standard OpenAI format (system + user)
+                    listOf(
+                        ChatMessage("system", "你是一个极其专业的食材识别专家。"),
+                        ChatMessage("user", listOf(
+                            ChatContentPart(type = "text", text = testPrompt),
+                            ChatContentPart(type = "image_url", imageUrl = ImageUrlPart(url = "data:image/jpeg;base64,$dynamicBase64"))
+                        ))
+                    )
+                }
+            } else {
+                listOf(ChatMessage("user", "ping"))
+            }
+
+            val isZhipuVision = isVision && (baseUrl.contains("bigmodel.cn") || baseUrl.contains("zhipuai"))
             val request = ChatRequest(
-                model = model,
-                messages = listOf(ChatMessage("user", "ping")),
-                maxTokens = 5
+                model = model.trim(),
+                messages = messages,
+                maxTokens = if (isZhipuVision) null else if (isVision) 2000 else 5,
+                temperature = if (isZhipuVision) null else 0.1f,
+                stream = if (isZhipuVision) null else false
             )
             val response = api.getChatCompletion(request)
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {
                 val error = response.errorBody()?.string() ?: "未知错误"
+                Log.e("AiRepository", "Test Connection Failed: $error")
                 Result.failure(Exception(error))
             }
         } catch (e: Exception) {
+            Log.e("AiRepository", "Test Connection Exception: ${e.message}", e)
             Result.failure(e)
         }
     }
-
-    private fun String.apiKey(): String = this.trim()
 
     @Suppress("unused")
     suspend fun generateDishRecipeByName(dishName: String): Result<Recipe> {
@@ -539,6 +631,10 @@ class AiRepository(private val context: Context, private val settings: SettingsR
 
     suspend fun fetchModels(baseUrl: String, apiKey: String): Result<List<String>> = withContext(Dispatchers.IO) {
         try {
+            if (baseUrl.contains("volces.com") || baseUrl.contains("ark")) {
+                return@withContext Result.failure(Exception("豆包 (Ark) 不支持自动获取列表。请在火山后台复制 '接入点 ID' (如 ep-xxx) 填入模型名。"))
+            }
+            
             val api = ApiClient.getService(baseUrl, apiKey)
             val response = api.getModels()
             if (response.isSuccessful) {
@@ -574,33 +670,46 @@ class AiRepository(private val context: Context, private val settings: SettingsR
         }
     }
 
-    private fun uriToBase64(uriString: String): String {
+    private fun uriToBase64(uriString: String): String? {
         return try {
             val uri = uriString.toUri()
             val inputStream = context.contentResolver.openInputStream(uri)
             val originalBitmap = BitmapFactory.decodeStream(inputStream)
-            
+            inputStream?.close()
+
+            if (originalBitmap == null) {
+                Log.e("AiRepository", "Failed to decode bitmap from URI: $uriString")
+                return null
+            }
+
             val maxDimension = 1024
             val width = originalBitmap.width
             val height = originalBitmap.height
+            Log.d("AiRepository", "Bitmap loaded: ${width}x$height")
+
             val newBitmap = if (width > maxDimension || height > maxDimension) {
                 val scale = maxDimension.toFloat() / maxOf(width, height)
-                originalBitmap.scale((width * scale).toInt(), (height * scale).toInt(), true)
+                val sw = (width * scale).toInt()
+                val sh = (height * scale).toInt()
+                Log.d("AiRepository", "Scaling bitmap to: ${sw}x$sh")
+                originalBitmap.scale(sw, sh, true)
             } else {
                 originalBitmap
             }
 
             val outputStream = ByteArrayOutputStream()
-            newBitmap.compress(Bitmap.CompressFormat.JPEG, 85, outputStream)
+            newBitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream)
             val bytes = outputStream.toByteArray()
             
             if (newBitmap != originalBitmap) newBitmap.recycle()
             originalBitmap.recycle()
             
-            Base64.encodeToString(bytes, Base64.NO_WRAP)
+            val base64 = Base64.encodeToString(bytes, Base64.NO_WRAP)
+            Log.d("AiRepository", "Base64 encoded success, length: ${base64.length} (approx ${bytes.size / 1024} KB)")
+            base64
         } catch (e: Exception) {
-            Log.e("AiRepository", "Error in uriToBase64: ${e.message}")
-            ""
+            Log.e("AiRepository", "Error in uriToBase64: ${e.message}", e)
+            null
         }
     }
 

@@ -42,6 +42,7 @@ fun HomeScreen(
     val ingredients = viewModel.ingredients
     val selectedCuisines = viewModel.selectedCuisines
     val isLoading by viewModel.isLoading
+    val isRecognizing by viewModel.isRecognizing
     val cuisineSlots by viewModel.cuisineSlots.collectAsState()
 
     var currentInput by remember { mutableStateOf("") }
@@ -59,12 +60,53 @@ fun HomeScreen(
         }
     }
 
+    // Image Management
+    val showImageSourceDialogState = remember { mutableStateOf(false) }
+    val showImageSourceDialog by showImageSourceDialogState
+    var tempPhotoUri by remember { mutableStateOf<android.net.Uri?>(null) }
+    
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success) {
+            tempPhotoUri?.let { viewModel.onImageInput(it.toString()) }
+        }
+    }
+
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let { viewModel.onImageInput(it.toString()) }
+    }
+
+    fun launchCamera() {
+        try {
+            val directory = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+            if (directory == null) {
+                Toast.makeText(context, "无法访问存储空间", Toast.LENGTH_SHORT).show()
+                return
+            }
+            val f = File(directory, "photo_${System.currentTimeMillis()}.jpg")
+            val uri = FileProvider.getUriForFile(context, "${context.packageName}.file_provider", f)
+            tempPhotoUri = uri
+            cameraLauncher.launch(uri)
+            showImageSourceDialogState.value = false
+        } catch (e: Exception) {
+            Toast.makeText(context, "拍照启动失败: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+
     // Permission Management
     val permissionsLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { results ->
         results.forEach { (permission, isGranted) ->
-            if (!isGranted) {
+            if (isGranted) {
+                // Feature: Automatically launch camera if it was just granted
+                if (permission == android.Manifest.permission.CAMERA) {
+                    launchCamera()
+                }
+            } else {
                 val activity = context as? android.app.Activity
                 val showRationale = activity?.let { 
                     androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale(it, permission) 
@@ -138,24 +180,6 @@ fun HomeScreen(
         )
     }
 
-    // Image Management
-    val showImageSourceDialogState = remember { mutableStateOf(false) }
-    val showImageSourceDialog by showImageSourceDialogState
-    var tempPhotoUri by remember { mutableStateOf<android.net.Uri?>(null) }
-    
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture()
-    ) { success ->
-        if (success) {
-            tempPhotoUri?.let { viewModel.onImageInput(it.toString()) }
-        }
-    }
-
-    val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri ->
-        uri?.let { viewModel.onImageInput(it.toString()) }
-    }
 
     if (showImageSourceDialog) {
         Dialog(onDismissRequest = { showImageSourceDialogState.value = false }) {
@@ -177,20 +201,7 @@ fun HomeScreen(
                             val permission = android.Manifest.permission.CAMERA
                             val granted = androidx.core.content.ContextCompat.checkSelfPermission(context, permission) == android.content.pm.PackageManager.PERMISSION_GRANTED
                             if (granted) {
-                                try {
-                                    val directory = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-                                    if (directory == null) {
-                                        Toast.makeText(context, "无法访问存储空间", Toast.LENGTH_SHORT).show()
-                                        return@NeoButton
-                                    }
-                                    val f = File(directory, "photo_${System.currentTimeMillis()}.jpg")
-                                    val uri = FileProvider.getUriForFile(context, "${context.packageName}.file_provider", f)
-                                    tempPhotoUri = uri
-                                    cameraLauncher.launch(uri)
-                                } catch (e: Exception) {
-                                    Toast.makeText(context, "拍照启动失败: ${e.message}", Toast.LENGTH_LONG).show()
-                                }
-                                showImageSourceDialogState.value = false
+                                launchCamera()
                             } else {
                                 permissionsLauncher.launch(arrayOf(permission))
                             }
@@ -326,7 +337,7 @@ fun HomeScreen(
                 Spacer(modifier = Modifier.height(12.dp))
                 
                 NeoButton(
-                    text = "添加食材",
+                    text = if (isRecognizing) "识别中..." else "添加食材",
                     onClick = {
                         if (currentInput.isNotBlank()) {
                             viewModel.addIngredient(currentInput)
@@ -335,7 +346,8 @@ fun HomeScreen(
                     },
                     modifier = Modifier.fillMaxWidth(),
                     backgroundColor = Color(0xFFFB923C), // Consistent Orange
-                    shadowOffset = 4.dp // Stronger shadow
+                    shadowOffset = 4.dp, // Stronger shadow
+                    enabled = !isRecognizing
                 )
             }
 

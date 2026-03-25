@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eatwhat.data.repository.AiRepository
 import com.eatwhat.data.repository.SettingsRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 data class AiProviderPreset(
@@ -21,7 +23,7 @@ val PROVIDER_PRESETS = listOf(
     AiProviderPreset("DeepSeek", "https://api.deepseek.com/v1/", "deepseek-chat"),
     AiProviderPreset("智谱 AI", "https://open.bigmodel.cn/api/paas/v4/", "glm-4", true),
     AiProviderPreset("Kimi", "https://api.moonshot.cn/v1/", "moonshot-v1-8k"),
-    AiProviderPreset("豆包 (Ark)", "https://ark.cn-beijing.volces.com/api/v3/", "ep-..."),
+    AiProviderPreset("豆包 (Ark)", "https://ark.cn-beijing.volces.com/api/v3/", "ep-...", true),
     AiProviderPreset("Groq", "https://api.groq.com/openai/v1/", "llama3-70b-8192")
 )
 
@@ -78,8 +80,14 @@ class SettingsViewModel(
     private val _visionModelList = mutableStateListOf<String>()
     val visionModelList: List<String> = _visionModelList
 
-    private val _isFetchingModels = mutableStateOf(false)
-    val isFetchingModels: State<Boolean> = _isFetchingModels
+    private val _isFetchingChat = MutableStateFlow(false)
+    val isFetchingChat = _isFetchingChat.asStateFlow()
+    
+    private val _isFetchingVision = MutableStateFlow(false)
+    val isFetchingVision = _isFetchingVision.asStateFlow()
+    
+    private val _isFetchingImage = MutableStateFlow(false)
+    val isFetchingImage = _isFetchingImage.asStateFlow()
 
     private val _errorMessage = mutableStateOf<String?>(null)
     val errorMessage: State<String?> = _errorMessage
@@ -110,7 +118,7 @@ class SettingsViewModel(
 
     fun fetchModels(type: Int) { // 0: Chat, 1: Vision, 2: Image
         viewModelScope.launch {
-            _isFetchingModels.value = true
+            setLoading(type, true)
             _errorMessage.value = null
             val url = when(type) {
                 1 -> _visionBaseUrl.value
@@ -144,7 +152,15 @@ class SettingsViewModel(
             }.onFailure { e ->
                 _errorMessage.value = "获取失败: ${e.message}"
             }
-            _isFetchingModels.value = false
+            setLoading(type, false)
+        }
+    }
+
+    private fun setLoading(type: Int, value: Boolean) {
+        when(type) {
+            0 -> _isFetchingChat.value = value
+            1 -> _isFetchingVision.value = value
+            2 -> _isFetchingImage.value = value
         }
     }
 
@@ -167,24 +183,25 @@ class SettingsViewModel(
     }
 
     fun applyPreset(preset: AiProviderPreset, type: Int) { // 0: Chat, 1: Vision, 2: Image
+        val isArk = preset.name.contains("豆包")
         when(type) {
             0 -> {
                 _chatBaseUrl.value = preset.baseUrl
                 _chatModel.value = preset.defaultModel
                 _chatProvider.value = preset.name
-                fetchModels(0)
+                if (!isArk && _chatApiKey.value.isNotBlank()) fetchModels(0)
             }
             1 -> {
                 _visionBaseUrl.value = preset.baseUrl
                 _visionModel.value = preset.defaultModel
                 _visionProvider.value = preset.name
-                fetchModels(1)
+                if (!isArk && _visionApiKey.value.isNotBlank()) fetchModels(1)
             }
             2 -> {
                 _imageBaseUrl.value = preset.baseUrl
                 _imageModel.value = preset.defaultModel
                 _imageProvider.value = preset.name
-                fetchModels(2)
+                if (!isArk && _imageApiKey.value.isNotBlank()) fetchModels(2)
             }
         }
         _isSaved.value = false
@@ -192,7 +209,7 @@ class SettingsViewModel(
 
     fun testConnection(type: Int) {
         viewModelScope.launch {
-            _isFetchingModels.value = true
+            setLoading(type, true)
             _errorMessage.value = null
             
             val url = when(type) {
@@ -211,13 +228,13 @@ class SettingsViewModel(
                 else -> _chatModel.value
             }
 
-            // Simple "Hello" test
-            aiRepository.testConnection(url, key, model).onSuccess {
+            // Simple "Hello" test (Vision models need a dummy image)
+            aiRepository.testConnection(url, key, model, isVision = (type == 1)).onSuccess {
                 _errorMessage.value = "连接成功！接口响应正常。"
             }.onFailure { e ->
                 _errorMessage.value = "连接失败: ${e.message}"
             }
-            _isFetchingModels.value = false
+            setLoading(type, false)
         }
     }
 }

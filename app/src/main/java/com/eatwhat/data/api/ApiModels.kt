@@ -5,9 +5,9 @@ import com.google.gson.annotations.SerializedName
 data class ChatRequest(
     val model: String,
     val messages: List<ChatMessage>,
-    val temperature: Float = 0.7f,
-    @SerializedName("max_tokens") val maxTokens: Int = 2000,
-    val stream: Boolean = false
+    val temperature: Float? = null,
+    @SerializedName("max_tokens") val maxTokens: Int? = null,
+    val stream: Boolean? = null
 )
 
 data class ChatMessage(

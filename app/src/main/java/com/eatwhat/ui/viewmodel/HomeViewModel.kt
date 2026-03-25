@@ -49,6 +49,9 @@ class HomeViewModel(
     private val _isLoading = mutableStateOf(false)
     val isLoading: State<Boolean> = _isLoading
 
+    private val _isRecognizing = mutableStateOf(false)
+    val isRecognizing: State<Boolean> = _isRecognizing
+
     private val _errorMessage = mutableStateOf<String?>(null)
     val errorMessage: State<String?> = _errorMessage
 
@@ -80,7 +83,7 @@ class HomeViewModel(
 
     fun onImageInput(uri: String) {
         viewModelScope.launch {
-            _isLoading.value = true
+            _isRecognizing.value = true
             _errorMessage.value = null
             val result = aiRepository.recognizeIngredients(uri)
             result.onSuccess { list ->
@@ -88,7 +91,7 @@ class HomeViewModel(
             }.onFailure { error ->
                 _errorMessage.value = error.message ?: "识别失败"
             }
-            _isLoading.value = false
+            _isRecognizing.value = false
         }
     }
 

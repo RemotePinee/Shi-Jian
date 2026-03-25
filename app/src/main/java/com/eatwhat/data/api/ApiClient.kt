@@ -13,7 +13,15 @@ object ApiClient {
      * Get or create an AiApiService for a specific base URL and API key.
      */
     fun getService(baseUrl: String, apiKey: String): AiApiService {
-        val normalizedUrl = if (baseUrl.endsWith("/")) baseUrl else "$baseUrl/"
+        // Normalize URL: Remove trailing paths that are already in the interface (@POST)
+        var normalizedUrl = baseUrl.trim()
+        if (normalizedUrl.endsWith("/chat/completions")) normalizedUrl = normalizedUrl.removeSuffix("chat/completions")
+        else if (normalizedUrl.endsWith("chat/completions")) normalizedUrl = normalizedUrl.removeSuffix("chat/completions")
+        else if (normalizedUrl.endsWith("/images/generations")) normalizedUrl = normalizedUrl.removeSuffix("images/generations")
+        else if (normalizedUrl.endsWith("images/generations")) normalizedUrl = normalizedUrl.removeSuffix("images/generations")
+        
+        if (!normalizedUrl.endsWith("/")) normalizedUrl = "$normalizedUrl/"
+        
         val cacheKey = "$normalizedUrl|$apiKey"
         
         return synchronized(services) {
@@ -31,8 +39,10 @@ object ApiClient {
 
         val okHttpClient = OkHttpClient.Builder()
             .addInterceptor { chain ->
+                val authHeader = if (apiKey.startsWith("Bearer ", ignoreCase = true)) apiKey 
+                                else "Bearer $apiKey"
                 val request = chain.request().newBuilder()
-                    .header("Authorization", "Bearer $apiKey")
+                    .header("Authorization", authHeader)
                     .header("Content-Type", "application/json")
                     .build()
                 chain.proceed(request)

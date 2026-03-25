@@ -203,11 +203,24 @@ fun AiChatScreen(viewModel: AiChatViewModel) {
         }
     }
 
+    fun launchCamera() {
+        try {
+            val directory = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+            val file = File.createTempFile("IMG_", ".jpg", directory)
+            val uri = FileProvider.getUriForFile(context, "${context.packageName}.file_provider", file)
+            tempPhotoUri = uri
+            cameraLauncher.launch(uri)
+            showImageSourceDialogState.value = false
+        } catch (_: Exception) {
+            Toast.makeText(context, "无法启动相机", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            showImageSourceDialogState.value = true
+            launchCamera()
         } else {
             val activity = context as? android.app.Activity
             val showRationale = activity?.let { 
@@ -291,19 +304,9 @@ fun AiChatScreen(viewModel: AiChatViewModel) {
                         onClick = {
                             val permission = Manifest.permission.CAMERA
                             if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED) {
-                                try {
-                                    val directory = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-                                    val file = File.createTempFile("IMG_", ".jpg", directory)
-                                    val uri = FileProvider.getUriForFile(context, "${context.packageName}.file_provider", file)
-                                    tempPhotoUri = uri
-                                    cameraLauncher.launch(uri)
-                                } catch (_: Exception) {
-                                    Toast.makeText(context, "无法启动相机", Toast.LENGTH_SHORT).show()
-                                }
-                                showImageSourceDialogState.value = false
+                                launchCamera()
                             } else {
                                 cameraPermissionLauncher.launch(permission)
-                                // Keep dialog open so user can try again after granting
                             }
                             Log.d("AiChat", "Camera source attempt")
                         },
