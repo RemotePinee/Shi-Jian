@@ -3,7 +3,7 @@
 > 🚀 **让 AI 为你的每一餐注入灵感！**  
 > 这是一款基于 **Neo-Brutalism** 设计风格，深度整合 AI 能力的智能菜谱创作助手。
 > 
-> 💡 **灵感来源**：本项目灵感源于 Web 开源项目 <a href="https://github.com/liu-ziting/what-to-eat" target="_blank">一饭封神(what-to-eat)</a>。
+> 💡 **灵感来源**：本项目灵感源于 Web 开源项目 <a href="https://github.com/liu-ziting/what-to-eat" target="_blank" rel="noopener noreferrer">一饭封神(what-to-eat)</a>。
 
 [![License](https://img.shields.io/badge/License-CC_BY--NC--SA_4.0-lightgrey.svg)](https://github.com/RemotePinee/Shi-Jian/blob/main/LICENSE)
 [![JDK](https://img.shields.io/badge/JDK-21-blue.svg)](https://www.oracle.com/java/technologies/downloads/#java21)
@@ -105,5 +105,5 @@ app/src/main/java/com/eatwhat/
 
 ## 🙏 致谢
 
-- 感谢 <a href="https://github.com/liu-ziting" target="_blank">liuziting</a> 提供的优秀灵感与 Web 端参考。
-- 感谢 <a href="https://developer.android.com/jetpack/compose" target="_blank">Jetpack Compose</a> 让现代 Android 开发如此优雅。
+- 感谢 <a href="https://github.com/liu-ziting" target="_blank" rel="noopener noreferrer">liuziting</a> 提供的优秀灵感与 Web 端参考。
+- 感谢 <a href="https://developer.android.com/jetpack/compose" target="_blank" rel="noopener noreferrer">Jetpack Compose</a> 让现代 Android 开发如此优雅。
