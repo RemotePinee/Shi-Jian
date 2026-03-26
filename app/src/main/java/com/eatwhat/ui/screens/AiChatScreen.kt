@@ -1,3 +1,4 @@
+@file:Suppress("SpellCheckingInspection")
 package com.eatwhat.ui.screens
 
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -10,7 +11,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
@@ -84,6 +84,7 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.ui.text.TextStyle
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -98,12 +99,16 @@ fun AiChatScreen(viewModel: AiChatViewModel) {
 
     /* Voice integration */
     val voiceManager = remember { VoiceInputManager(context) }
+    val scope = rememberCoroutineScope()
     DisposableEffect(voiceManager) { onDispose { voiceManager.destroy() } }
     
     val showVoiceDialogState = remember { mutableStateOf(false) }
     var showVoiceDialog by showVoiceDialogState
     val voiceState by voiceManager.state
     val recognizedText by voiceManager.text
+    
+    /* Permission Guide State */
+    val permissionGuideState = remember { mutableStateOf<PermissionGuideData?>(null) }
     @Suppress("SpellCheckingInspection")
     val rmsdB by voiceManager.rmsdB
 
@@ -134,16 +139,11 @@ fun AiChatScreen(viewModel: AiChatViewModel) {
         )
     }
 
-    // Image Management (Reusing Home logic)
+    /* Image Management (Reusing Home logic) */
     val showImageSourceDialogState = remember { mutableStateOf(false) }
     var showImageSourceDialog by showImageSourceDialogState
     var tempPhotoUri by remember { mutableStateOf<Uri?>(null) }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
-    
-    /* Permission Guide State */
-    var showPermissionGuide by remember { mutableStateOf(false) }
-    var permissionGuideTitle by remember { mutableStateOf("") }
-    var permissionGuideMessage by remember { mutableStateOf("") }
     
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
@@ -185,8 +185,13 @@ fun AiChatScreen(viewModel: AiChatViewModel) {
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            voiceManager.startListening()
+            // 首先显示对话框，确保 UI 先展示
             showVoiceDialogState.value = true
+            // 稍等 50ms 确保权限状态在系统中同步并让 UI 响应，然后再开启录音
+            scope.launch {
+                delay(50)
+                voiceManager.startListening()
+            }
         } else {
             val activity = context as? android.app.Activity
             val showRationale = activity?.let { 
@@ -194,9 +199,10 @@ fun AiChatScreen(viewModel: AiChatViewModel) {
             } ?: true
             
             if (!showRationale) {
-                permissionGuideTitle = "麦克风权限已禁用"
-                permissionGuideMessage = "由于您拒绝了麦克风权限，目前无法使用语音录入功能。请前往系统设置手动开启。"
-                showPermissionGuide = true
+                permissionGuideState.value = PermissionGuideData(
+                    title = "麦克风权限已禁用",
+                    message = "由于您拒绝了麦克风权限，目前无法使用语音录入功能。请前往系统设置手动开启。"
+                )
             } else {
                 Toast.makeText(context, "请授权麦克风权限以使用语音功能", Toast.LENGTH_SHORT).show()
             }
@@ -228,17 +234,19 @@ fun AiChatScreen(viewModel: AiChatViewModel) {
             } ?: true
             
             if (!showRationale) {
-                permissionGuideTitle = "相机权限已禁用"
-                permissionGuideMessage = "由于您拒绝了相机权限，请前往系统设置手动开启，否则无法使用拍照识别功能。"
-                showPermissionGuide = true
+                permissionGuideState.value = PermissionGuideData(
+                    title = "相机权限已禁用",
+                    message = "由于您拒绝了相机权限，请前往系统设置手动开启，否则无法使用拍照识别功能。"
+                )
             } else {
                 Toast.makeText(context, "请授权相机权限以进行拍摄", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    if (showPermissionGuide) {
-        Dialog(onDismissRequest = { showPermissionGuide = false }) {
+    /* Permission Guide Dialog */
+    permissionGuideState.value?.let { guideData ->
+        Dialog(onDismissRequest = { permissionGuideState.value = null }) {
             NeoCard(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp),
                 backgroundColor = Color.White
@@ -248,23 +256,25 @@ fun AiChatScreen(viewModel: AiChatViewModel) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Text(permissionGuideTitle, fontWeight = FontWeight.Black, fontSize = 20.sp, color = NeoBlack)
-                    Text(permissionGuideMessage, fontSize = 14.sp, color = NeoBlack, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                    Text("权限申请", fontWeight = FontWeight.Black, fontSize = 20.sp, color = NeoBlack)
+                    Text(guideData.title, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = NeoBlack)
+                    Text(guideData.message, fontSize = 14.sp, color = NeoBlack, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
                     
                     NeoButton(
                         text = "🚀 前往系统设置",
                         onClick = {
+                            permissionGuideState.value = null
                             val intent = android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                                data = Uri.fromParts("package", context.packageName, null)
+                                val uri = Uri.fromParts("package", context.packageName, null)
+                                data = uri
                             }
                             context.startActivity(intent)
-                            showPermissionGuide = false
                         },
                         modifier = Modifier.fillMaxWidth(),
                         backgroundColor = Color(0xFFFACC15)
                     )
                     
-                    TextButton(onClick = { showPermissionGuide = false }) {
+                    TextButton(onClick = { permissionGuideState.value = null }) {
                         Text("稍后再说", color = NeoBlack.copy(alpha = 0.5f), fontWeight = FontWeight.Bold)
                     }
                 }
@@ -1161,3 +1171,5 @@ fun ChatRecipeLayout(recipe: Recipe, isFavorite: Boolean, onFavoriteClick: () ->
         }
     }
 }
+
+data class PermissionGuideData(val title: String, val message: String)

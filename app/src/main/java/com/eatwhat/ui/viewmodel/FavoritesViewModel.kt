@@ -10,6 +10,7 @@ import com.eatwhat.data.repository.AiRepository
 import com.eatwhat.data.repository.FavoriteRepository
 import com.eatwhat.data.repository.GalleryRepository
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.async
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -34,9 +35,6 @@ class FavoritesViewModel(
         }
     }
 
-    fun refresh() {
-        // Now handled by Flow collection
-    }
 
     fun updateSearch(query: String) { _searchQuery.value = query }
 
@@ -55,6 +53,9 @@ class FavoritesViewModel(
 
     private val _isGeneratingImage = mutableStateOf(false)
     val isGeneratingImage: State<Boolean> = _isGeneratingImage
+
+    private val _isAnalyzingDeepInsights = mutableStateOf(false)
+    val isAnalyzingDeepInsights: State<Boolean> = _isAnalyzingDeepInsights
 
     fun generateImage(recipe: Recipe, onComplete: (String?) -> Unit) {
         viewModelScope.launch {
@@ -78,6 +79,28 @@ class FavoritesViewModel(
             }
             result.onFailure { onComplete(null) }
             _isGeneratingImage.value = false
+        }
+    }
+
+    fun unlockDeepInsights(recipe: Recipe, onComplete: (Recipe) -> Unit) {
+        viewModelScope.launch {
+            _isAnalyzingDeepInsights.value = true
+            
+            // Parallel execution with synchronized update and persistence
+            val nutritionDeferred = async { aiRepository.getNutritionAnalysis(recipe) }
+            val wineDeferred = async { aiRepository.getWinePairing(recipe) }
+            
+            val nutritionRes = nutritionDeferred.await()
+            val wineRes = wineDeferred.await()
+            
+            val updated = recipe.copy(
+                nutritionAnalysis = nutritionRes.getOrNull(),
+                winePairing = wineRes.getOrNull()
+            )
+            repository.updateFavoriteRecipe(recipe.id, updated)
+            onComplete(updated)
+            
+            _isAnalyzingDeepInsights.value = false
         }
     }
 }

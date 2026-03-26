@@ -33,13 +33,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import com.eatwhat.R
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.Placeable
 
 val NeoBlack = Color(0xFF0A0910)
 
 /**
  * A custom clickable modifier that eliminates the default gray ripple/mask.
- * Ideal for Neo-Brutalism where hard edges and direct feedback are preferred.
- * Added immediate press feedback via offset.
+ * Optimized for maximum stability - No visual movement during press to avoid hit-testing issues.
  */
 fun Modifier.neoClickable(
     enabled: Boolean = true,
@@ -48,11 +49,11 @@ fun Modifier.neoClickable(
     val interactionSource = remember { MutableInteractionSource() }
     
     this.clickable(
-            interactionSource = interactionSource,
-            indication = null, // No ripple
-            enabled = enabled,
-            onClick = onClick
-        )
+        interactionSource = interactionSource,
+        indication = null, // No ripple
+        enabled = enabled,
+        onClick = onClick
+    )
 }
 
 @Composable
@@ -140,7 +141,7 @@ fun NeoButton(
                 .fillMaxWidth()
                 .background(backgroundColor, shape)
                 .border(2.dp, NeoBlack, shape)
-                .padding(horizontal = 12.dp, vertical = 12.dp),
+                .padding(horizontal = 12.dp, vertical = 8.dp),
             contentAlignment = Alignment.Center
         ) {
             Text(
@@ -442,6 +443,56 @@ fun NeoEmptyState(
         if (action != null) {
             Spacer(modifier = Modifier.height(48.dp))
             action()
+        }
+    }
+}
+@Composable
+fun FlowRow(
+    modifier: Modifier = Modifier,
+    spacing: Dp = 0.dp,
+    content: @Composable () -> Unit
+) {
+    Layout(
+        modifier = modifier,
+        content = content
+    ) { measurables, constraints ->
+        val placeholders = measurables.map { it.measure(constraints.copy(minWidth = 0)) }
+        val spacingPx = spacing.roundToPx()
+        
+        var currentRowWidth = 0
+        var currentRowHeight = 0
+        var totalHeight = 0
+        val rows = mutableListOf<List<Placeable>>()
+        var currentRow = mutableListOf<Placeable>()
+
+        placeholders.forEach { placeable ->
+            if (currentRowWidth + placeable.width + spacingPx > constraints.maxWidth) {
+                rows.add(currentRow)
+                totalHeight += currentRowHeight + spacingPx
+                currentRow = mutableListOf(placeable)
+                currentRowWidth = placeable.width
+                currentRowHeight = placeable.height
+            } else {
+                currentRow.add(placeable)
+                currentRowWidth += placeable.width + spacingPx
+                currentRowHeight = maxOf(currentRowHeight, placeable.height)
+            }
+        }
+        rows.add(currentRow)
+        totalHeight += currentRowHeight
+
+        layout(constraints.maxWidth, totalHeight) {
+            var y = 0
+            rows.forEach { row ->
+                var x = 0
+                var maxHeight = 0
+                row.forEach { placeable ->
+                    placeable.placeRelative(x, y)
+                    x += placeable.width + spacingPx
+                    maxHeight = maxOf(maxHeight, placeable.height)
+                }
+                y += maxHeight + spacingPx
+            }
         }
     }
 }

@@ -11,6 +11,8 @@ import com.eatwhat.data.repository.AiRepository
 import com.eatwhat.data.repository.FavoriteRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -35,6 +37,8 @@ class TodayEatViewModel(
     private val galleryRepository: com.eatwhat.data.repository.GalleryRepository
 ) : ViewModel() {
 
+    private var generateJob: Job? = null
+
     private val _isSelecting = mutableStateOf(false)
     val isSelecting: State<Boolean> = _isSelecting
 
@@ -55,6 +59,9 @@ class TodayEatViewModel(
 
     private val _preference = mutableStateOf<Preference?>(null)
     val preference: State<Preference?> = _preference
+
+    private val _isAnalyzingDeepInsights = mutableStateOf(false)
+    val isAnalyzingDeepInsights: State<Boolean> = _isAnalyzingDeepInsights
 
     private val _selectionStatus = mutableStateOf("")
     val selectionStatus: State<String> = _selectionStatus
@@ -77,7 +84,18 @@ class TodayEatViewModel(
         viewModelScope.launch {
             favoriteRepository.favoritesFlow.collect { list ->
                 _favorites.value = list
+                // Sync current recipe if it exists and has updates in favorites
+                _recipe.value?.let { current ->
+                    list.find { it.recipe.id == current.id }?.let { fav ->
+                        if (fav.recipe.nutritionAnalysis != null || fav.recipe.winePairing != null) {
+                             if (_recipe.value != fav.recipe) {
+                                 _recipe.value = fav.recipe
+                             }
+                        }
+                    }
+                }
             }
+            _isGeneratingImage.value = false
         }
     }
 
@@ -93,6 +111,8 @@ class TodayEatViewModel(
 
     fun startRandomSelection() {
         viewModelScope.launch {
+            generateJob?.cancel() // Cancel any ongoing recipe generation
+            _isGenerating.value = false
             _isSelecting.value = true
             _selectedDishes.value = emptyList()
             _selectedMaster.value = null
@@ -151,7 +171,8 @@ class TodayEatViewModel(
     fun generateRecipe() {
         if (_selectedMaster.value == null || _selectedDishes.value.isEmpty()) return
         
-        viewModelScope.launch {
+        generateJob?.cancel()
+        generateJob = viewModelScope.launch {
             _isGenerating.value = true
             _errorMessage.value = null
             val result = aiRepository.generateRecipe(_selectedDishes.value, _selectedMaster.value!!, "")
@@ -165,6 +186,8 @@ class TodayEatViewModel(
     }
 
     fun reset() {
+        generateJob?.cancel()
+        _isGenerating.value = false
         _selectedDishes.value = emptyList()
         _selectedMaster.value = null
         _recipe.value = null
@@ -214,6 +237,27 @@ class TodayEatViewModel(
                 onComplete(null)
             }
             _isGeneratingImage.value = false
+        }
+    }
+
+    fun unlockDeepInsights(recipe: Recipe) {
+        android.util.Log.d("EatWhat-AI", "Unlock requested for recipe: ${recipe.name}")
+        viewModelScope.launch {
+            _isAnalyzingDeepInsights.value = true
+            
+            // Parallel execution with synchronized update
+            val nutritionDeferred = async { aiRepository.getNutritionAnalysis(recipe) }
+            val wineDeferred = async { aiRepository.getWinePairing(recipe) }
+            
+            val nutritionRes = nutritionDeferred.await()
+            val wineRes = wineDeferred.await()
+            
+            _recipe.value = _recipe.value?.copy(
+                nutritionAnalysis = nutritionRes.getOrNull(),
+                winePairing = wineRes.getOrNull()
+            )
+            
+            _isAnalyzingDeepInsights.value = false
         }
     }
 }

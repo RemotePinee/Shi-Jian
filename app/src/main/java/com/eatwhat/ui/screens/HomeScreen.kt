@@ -18,6 +18,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.Dp
 import androidx.compose.foundation.BorderStroke
 import com.eatwhat.ui.theme.NeoBlack
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import androidx.compose.ui.window.Dialog
 import android.os.Environment
 import android.widget.Toast
@@ -59,6 +61,11 @@ fun HomeScreen(
             viewModel.clearError()
         }
     }
+
+    // Voice Management & Coroutines
+    val voiceManager = remember { VoiceInputManager(context) }
+    val scope = rememberCoroutineScope()
+    val showVoiceDialogState = remember { mutableStateOf(false) }
 
     // Image Management
     val showImageSourceDialogState = remember { mutableStateOf(false) }
@@ -105,6 +112,12 @@ fun HomeScreen(
                 // Feature: Automatically launch camera if it was just granted
                 if (permission == android.Manifest.permission.CAMERA) {
                     launchCamera()
+                } else if (permission == android.Manifest.permission.RECORD_AUDIO) {
+                    showVoiceDialogState.value = true
+                    scope.launch {
+                        delay(50)
+                        voiceManager.startListening()
+                    }
                 }
             } else {
                 val activity = context as? android.app.Activity
@@ -132,7 +145,6 @@ fun HomeScreen(
     }
 
     // Voice Management
-    val voiceManager = remember { VoiceInputManager(context) }
     
     // Properly clean up when the screen is disposed
     DisposableEffect(voiceManager) {
@@ -140,7 +152,6 @@ fun HomeScreen(
             voiceManager.destroy()
         }
     }
-    val showVoiceDialogState = remember { mutableStateOf(false) }
     val showVoiceDialog by showVoiceDialogState
     val voiceState by voiceManager.state
     val recognizedText by voiceManager.text
@@ -420,8 +431,17 @@ fun HomeScreen(
 
         // Results Section
         if (cuisineSlots.isNotEmpty()) {
-            LaunchedEffect(cuisineSlots.size) {
-                 // Scroll when slots are first created (generation starts)
+            // 逻辑 A: 监听生成结束（无论成功或失败），触发聚焦滚动
+            val triggerScrollCount = cuisineSlots.count { it.recipe != null || it.error != null }
+            LaunchedEffect(triggerScrollCount) {
+                if (triggerScrollCount > 0) {
+                    delay(300)
+                    scrollState.animateScrollTo(scrollState.maxValue)
+                }
+            }
+
+            // 逻辑 B: 保持原有的初始生成滚动
+            LaunchedEffect(cuisineSlots) {
                  scrollState.animateScrollTo(scrollState.maxValue)
             }
             
@@ -435,6 +455,10 @@ fun HomeScreen(
                             isFavorite = viewModel.isFavorite(slot.recipe.id),
                             isGenerating = viewModel.isGenerating(slot.recipe.id),
                             onFavoriteClick = { viewModel.toggleFavorite(slot.recipe) },
+                            isAnalyzingDeepInsights = viewModel.isAnalyzingDeepInsights.value,
+                            onUnlockDeepInsights = {
+                                viewModel.unlockDeepInsights(slot.recipe)
+                            },
                             onGenerateImage = {
                                 Toast.makeText(context, "正在为 '${slot.recipe.name}' 创作图鉴...", Toast.LENGTH_LONG).show()
                                 viewModel.generateImage(slot.recipe) { url ->
@@ -454,6 +478,16 @@ fun HomeScreen(
                                 color = Color(0xFF22C55E), // Changed Blue to NeoGreen
                                 trackColor = Color.White
                             )
+                        }
+                    } else if (slot.error != null) {
+                        NeoCard(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                            backgroundColor = Color(0xFFFEF2F2), // Neo-Red Soft
+                            shadowOffset = 4.dp
+                        ) {
+                            Text("${slot.name} 创作失败", fontWeight = FontWeight.Black, color = Color.Red, fontSize = 16.sp)
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(slot.error, color = NeoBlack, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }

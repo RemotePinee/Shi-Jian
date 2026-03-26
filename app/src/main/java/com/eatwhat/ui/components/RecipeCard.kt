@@ -26,6 +26,8 @@ fun RecipeCard(
     isGenerating: Boolean = false,
     onFavoriteClick: () -> Unit = {},
     onGenerateImage: () -> Unit = {},
+    isAnalyzingDeepInsights: Boolean = false,
+    onUnlockDeepInsights: () -> Unit = {},
     shadowOffset: androidx.compose.ui.unit.Dp = 6.dp,
     isFlat: Boolean = false,
     isContentScrollable: Boolean = false
@@ -117,8 +119,19 @@ fun RecipeCard(
         }
 
         // Content
+        val internalScrollState = rememberScrollState()
+        
+        // Auto-scroll when insights updated (for Overlay/Dialog usage)
+        LaunchedEffect(recipe.nutritionAnalysis != null, recipe.winePairing != null) {
+            if (isContentScrollable && (recipe.nutritionAnalysis != null || recipe.winePairing != null)) {
+                // Wait for content layout update
+                kotlinx.coroutines.delay(100)
+                internalScrollState.animateScrollTo(internalScrollState.maxValue)
+            }
+        }
+
         val contentModifier = if (isContentScrollable) {
-            Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState())
+            Modifier.weight(1f, fill = false).verticalScroll(internalScrollState)
         } else Modifier
 
         Column(modifier = Modifier.padding(16.dp).then(contentModifier)) {
@@ -189,6 +202,16 @@ fun RecipeCard(
                     }
                 }
             }
+
+            // Deep Insights Section
+            if (!recipe.isSauce) {
+                DeepInsightsSection(
+                    nutrition = recipe.nutritionAnalysis,
+                    pairing = recipe.winePairing,
+                    isLoading = isAnalyzingDeepInsights,
+                    onUnlock = onUnlockDeepInsights
+                )
+            }
         }
     }
 
@@ -230,55 +253,5 @@ fun RecipeStepItem(step: RecipeStep) {
     }
 }
 
-@Composable
-fun FlowRow(
-    modifier: Modifier = Modifier,
-    spacing: androidx.compose.ui.unit.Dp = 0.dp,
-    content: @Composable () -> Unit
-) {
-    androidx.compose.ui.layout.Layout(
-        modifier = modifier,
-        content = content
-    ) { measurables, constraints ->
-        val placeholders = measurables.map { it.measure(constraints.copy(minWidth = 0)) }
-        val spacingPx = spacing.roundToPx()
-        
-        var currentRowWidth = 0
-        var currentRowHeight = 0
-        var totalHeight = 0
-        val rows = mutableListOf<List<androidx.compose.ui.layout.Placeable>>()
-        var currentRow = mutableListOf<androidx.compose.ui.layout.Placeable>()
-
-        placeholders.forEach { placeable ->
-            if (currentRowWidth + placeable.width + spacingPx > constraints.maxWidth) {
-                rows.add(currentRow)
-                totalHeight += currentRowHeight + spacingPx
-                currentRow = mutableListOf(placeable)
-                currentRowWidth = placeable.width
-                currentRowHeight = placeable.height
-            } else {
-                currentRow.add(placeable)
-                currentRowWidth += placeable.width + spacingPx
-                currentRowHeight = maxOf(currentRowHeight, placeable.height)
-            }
-        }
-        rows.add(currentRow)
-        totalHeight += currentRowHeight
-
-        layout(constraints.maxWidth, totalHeight) {
-            var y = 0
-            rows.forEach { row ->
-                var x = 0
-                var maxHeight = 0
-                row.forEach { placeable ->
-                    placeable.placeRelative(x, y)
-                    x += placeable.width + spacingPx
-                    maxHeight = maxOf(maxHeight, placeable.height)
-                }
-                y += maxHeight + spacingPx
-            }
-        }
-    }
-}
 
 private fun rowBorder(width: androidx.compose.ui.unit.Dp, color: Color) = androidx.compose.foundation.BorderStroke(width, color)

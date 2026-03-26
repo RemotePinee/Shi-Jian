@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.async
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -57,6 +58,33 @@ class HomeViewModel(
 
     private val _favoritesRevision = mutableIntStateOf(0)
     val favoritesRevision: IntState = _favoritesRevision
+
+    private val _isAnalyzingDeepInsights = mutableStateOf(false)
+    val isAnalyzingDeepInsights: State<Boolean> = _isAnalyzingDeepInsights
+
+    init {
+        viewModelScope.launch {
+            favoriteRepository.favoritesFlow.collect { list ->
+                _favoritesRevision.intValue += 1
+                
+                // Sync cuisine slots with updated data from favorites
+                val currentSlots = _cuisineSlots.value
+                val updatedSlots = currentSlots.map { slot ->
+                    slot.recipe?.let { recipe ->
+                        list.find { it.recipe.id == recipe.id }?.let { fav ->
+                            // If the favorite entry has more info (nutrition/pairing), sync it
+                            if (fav.recipe.nutritionAnalysis != null || fav.recipe.winePairing != null) {
+                                slot.copy(recipe = fav.recipe)
+                            } else slot
+                        } ?: slot
+                    } ?: slot
+                }
+                if (updatedSlots != currentSlots) {
+                    _cuisineSlots.value = updatedSlots
+                }
+            }
+        }
+    }
 
     fun isGenerating(recipeId: String): Boolean = _isGeneratingImage.value[recipeId] ?: false
 
@@ -185,6 +213,36 @@ class HomeViewModel(
                 onComplete(null)
             }
             _isGeneratingImage.value += (recipe.id to false)
+        }
+    }
+
+    fun unlockDeepInsights(recipe: Recipe) {
+        viewModelScope.launch {
+            _isAnalyzingDeepInsights.value = true
+            
+            // Parallel execution with synchronized update
+            val nutritionDeferred = async { aiRepository.getNutritionAnalysis(recipe) }
+            val wineDeferred = async { aiRepository.getWinePairing(recipe) }
+            
+            val nutritionRes = nutritionDeferred.await()
+            val wineRes = wineDeferred.await()
+            
+            updateRecipeInSlots(recipe.id, nutritionRes.getOrNull(), wineRes.getOrNull())
+            _isAnalyzingDeepInsights.value = false
+        }
+    }
+
+    private fun updateRecipeInSlots(recipeId: String, nutrition: NutritionAnalysis?, pairing: WinePairing?) {
+        val updatedSlots = _cuisineSlots.value.toMutableList()
+        val index = updatedSlots.indexOfFirst { it.recipe?.id == recipeId }
+        if (index != -1) {
+            val currentRecipe = updatedSlots[index].recipe ?: return
+            val newRecipe = currentRecipe.copy(
+                nutritionAnalysis = nutrition ?: currentRecipe.nutritionAnalysis,
+                winePairing = pairing ?: currentRecipe.winePairing
+            )
+            updatedSlots[index] = updatedSlots[index].copy(recipe = newRecipe)
+            _cuisineSlots.value = updatedSlots
         }
     }
 }

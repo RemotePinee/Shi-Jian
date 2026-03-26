@@ -35,6 +35,7 @@ fun SauceDesignScreen(
     val currentSauce by viewModel.currentSauce
     val isLoadingRecs by viewModel.isLoadingRecommendations
     val isLoadingSauce by viewModel.isLoadingSauce
+    val errorMessage by viewModel.errorMessage
 
     Column(
         modifier = Modifier
@@ -124,32 +125,59 @@ fun SauceDesignScreen(
             LaunchedEffect(recommendations.size) {
                 scrollState.animateScrollTo(scrollState.maxValue)
             }
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("✨ 为您推荐", fontWeight = FontWeight.Black, color = NeoBlack, fontSize = 18.sp)
+            // 预设的多彩色调 (Neo-Brutalist Pastels)
+            val sauceCardColors = listOf(
+                Color(0xFFF5F3FF), // Purple
+                Color(0xFFFEF2F2), // Red/Pink
+                Color(0xFFF0FDF4), // Green
+                Color(0xFFFFFBEB), // Yellow/Amber
+                Color(0xFFF0F9FF)  // Blue
+            )
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text("🥣 为您推荐", fontWeight = FontWeight.Black, color = NeoBlack, fontSize = 18.sp)
                 
-                recommendations.forEachIndexed { index, name ->
-                    NeoCard(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .neoClickable { viewModel.selectSauce(name) },
-                        backgroundColor = Color(0xFFFAF5FF),
-                        padding = 12.dp // Corrected from paddingSize
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Surface(
-                                shape = RoundedCornerShape(8.dp),
-                                color = Color(0xFF8B5CF6),
-                                modifier = Modifier.size(28.dp)
-                            ) {
-                                Box(contentAlignment = Alignment.Center) {
-                                    Text((index + 1).toString(), color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                                }
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    maxItemsInEachRow = 2
+                ) {
+                    recommendations.forEachIndexed { index, name ->
+                        NeoCard(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth(0.45f)
+                                .neoClickable { viewModel.selectSauce(name) },
+                            backgroundColor = sauceCardColors[index % sauceCardColors.size],
+                            padding = 12.dp,
+                            shadowOffset = 4.dp
+                        ) {
+                            Box(modifier = Modifier.fillMaxWidth().heightIn(min = 40.dp), contentAlignment = Alignment.Center) {
+                                Text(
+                                    text = name,
+                                    fontWeight = FontWeight.Black,
+                                    fontSize = 14.sp,
+                                    color = NeoBlack,
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                    lineHeight = 18.sp
+                                )
                             }
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Text(name, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = NeoBlack)
                         }
                     }
                 }
+            }
+        } else if (errorMessage != null && currentSauce == null) {
+            LaunchedEffect(errorMessage) {
+                scrollState.animateScrollTo(scrollState.maxValue)
+            }
+            NeoCard(
+                modifier = Modifier.fillMaxWidth(),
+                backgroundColor = Color(0xFFFEF2F2),
+                shadowOffset = 4.dp
+            ) {
+                Text("推荐获取失败", fontWeight = FontWeight.Black, color = Color.Red, fontSize = 16.sp)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(errorMessage ?: "请检查 API 设置或网络连接", color = NeoBlack, fontSize = 12.sp, fontWeight = FontWeight.Bold)
             }
         }
 
@@ -161,6 +189,19 @@ fun SauceDesignScreen(
             NeoCard(modifier = Modifier.fillMaxWidth()) {
                 Text("AI大师正在准备酱料配方...", fontWeight = FontWeight.Black, color = NeoBlack)
                 LinearProgressIndicator(modifier = Modifier.fillMaxWidth().height(8.dp).border(1.dp, NeoBlack, RoundedCornerShape(4.dp)), color = Color(0xFF8B5CF6), trackColor = Color.White)
+            }
+        } else if (errorMessage != null && currentSauce == null && recommendations.isNotEmpty()) {
+            LaunchedEffect(errorMessage) {
+                scrollState.animateScrollTo(scrollState.maxValue)
+            }
+            NeoCard(
+                modifier = Modifier.fillMaxWidth(),
+                backgroundColor = Color(0xFFFEF2F2),
+                shadowOffset = 4.dp
+            ) {
+                Text("教程生成失败", fontWeight = FontWeight.Black, color = Color.Red, fontSize = 16.sp)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(errorMessage ?: "请检查 API 设置或稍后重试", color = NeoBlack, fontSize = 12.sp, fontWeight = FontWeight.Bold)
             }
         }
 

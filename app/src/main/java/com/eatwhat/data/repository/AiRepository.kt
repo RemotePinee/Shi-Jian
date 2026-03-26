@@ -211,34 +211,37 @@ class AiRepository(private val context: Context, private val settings: SettingsR
     }
 
     suspend fun generateRecipe(ingredients: List<String>, cuisine: CuisineType, customPrompt: String? = null): Result<Recipe> {
-        var prompt = "${cuisine.prompt}\n\n用户提供的食材：${ingredients.joinToString("、")}"
-        if (customPrompt != null) prompt += "\n\n用户的特殊要求：$customPrompt"
-        
-        prompt += """
-            
-            请生成一份详细实用的菜谱，要求：
-            1. 食材清单要包含具体用量（如：猪肉300g、生抽2勺、盐1茶匙）
-            2. 每个食材/调料必须是独立的数组项，严禁将多种调料用逗号或顿号合并成一个字符串（如：不要出现"调料：盐、生抽"这种合并项）。
-            3. 制作步骤要详细具体，包含具体的操作方法、准确的时间控制、火候掌握及关键判断标准。
-            4. 烹饪技巧要实用。
-            
-            请按照以下JSON格式返回菜谱：
-            {
-              "name": "菜品名称",
-              "ingredients": ["主料1 300g", "调料1 2勺", "配菜1 100g"],
-              "steps": [
-                {
-                  "step": 1,
-                  "description": "详细的操作描述",
-                  "time": 5,
-                  "temperature": "中火"
-                }
-              ],
-              "cookingTime": 30,
-              "difficulty": "medium",
-              "tips": ["技巧1"]
+        val prompt = buildString {
+            append("${cuisine.prompt}\n\n用户提供的食材：${ingredients.joinToString("、")}")
+            if (customPrompt != null) {
+                append("\n\n用户的特殊要求：$customPrompt")
             }
-        """.trimIndent()
+            append("""
+                
+                请生成一份详细实用的菜谱，要求：
+                1. 食材清单要包含具体用量（如：猪肉300g、生抽2勺、盐1茶匙）
+                2. 每个食材/调料必须是独立的数组项，严禁将多种调料用逗号或顿号合并成一个字符串（如：不要出现"调料：盐、生抽"这种合并项）。
+                3. 制作步骤要详细具体，包含具体的操作方法、准确的时间控制、火候掌握及关键判断标准。
+                4. 烹饪技巧要实用。
+                
+                请按照以下JSON格式返回菜谱：
+                {
+                  "name": "菜品名称",
+                  "ingredients": ["主料1 300g", "调料1 2勺", "配菜1 100g"],
+                  "steps": [
+                    {
+                      "step": 1,
+                      "description": "详细的操作描述",
+                      "time": 5,
+                      "temperature": "中火"
+                    }
+                  ],
+                  "cookingTime": 30,
+                  "difficulty": "medium",
+                  "tips": ["技巧1"]
+                }
+            """.trimIndent())
+        }
         
         val systemMsg = "你是一位经验丰富的专业厨师。请严格按照JSON格式返回，不要包含任何其他文字。"
         val res = callAi(systemMsg, prompt, Recipe::class.java)
@@ -254,9 +257,37 @@ class AiRepository(private val context: Context, private val settings: SettingsR
 
     private fun sanitizeIngredients(list: List<String>): List<String> {
         return list.flatMap { item ->
-            // Split by common delimiters if the AI groups them
-            val parts = item.split("[,，、]".toRegex())
-            parts.map { it.trim() }
+            val result = mutableListOf<String>()
+            val current = StringBuilder()
+            var balance = 0
+            
+            for (char in item) {
+                when (char) {
+                    '(', '（' -> {
+                        balance++
+                        current.append(char)
+                    }
+                    ')', '）' -> {
+                        if (balance > 0) balance--
+                        current.append(char)
+                    }
+                    ',', '，', '、' -> {
+                        if (balance == 0) {
+                            val part = current.toString().trim()
+                            if (part.isNotEmpty()) result.add(part)
+                            current.setLength(0)
+                        } else {
+                            current.append(char)
+                        }
+                    }
+                    else -> current.append(char)
+                }
+            }
+            
+            val lastPart = current.toString().trim()
+            if (lastPart.isNotEmpty()) result.add(lastPart)
+            
+            result.map { it.trim() }
                 .filter { it.isNotEmpty() }
                 .map { if (it.startsWith("调料：") || it.startsWith("调料:")) it.substring(3).trim() else it }
                 .filter { it.isNotEmpty() }
@@ -405,19 +436,19 @@ class AiRepository(private val context: Context, private val settings: SettingsR
 
     suspend fun generateDailyFortune(zodiac: String, animal: String): Result<FortuneResult> {
         val prompt = """
-            星座：$zodiac，生肖：$animal。请结合星座生肖为用户推荐今日幸运菜并给出占卜理由。
-            请按照以下JSON格式返回：
+            星座：$zodiac，生肖：$animal。请深度结合星座生肖，为用户推荐今日幸运菜并给出神秘占卜寄语。
+            请严格按照以下JSON格式返回（寄语与菜名置于顶部）：
             {
               "dishName": "菜名",
-              "reason": "占卜理由",
+              "mysticalMessage": "一句充满玄学色彩的神秘寄语",
+              "description": "基于星座生肖的今日运势深度解读",
               "luckyIndex": 95,
-              "description": "今日运势描述",
-              "tips": ["建议1"],
+              "reason": "推荐理由解析",
+              "tips": ["厨艺建议1"],
               "difficulty": "easy",
               "cookingTime": 15,
-              "mysticalMessage": "神秘寄语",
               "ingredients": ["主要食材 200g", "配料 10g"],
-              "steps": ["1. 步骤描述", "2. 步骤描述"]
+              "steps": ["1. 描述", "2. 描述"]
             }
         """.trimIndent()
         val res = callAi("你是一位神秘的料理占卜师。请严格按JSON返回。每个食材/调料必须是独立的数组项，严禁合并。", prompt, FortuneResult::class.java)
@@ -431,19 +462,19 @@ class AiRepository(private val context: Context, private val settings: SettingsR
 
     suspend fun generateMoodCooking(moods: List<String>, intensity: Int): Result<FortuneResult> {
         val prompt = """
-            当前心情：${moods.joinToString("、")}，强度：$intensity/5。请推荐一道治愈菜品并给出情感分析。
-            请按照以下JSON格式返回：
+            当前心情：${moods.joinToString("、")}，强度：$intensity/5。请推荐一道治愈菜品并给出情感解析。
+            请严格按照以下JSON格式返回（寄语与菜名置于顶部）：
             {
               "dishName": "治愈菜名",
-              "reason": "情感解析与推荐逻辑",
+              "mysticalMessage": "一句温暖治愈的心情语录",
+              "description": "针对当前心情的情感寄语",
               "luckyIndex": 88,
-              "description": "心情寄语",
+              "reason": "推荐逻辑",
               "tips": ["厨艺小贴士"],
               "difficulty": "medium",
               "cookingTime": 20,
-              "mysticalMessage": "治愈系的一句话",
               "ingredients": ["食材1 100g", "调料2"],
-              "steps": ["1. 第一步操作", "2. 第二步操作"]
+              "steps": ["1. 操作说明", "2. 操作说明"]
             }
         """.trimIndent()
         val res = callAi("你是一位温暖的情感治愈料理占卜师。请严格按JSON返回。每个食材/调料必须是独立的数组项，严禁合并。", prompt, FortuneResult::class.java)
@@ -456,19 +487,19 @@ class AiRepository(private val context: Context, private val settings: SettingsR
 
     suspend fun generateNumberFortune(number: Int): Result<FortuneResult> {
         val prompt = """
-            幸运数字：$number。请解析数字寓意并推荐对应的幸运菜。
-            请按照以下JSON格式返回：
+            幸运数字：$number。请深度解析数字寓意并推荐幸运菜。
+            请严格按照以下JSON格式返回（寄语与菜名置于顶部）：
             {
-              "dishName": "幸运数字菜名",
-              "reason": "数字寓意解析",
+              "dishName": "幸运菜名",
+              "mysticalMessage": "关于这个数字的神秘寄语",
+              "description": "数字占卜解析",
               "luckyIndex": 99,
-              "description": "数字占卜解读",
+              "reason": "寓意解析",
               "tips": ["小贴士"],
               "difficulty": "easy",
               "cookingTime": 10,
-              "mysticalMessage": "数字相关的寄语",
               "ingredients": ["对应食材"],
-              "steps": ["1. 简单步骤", "2. 步骤"]
+              "steps": ["1. 步骤", "2. 步骤"]
             }
         """.trimIndent()
         val res = callAi("你是一位精通数字占卜的料理大师。请严格按JSON返回。每个食材/调料必须是独立的数组项，严禁合并。", prompt, FortuneResult::class.java)
@@ -479,7 +510,6 @@ class AiRepository(private val context: Context, private val settings: SettingsR
         ) }
     }
 
-    @Suppress("unused")
     suspend fun getNutritionAnalysis(recipe: Recipe): Result<NutritionAnalysis> {
         val prompt = """
             请为菜品'${recipe.name}'生成营养分析。
@@ -498,20 +528,27 @@ class AiRepository(private val context: Context, private val settings: SettingsR
         return callAi("你是一位专业的营养师。请严格按JSON返回数据。", prompt, NutritionAnalysis::class.java)
     }
 
-    @Suppress("unused")
     suspend fun getWinePairing(recipe: Recipe): Result<WinePairing> {
         val prompt = """
-            请为菜品'${recipe.name}'推荐搭配的平民化饮品。
+            请为菜品'${recipe.name}'推荐一款绝佳的灵魂饮品。
+            食材组成：${recipe.ingredients.joinToString("、")}
+            
+            要求：
+            1. 饮品种类要多样化，不要局限于绿茶或白开水。可以是特色中式茶（如大红袍、鸭屎香）、鲜煎果蔬汁、手作特饮、气泡水、甚至是适合佐餐的无酒精鸡尾酒。
+            2. 推荐逻辑要专业：根据菜品的主味调（油腻度、辣度、咸甜口）进行精准匹配，实现解腻、提味或口感上的奇妙碰撞。
+            3. 饮品名称要诱人，理由要专业且有趣。
+            4. 给出建议的饮用温度。
+            
             请按照以下JSON格式返回：
             {
-              "name": "推荐饮品",
-              "type": "soft_drink",
-              "reason": "搭配理由",
-              "servingTemperature": "冰镇",
-              "flavor": "口感描述"
+              "name": "饮品全名",
+              "type": "饮品类别",
+              "reason": "为什么它与这道菜是绝配？",
+              "servingTemperature": "常温/冰镇/热水/55℃温饮",
+              "flavor": "口感细节描述"
             }
         """.trimIndent()
-        return callAi("你是一位专业的饮品搭配师。请严格按JSON返回结果。", prompt, WinePairing::class.java)
+        return callAi("你是一位精致生活的饮品搭配师。请严格按JSON返回结果。", prompt, WinePairing::class.java)
     }
 
     suspend fun generateImage(recipe: Recipe): Result<String> = withContext(Dispatchers.IO) {
@@ -717,6 +754,71 @@ class AiRepository(private val context: Context, private val settings: SettingsR
         var clean = content.trim()
         if (clean.startsWith("```json")) clean = clean.removePrefix("```json").removeSuffix("```").trim()
         else if (clean.startsWith("```")) clean = clean.removePrefix("```").removeSuffix("```").trim()
-        return clean
+        
+        return try {
+            fixUnterminatedJson(clean)
+        } catch (e: Exception) {
+            clean
+        }
+    }
+
+    /**
+     * Attempts to fix JSON strings that were truncated (e.g., due to AI max tokens).
+     * It closes unclosed strings and balances brackets using a stack.
+     */
+    private fun fixUnterminatedJson(json: String): String {
+        val result = json.trim()
+        if (result.isEmpty()) return result
+        
+        val openBrackets = mutableListOf<Char>()
+        var inString = false
+        var escaped = false
+        
+        for (i in result.indices) {
+            val char = result[i]
+            if (escaped) {
+                escaped = false
+                continue
+            }
+            if (char == '\\') {
+                escaped = true
+                continue
+            }
+            if (char == '"') {
+                inString = !inString
+                continue
+            }
+            
+            if (!inString) {
+                when (char) {
+                    '{', '[' -> openBrackets.add(char)
+                    '}', ']' -> {
+                        if (openBrackets.isNotEmpty()) {
+                            val last = openBrackets.last()
+                            if ((char == '}' && last == '{') || (char == ']' && last == '[')) {
+                                openBrackets.removeAt(openBrackets.size - 1)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        var fixedResult = result
+        // 1. Close string if it was cut off inside a string literal
+        if (inString) {
+            fixedResult += "\""
+        }
+        
+        // 2. Remove trailing commas if they are followed by nothing (invalid in JSON)
+        fixedResult = fixedResult.trim().removeSuffix(",")
+        
+        // 3. Close open brackets in reverse order
+        while (openBrackets.isNotEmpty()) {
+            val last = openBrackets.removeAt(openBrackets.size - 1)
+            fixedResult += if (last == '{') "}" else "]"
+        }
+        
+        return fixedResult
     }
 }

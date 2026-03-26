@@ -1,8 +1,10 @@
 package com.eatwhat.ui.viewmodel
 
 import androidx.compose.runtime.FloatState
+import androidx.compose.runtime.IntState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -35,6 +37,14 @@ class SauceDesignViewModel(
     private val _sourLevel = mutableFloatStateOf(2f)
     val sourLevel: FloatState = _sourLevel
 
+    private val _errorMessage = mutableStateOf<String?>(null)
+    val errorMessage: State<String?> = _errorMessage
+
+    private val _favoritesRevision = mutableIntStateOf(0)
+    val favoritesRevision: IntState = _favoritesRevision
+
+    fun clearError() { _errorMessage.value = null }
+
     private val _selectedUseCases = mutableStateListOf<String>()
     val selectedUseCases: List<String> = _selectedUseCases
 
@@ -65,6 +75,7 @@ class SauceDesignViewModel(
 
     fun getRecommendations() {
         viewModelScope.launch {
+            clearError()
             _isLoadingRecommendations.value = true
             _currentSauce.value = null
             
@@ -80,8 +91,10 @@ class SauceDesignViewModel(
             val result = aiRepository.recommendSauces(pref)
             result.onSuccess {
                 _recommendations.value = it
-            }.onFailure {
-                _recommendations.value = listOf("失败了，请重试")
+                _errorMessage.value = null
+            }.onFailure { error ->
+                _recommendations.value = emptyList()
+                _errorMessage.value = error.message ?: "推荐失败，请检查设置"
             }
             _isLoadingRecommendations.value = false
         }
@@ -89,20 +102,22 @@ class SauceDesignViewModel(
 
     fun selectSauce(name: String) {
         viewModelScope.launch {
+            clearError()
             _isLoadingSauce.value = true
             _currentSauce.value = null
             
             val result = aiRepository.generateSauceRecipe(name)
             result.onSuccess {
                 _currentSauce.value = it
-            }.onFailure {
-                // Error handling
+                _errorMessage.value = null
+            }.onFailure { error ->
+                _errorMessage.value = error.message ?: "配方请求失败，请稍后重试"
             }
             _isLoadingSauce.value = false
         }
     }
-
     fun isFavorite(id: String): Boolean {
+        favoritesRevision.intValue // Subscribe to changes
         return favoriteRepository.isFavorite(id)
     }
 
@@ -118,7 +133,8 @@ class SauceDesignViewModel(
                 steps = sauce.steps.map { RecipeStep(it.step, it.description, it.time, it.temperature) },
                 cookingTime = sauce.makingTime,
                 difficulty = sauce.difficulty,
-                tips = sauce.tips
+                tips = sauce.tips,
+                isSauce = true
             )
             favoriteRepository.addFavorite(
                 FavoriteRecipe(
@@ -128,6 +144,7 @@ class SauceDesignViewModel(
                 )
             )
         }
+        _favoritesRevision.intValue += 1
     }
 
     fun generateImage(recipe: Recipe, onComplete: (String?) -> Unit) {

@@ -8,6 +8,7 @@ import androidx.core.content.edit
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import com.eatwhat.data.model.Recipe
 
 class FavoriteRepository(context: Context) {
     private val prefs = context.getSharedPreferences("favorites_prefs", Context.MODE_PRIVATE)
@@ -42,6 +43,16 @@ class FavoriteRepository(context: Context) {
             saveList(list)
         }
     }
+
+    fun updateFavoriteRecipe(recipeId: String, updatedRecipe: Recipe) {
+        val list = getFavorites().toMutableList()
+        val index = list.indexOfFirst { it.recipe.id == recipeId }
+        if (index != -1) {
+            list[index] = list[index].copy(recipe = updatedRecipe)
+            saveList(list)
+        }
+    }
+
 
     fun removeFavorite(recipeId: String) {
         val list = getFavorites().toMutableList()

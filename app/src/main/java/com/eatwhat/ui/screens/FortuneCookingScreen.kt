@@ -205,10 +205,42 @@ fun FortuneCookingScreen(
                     }
                 }
                 FortuneType.NUMBER -> {
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-                        Text(luckyNumber.toString(), fontSize = 48.sp, fontWeight = FontWeight.Black)
-                        Spacer(modifier = Modifier.width(16.dp))
-                        NeoButton(text = "🎲 随机", onClick = { viewModel.generateRandomNumber() })
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Lucky Number Card
+                        NeoCard(
+                            backgroundColor = Color(0xFFF5F3FF), // Light Purple
+                            shadowOffset = 4.dp,
+                            borderWidth = 3,
+                            padding = 0.dp,
+                            fullWidth = false // Fix: don't take up entire Row width
+                        ) {
+                            Box(
+                                modifier = Modifier.size(width = 80.dp, height = 70.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = luckyNumber.toString(),
+                                    fontSize = 40.sp,
+                                    fontWeight = FontWeight.Black,
+                                    color = NeoBlack
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.width(20.dp))
+
+                        // Random Button with matching height and constrained width
+                        NeoButton(
+                            text = "🎲 随机",
+                            onClick = { viewModel.generateRandomNumber() },
+                            modifier = Modifier.height(70.dp).width(120.dp), // Constrain width
+                            backgroundColor = Color(0xFFFB923C),
+                            shadowOffset = 4.dp
+                        )
                     }
                 }
             }
@@ -239,16 +271,22 @@ fun FortuneCookingScreen(
 
         // Result
         fortuneResult?.let { fortune ->
-            LaunchedEffect(fortune.id) {
+            val context = androidx.compose.ui.platform.LocalContext.current
+            
+            // Auto-scroll whenever result ID changes OR deep insights content expands
+            LaunchedEffect(fortune, fortune.nutritionAnalysis != null, fortune.winePairing != null) {
                 scrollState.animateScrollTo(scrollState.maxValue)
             }
             // Removed extra 24.dp spacer - parent Column Arrangement.spacedBy(16.dp) handles it
             val isFavorite = viewModel.isFavorite(fortune.id)
-            val context = androidx.compose.ui.platform.LocalContext.current
             FortuneCard(
                 fortune = fortune,
                 isFavorite = isFavorite,
                 isGenerating = viewModel.isGeneratingImage.value,
+                isAnalyzingDeepInsights = viewModel.isAnalyzingDeepInsights.value,
+                onUnlockDeepInsights = {
+                    viewModel.unlockDeepInsights(fortune)
+                },
                 onFavoriteClick = { viewModel.toggleFavorite(fortune) },
                 onGenerateImage = {
                     val recipe = Recipe(
@@ -284,35 +322,28 @@ fun FortuneCookingScreen(
 @Composable
 fun FortuneCard(
     fortune: FortuneResult,
-    isFavorite: Boolean,
-    onFavoriteClick: () -> Unit,
+    isFavorite: Boolean = false,
+    isGenerating: Boolean = false,
+    isAnalyzingDeepInsights: Boolean = false,
+    onFavoriteClick: () -> Unit = {},
     onGenerateImage: () -> Unit = {},
-    isGenerating: Boolean = false
+    onUnlockDeepInsights: () -> Unit = {}
 ) {
     NeoCard(modifier = Modifier.fillMaxWidth(), backgroundColor = Color.White) {
-        Column {
-            Box(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("🔮 占卜结果", fontWeight = FontWeight.Black, fontSize = 20.sp)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(fortune.dishName, fontWeight = FontWeight.Black, fontSize = 26.sp, color = Color(0xFFFDA4AF))
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(fortune.mysticalMessage, textAlign = TextAlign.Center, fontSize = 15.sp, color = NeoBlack, fontWeight = FontWeight.Bold)
-                    
-                    Spacer(modifier = Modifier.height(20.dp))
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("幸运指数", fontSize = 12.sp, color = NeoBlack, fontWeight = FontWeight.Bold)
-                            Text("${fortune.luckyIndex}/10", fontWeight = FontWeight.Black, color = Color(0xFFDB2777))
-                        }
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("推荐理由", fontSize = 12.sp, color = NeoBlack, fontWeight = FontWeight.Bold)
-                            Text(fortune.reason, fontWeight = FontWeight.Black, fontSize = 13.sp, color = NeoBlack)
-                        }
-                    }
+        Column(modifier = Modifier.fillMaxWidth()) {
+            // Header with Buttons
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("🔮", fontSize = 22.sp)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("占卜结果", fontWeight = FontWeight.Black, fontSize = 20.sp)
                 }
 
-                Row(modifier = Modifier.align(Alignment.TopEnd)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     // Generate Image Button
                     Surface(
                         modifier = Modifier
@@ -334,7 +365,7 @@ fun FortuneCard(
                             }
                         }
                     }
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(10.dp))
                     // Favorite Button
                     Surface(
                         modifier = Modifier
@@ -353,34 +384,159 @@ fun FortuneCard(
                     }
                 }
             }
-            
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Dish Name & Mystical Message
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = fortune.dishName,
+                    fontWeight = FontWeight.Black,
+                    fontSize = 32.sp,
+                    color = Color(0xFFFDA4AF),
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                // Sentiments / Mystical Message
+                Surface(
+                    color = Color(0xFFFFF7ED),
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                ) {
+                    Text(
+                        text = "「 ${fortune.mysticalMessage} 」",
+                        modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
+                        textAlign = TextAlign.Center,
+                        fontSize = 15.sp,
+                        color = Color(0xFF9A3412),
+                        fontWeight = FontWeight.Black
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Fortune Stats & Reason
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Lucky Index Badge
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Surface(
+                        color = Color(0xFFDB2777),
+                        shape = RoundedCornerShape(20.dp),
+                        border = androidx.compose.foundation.BorderStroke(2.dp, NeoBlack)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("幸运指数", fontSize = 12.sp, color = Color.White, fontWeight = FontWeight.Black)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "${fortune.luckyIndex}/10",
+                                fontWeight = FontWeight.Black,
+                                fontSize = 18.sp,
+                                color = Color.White
+                            )
+                        }
+                    }
+                }
+
+                // Reason Block (Full Width)
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = Color(0xFFF1F5F9),
+                    shape = RoundedCornerShape(12.dp),
+                    border = androidx.compose.foundation.BorderStroke(2.dp, NeoBlack)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = "🔮 推荐理由",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Black,
+                            color = NeoBlack.copy(alpha = 0.6f)
+                        )
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text(
+                            text = fortune.reason,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp,
+                            color = NeoBlack,
+                            lineHeight = 22.sp
+                        )
+                    }
+                }
+            }
+
+            // Description / Fortune Analysis
+            if (fortune.description.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = fortune.description,
+                    fontSize = 13.sp,
+                    color = NeoBlack.copy(alpha = 0.8f),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth(),
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
             // Ingredients and Steps
             if (!fortune.ingredients.isNullOrEmpty()) {
+                Spacer(modifier = Modifier.height(32.dp))
+                HorizontalDivider(thickness = 2.dp, color = NeoBlack.copy(0.1f))
                 Spacer(modifier = Modifier.height(24.dp))
-                Text("🥣 烹饪食材", fontWeight = FontWeight.Black, fontSize = 16.sp, color = NeoBlack)
-                Spacer(modifier = Modifier.height(8.dp))
+                
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("🥣", fontSize = 20.sp)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("烹饪食材", fontWeight = FontWeight.Black, fontSize = 18.sp, color = NeoBlack)
+                }
+                Spacer(modifier = Modifier.height(12.dp))
                 fortune.ingredients.forEach { ing ->
-                    Text("• $ing", fontSize = 14.sp, color = NeoBlack, fontWeight = FontWeight.Bold)
+                    Text("• $ing", fontSize = 15.sp, color = NeoBlack, fontWeight = FontWeight.Bold)
                 }
             }
 
             if (!fortune.steps.isNullOrEmpty()) {
-                Spacer(modifier = Modifier.height(24.dp))
-                Text("📝 制作步骤", fontWeight = FontWeight.Black, fontSize = 16.sp, color = NeoBlack)
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(32.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("📝", fontSize = 20.sp)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("制作步骤", fontWeight = FontWeight.Black, fontSize = 18.sp, color = NeoBlack)
+                }
+                Spacer(modifier = Modifier.height(12.dp))
                 fortune.steps.forEachIndexed { index, step ->
-                    Row(modifier = Modifier.padding(vertical = 4.dp)) {
+                    Row(modifier = Modifier.padding(vertical = 6.dp)) {
                         Box(
-                            modifier = Modifier.size(20.dp).background(NeoBlack, RoundedCornerShape(4.dp)),
+                            modifier = Modifier
+                                .size(24.dp)
+                                .background(NeoBlack, RoundedCornerShape(6.dp)),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text((index + 1).toString(), color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                            Text((index + 1).toString(), color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                         }
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(step, fontSize = 13.sp, color = NeoBlack, fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(step, fontSize = 14.sp, color = NeoBlack, fontWeight = FontWeight.Bold, lineHeight = 20.sp)
                     }
                 }
             }
+
+            // Deep Insights Section (Nutrition & Beverage)
+            DeepInsightsSection(
+                nutrition = fortune.nutritionAnalysis,
+                pairing = fortune.winePairing,
+                isLoading = isAnalyzingDeepInsights,
+                onUnlock = onUnlockDeepInsights
+            )
         }
     }
 }

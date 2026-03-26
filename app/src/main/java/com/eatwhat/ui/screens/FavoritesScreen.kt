@@ -31,7 +31,7 @@ import com.eatwhat.ui.viewmodel.FavoritesViewModel
 fun FavoritesScreen(viewModel: FavoritesViewModel) {
     val favorites = viewModel.filterFavorites()
     val searchQuery by viewModel.searchQuery
-    var selectedRecipe by remember { mutableStateOf<Recipe?>(null) }
+    val selectedRecipe = remember { mutableStateOf<Recipe?>(null) }
     val context = androidx.compose.ui.platform.LocalContext.current
 
     Column(
@@ -109,7 +109,7 @@ fun FavoritesScreen(viewModel: FavoritesViewModel) {
                         items(favorites, key = { it.recipe.id }) { fav ->
                             FavoriteCompactCard(
                                 recipe = fav.recipe,
-                                onClick = { selectedRecipe = fav.recipe },
+                                onClick = { selectedRecipe.value = fav.recipe },
                                 onRemove = { viewModel.removeFavorite(fav.recipe.id) }
                             )
                         }
@@ -124,8 +124,8 @@ fun FavoritesScreen(viewModel: FavoritesViewModel) {
     }
 
     // Detail Dialog with Sticky Header
-    if (selectedRecipe != null) {
-        Dialog(onDismissRequest = { selectedRecipe = null }) {
+    if (selectedRecipe.value != null) {
+        Dialog(onDismissRequest = { selectedRecipe.value = null }) {
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -137,15 +137,14 @@ fun FavoritesScreen(viewModel: FavoritesViewModel) {
                 color = Color.White
             ) {
                 RecipeCard(
-                    recipe = selectedRecipe!!,
+                    recipe = selectedRecipe.value!!,
                     isFavorite = true,
                     onFavoriteClick = { 
-                        val idToRemove = selectedRecipe!!.id
-                        selectedRecipe = null
-                        viewModel.removeFavorite(idToRemove)
+                        selectedRecipe.value?.id?.let { viewModel.removeFavorite(it) }
+                        selectedRecipe.value = null
                     },
                     onGenerateImage = {
-                        val recipe = selectedRecipe!!
+                        val recipe = selectedRecipe.value!!
                         android.widget.Toast.makeText(context, "🪄 正在为 '${recipe.name}' 创作图鉴...", android.widget.Toast.LENGTH_LONG).show()
                         viewModel.generateImage(recipe) { url ->
                             if (url != null) {
@@ -158,7 +157,13 @@ fun FavoritesScreen(viewModel: FavoritesViewModel) {
                     modifier = Modifier.fillMaxWidth(),
                     isFlat = true,
                     isContentScrollable = true, // Enable the sticky header behavior
-                    isGenerating = viewModel.isGeneratingImage.value
+                    isGenerating = viewModel.isGeneratingImage.value,
+                    isAnalyzingDeepInsights = viewModel.isAnalyzingDeepInsights.value,
+                    onUnlockDeepInsights = {
+                        viewModel.unlockDeepInsights(selectedRecipe.value!!) { updated ->
+                            selectedRecipe.value = updated
+                        }
+                    }
                 )
             }
         }
@@ -197,18 +202,37 @@ fun FavoriteCompactCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Tilted cuisine tag
-                Surface(
-                    color = NeoBlack,
-                    shape = RoundedCornerShape(4.dp)
-                ) {
-                    Text(
-                        text = recipe.cuisine,
-                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                        fontSize = 9.sp,
-                        fontWeight = FontWeight.Black,
-                        color = Color.White
-                    )
+                // Left side: Type tags
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Surface(
+                        color = NeoBlack,
+                        shape = RoundedCornerShape(4.dp)
+                    ) {
+                        Text(
+                            text = recipe.cuisine,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                            fontSize = 9.sp,
+                            fontWeight = FontWeight.Black,
+                            color = Color.White
+                        )
+                    }
+
+                    if (recipe.isSauce) {
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Surface(
+                            color = Color(0xFFFACC15), // Yellow-400
+                            shape = RoundedCornerShape(4.dp),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, NeoBlack)
+                        ) {
+                            Text(
+                                text = "蘸料",
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 1.dp),
+                                fontSize = 8.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = NeoBlack
+                            )
+                        }
+                    }
                 }
                 
                 IconButton(onClick = onRemove, modifier = Modifier.size(24.dp)) {

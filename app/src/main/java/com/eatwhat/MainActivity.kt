@@ -2,13 +2,13 @@ package com.eatwhat
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import android.annotation.SuppressLint
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.background
 import androidx.compose.material.icons.Icons
@@ -51,6 +51,8 @@ sealed class Screen(val route: String, val label: String, val icon: ImageVector)
     object Settings : Screen("settings", "设置", Icons.Default.Settings)
 }
 
+private var isSplashShownInProcess = false
+
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalLayoutApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,9 +64,6 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             @Suppress("UNUSED_EXPRESSION")
             ConfigData.cuisines.size // Trigger object allocations in background
-            // Pre-warm WindowInsets infrastructure to prevent first-call lag in Chat
-            @Suppress("UNUSED_EXPRESSION")
-            try { WindowInsets.Companion } catch (_: Exception) {}
         }
 
         val settingsRepository = SettingsRepository(this)
@@ -86,15 +85,17 @@ class MainActivity : ComponentActivity() {
         
         // Properly managed ViewModel with SavedStateHandle support
         // We use this factory to injection dependencies and enable state survival
+        @SuppressLint("RestrictedApi")
         val aiChatViewModel: AiChatViewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST", "RestrictedApi", "VisibleForTesting")
             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
-                @Suppress("UNCHECKED_CAST")
+                val handle = SavedStateHandle()
                 return AiChatViewModel(
                     aiRepository, 
                     chatRepository, 
                     favRepository, 
                     settingsRepository, 
-                    SavedStateHandle() // Populated automatically during process restoration
+                    handle
                 ) as T
             }
         })[AiChatViewModel::class.java]
@@ -119,7 +120,7 @@ class MainActivity : ComponentActivity() {
                 AnimatedContent(
                     targetState = showSplash,
                     transitionSpec = {
-                        if (initialState == true && targetState == false) {
+                        if (initialState && !targetState) {
                             // High-end Reveal: Splash fades/scales out, Home fades/scales in
                             (fadeIn(animationSpec = tween(800)) + scaleIn(initialScale = 1.1f, animationSpec = tween(800)))
                                 .togetherWith(fadeOut(animationSpec = tween(800)) + scaleOut(targetScale = 0.9f, animationSpec = tween(800)))
@@ -263,9 +264,6 @@ class MainActivity : ComponentActivity() {
 
     }
 
-    companion object {
-        private var isSplashShownInProcess = false
-    }
 }
 
 private val NAVIGATION_SCREENS = listOf(Screen.Home, Screen.Discovery, Screen.Chat, Screen.Favorites, Screen.Gallery)

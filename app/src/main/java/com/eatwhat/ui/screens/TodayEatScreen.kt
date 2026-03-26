@@ -40,6 +40,8 @@ fun TodayEatScreen(
     val currentSelection by viewModel.currentSelection
     val showPreference by viewModel.showPreference
     val preference by viewModel.preference
+    val isAnalyzingDeepInsights by viewModel.isAnalyzingDeepInsights
+    val isGeneratingImage by viewModel.isGeneratingImage
 
     val context = androidx.compose.ui.platform.LocalContext.current
     val errorMessage by viewModel.errorMessage
@@ -269,15 +271,23 @@ fun TodayEatScreen(
             // Results Section (Parent spacedBy handles this)
 
             recipe?.let {
-                LaunchedEffect(it.id) {
+                // Precision scroll: Trigger when recipe ID changes OR content results arrive (causing height expansion)
+                LaunchedEffect(it.id, it.nutritionAnalysis != null, it.winePairing != null) {
                     scrollState.animateScrollTo(scrollState.maxValue)
                 }
                 val context = androidx.compose.ui.platform.LocalContext.current
                 RecipeCard(
                     recipe = it,
                     isFavorite = viewModel.isFavorite(it.id),
-                    isGenerating = viewModel.isGeneratingImage.value,
+                    isGenerating = isGeneratingImage,
+                    isAnalyzingDeepInsights = isAnalyzingDeepInsights,
                     onFavoriteClick = { viewModel.toggleFavorite(it) },
+                    onUnlockDeepInsights = {
+                        // Use viewModel.recipe.value directly to avoid any stale lambda capture
+                        viewModel.recipe.value?.let { currentRecipe ->
+                            viewModel.unlockDeepInsights(currentRecipe)
+                        }
+                    },
                     onGenerateImage = {
                         android.widget.Toast.makeText(context, "正在为 '${it.name}' 创作图鉴...", android.widget.Toast.LENGTH_LONG).show()
                         viewModel.generateImage(it) { url ->

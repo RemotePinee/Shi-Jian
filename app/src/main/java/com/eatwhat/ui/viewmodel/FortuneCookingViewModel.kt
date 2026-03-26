@@ -10,8 +10,8 @@ import androidx.lifecycle.viewModelScope
 import com.eatwhat.data.model.*
 import com.eatwhat.data.repository.AiRepository
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.async
 
 import com.eatwhat.data.repository.FavoriteRepository
 import java.text.SimpleDateFormat
@@ -46,6 +46,10 @@ class FortuneCookingViewModel(
 
     private val _moodIntensity = mutableFloatStateOf(3f)
 
+    private val _favoritesRevision = mutableIntStateOf(0)
+    val favoritesRevision: State<Int> = _favoritesRevision
+
+
     private val _luckyNumber = mutableIntStateOf(1)
     val luckyNumber: State<Int> = _luckyNumber
 
@@ -57,6 +61,28 @@ class FortuneCookingViewModel(
 
     private val _errorMessage = mutableStateOf<String?>(null)
     val errorMessage: State<String?> = _errorMessage
+
+    init {
+        viewModelScope.launch {
+            favoriteRepository.favoritesFlow.collect { list ->
+                _favoritesRevision.intValue += 1
+                // Sync current fortune result with updates from favorites
+                _fortuneResult.value?.let { current ->
+                    list.find { it.recipe.id == current.id }?.let { fav ->
+                        if (fav.recipe.nutritionAnalysis != null || fav.recipe.winePairing != null) {
+                             _fortuneResult.value = _fortuneResult.value?.copy(
+                                 nutritionAnalysis = fav.recipe.nutritionAnalysis,
+                                 winePairing = fav.recipe.winePairing
+                             )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private val _isAnalyzingDeepInsights = mutableStateOf(false)
+    val isAnalyzingDeepInsights: State<Boolean> = _isAnalyzingDeepInsights
 
     private val _favorites = mutableStateOf<List<FavoriteRecipe>>(emptyList())
 
@@ -129,12 +155,15 @@ class FortuneCookingViewModel(
     }
 
     fun isFavorite(id: String): Boolean {
+        // Read favoritesRevision to trigger recomposition when favorites change
+        favoritesRevision.value
         return _favorites.value.any { it.id == id }
     }
 
     fun toggleFavorite(fortune: FortuneResult) {
         if (favoriteRepository.isFavorite(fortune.id)) {
             favoriteRepository.removeFavorite(fortune.id)
+            _favoritesRevision.intValue++
         } else {
             val recipe = Recipe(
                 id = fortune.id,
@@ -158,6 +187,7 @@ class FortuneCookingViewModel(
                     favoriteDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
                 )
             )
+            _favoritesRevision.intValue++
         }
     }
 
@@ -183,6 +213,31 @@ class FortuneCookingViewModel(
             }
             result.onFailure { onComplete(null) }
             _isGeneratingImage.value = false
+        }
+    }
+
+    fun unlockDeepInsights(fortune: FortuneResult) {
+        viewModelScope.launch {
+            _isAnalyzingDeepInsights.value = true
+            
+            val proxyRecipe = Recipe(
+                name = fortune.dishName,
+                ingredients = fortune.ingredients ?: emptyList()
+            )
+            
+            // Parallel execution with synchronized update
+            val nutritionDeferred = async { aiRepository.getNutritionAnalysis(proxyRecipe) }
+            val wineDeferred = async { aiRepository.getWinePairing(proxyRecipe) }
+            
+            val nutritionRes = nutritionDeferred.await()
+            val wineRes = wineDeferred.await()
+            
+            _fortuneResult.value = _fortuneResult.value?.copy(
+                nutritionAnalysis = nutritionRes.getOrNull(),
+                winePairing = wineRes.getOrNull()
+            )
+            
+            _isAnalyzingDeepInsights.value = false
         }
     }
 }
