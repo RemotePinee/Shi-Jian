@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.animation.core.*
 import com.eatwhat.ui.theme.NeoBlack
 import com.eatwhat.ui.components.*
 import com.eatwhat.ui.viewmodel.SauceDesignViewModel
@@ -37,12 +38,39 @@ fun SauceDesignScreen(
     val isLoadingSauce by viewModel.isLoadingSauce
     val errorMessage by viewModel.errorMessage
 
+    // --- Scroll Focus Management (Height-Observer Pattern) ---
+    var lastRecSize by remember { mutableIntStateOf(recommendations.size) }
+    var lastSauceName by remember { mutableStateOf(currentSauce?.name) }
+    var autoScrollWindowUntil by remember { mutableLongStateOf(0L) }
+
+    LaunchedEffect(recommendations.size, currentSauce?.name, isLoadingRecs, isLoadingSauce, errorMessage) {
+        val hasNewRecs = recommendations.size > lastRecSize
+        val hasNewSauce = currentSauce != null && currentSauce?.name != lastSauceName
+        val hasNewError = errorMessage != null
+        
+        if (hasNewRecs || hasNewSauce || isLoadingRecs || isLoadingSauce || hasNewError) {
+            autoScrollWindowUntil = System.currentTimeMillis() + 2500
+        }
+        
+        lastRecSize = recommendations.size
+        lastSauceName = currentSauce?.name
+    }
+
+    LaunchedEffect(scrollState.maxValue) {
+        if (System.currentTimeMillis() < autoScrollWindowUntil) {
+            scrollState.animateScrollTo(
+                scrollState.maxValue,
+                animationSpec = spring(stiffness = Spring.StiffnessLow)
+            )
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFFACC15)) // Yellow-400
             .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 0.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         NeoHeader(
             title = "酱料设计",
@@ -122,9 +150,6 @@ fun SauceDesignScreen(
 
         // Step 2: Recommendations Result
         if (recommendations.isNotEmpty()) {
-            LaunchedEffect(recommendations.size) {
-                scrollState.animateScrollTo(scrollState.maxValue)
-            }
             // 预设的多彩色调 (Neo-Brutalist Pastels)
             val sauceCardColors = listOf(
                 Color(0xFFF5F3FF), // Purple
@@ -167,9 +192,6 @@ fun SauceDesignScreen(
                 }
             }
         } else if (errorMessage != null && currentSauce == null) {
-            LaunchedEffect(errorMessage) {
-                scrollState.animateScrollTo(scrollState.maxValue)
-            }
             NeoCard(
                 modifier = Modifier.fillMaxWidth(),
                 backgroundColor = Color(0xFFFEF2F2),
@@ -183,17 +205,11 @@ fun SauceDesignScreen(
 
         // Step 3: Sauce Details
         if (isLoadingSauce) {
-            LaunchedEffect(Unit) {
-                scrollState.animateScrollTo(scrollState.maxValue)
-            }
             NeoCard(modifier = Modifier.fillMaxWidth()) {
                 Text("AI大师正在准备酱料配方...", fontWeight = FontWeight.Black, color = NeoBlack)
                 LinearProgressIndicator(modifier = Modifier.fillMaxWidth().height(8.dp).border(1.dp, NeoBlack, RoundedCornerShape(4.dp)), color = Color(0xFF8B5CF6), trackColor = Color.White)
             }
         } else if (errorMessage != null && currentSauce == null && recommendations.isNotEmpty()) {
-            LaunchedEffect(errorMessage) {
-                scrollState.animateScrollTo(scrollState.maxValue)
-            }
             NeoCard(
                 modifier = Modifier.fillMaxWidth(),
                 backgroundColor = Color(0xFFFEF2F2),
@@ -206,12 +222,6 @@ fun SauceDesignScreen(
         }
 
         currentSauce?.let { sauce ->
-            // Use sauce.name or another property that definitely changes for each new recipe
-            LaunchedEffect(sauce.name) {
-                // Wait for the new content to be fully laid out
-                kotlinx.coroutines.delay(200)
-                scrollState.animateScrollTo(scrollState.maxValue)
-            }
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text("📖 制作教程", fontWeight = FontWeight.Black, color = NeoBlack, fontSize = 18.sp)
                 val isFavorite = viewModel.isFavorite(sauce.id)

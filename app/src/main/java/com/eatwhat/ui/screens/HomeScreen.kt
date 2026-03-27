@@ -15,10 +15,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
+import androidx.compose.animation.core.*
+import androidx.compose.animation.*
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.asComposeRenderEffect
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.Dp
 import androidx.compose.foundation.BorderStroke
 import com.eatwhat.ui.theme.NeoBlack
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.compose.ui.window.Dialog
 import android.os.Environment
@@ -33,6 +38,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.PhotoCamera
+import com.airbnb.lottie.compose.*
+import com.eatwhat.R
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -45,10 +52,79 @@ fun HomeScreen(
     val selectedCuisines = viewModel.selectedCuisines
     val isLoading by viewModel.isLoading
     val isRecognizing by viewModel.isRecognizing
+    val isAnalyzingDeepInsights by viewModel.isAnalyzingDeepInsights
     val cuisineSlots by viewModel.cuisineSlots.collectAsState()
+
+    // High-End Blur Animation (Matches Blind Box & Divination)
+    val blurRadius by animateFloatAsState(
+        targetValue = if (isLoading) 30f else 0f,
+        animationSpec = tween(durationMillis = 600),
+        label = "ritualBlur"
+    )
+
+    // Floating Animation (Matches Blind Box & Divination)
+    val infiniteTransition = rememberInfiniteTransition(label = "floating")
+    val dy by infiniteTransition.animateFloat(
+        initialValue = -15f,
+        targetValue = 15f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2000, easing = LinearOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "floatingScale"
+    )
 
     var currentInput by remember { mutableStateOf("") }
     val errorMessage by viewModel.errorMessage
+
+    // --- Scroll Focus Management (Height-Observer Pattern) ---
+    val recipesCount = cuisineSlots.count { it.recipe != null }
+    val errorsCount = cuisineSlots.count { it.error != null }
+    val nutritionCount = cuisineSlots.count { it.recipe?.nutritionAnalysis != null }
+    val pairingCount = cuisineSlots.count { it.recipe?.winePairing != null }
+    val totalExpansionEvents = recipesCount + errorsCount + nutritionCount + pairingCount
+    
+    var lastEventsCount by remember { mutableIntStateOf(totalExpansionEvents) }
+    var lastCuisineSlotsSize by remember { mutableIntStateOf(cuisineSlots.size) }
+    var autoScrollWindowUntil by remember { mutableLongStateOf(0L) }
+    var lastMaxValue by remember { mutableIntStateOf(scrollState.maxValue) }
+
+    // Trigger an auto-scroll window & follow-up active loop
+    LaunchedEffect(totalExpansionEvents, cuisineSlots.size, isAnalyzingDeepInsights) {
+        val hasNewExpansion = totalExpansionEvents > lastEventsCount || cuisineSlots.size > lastCuisineSlotsSize
+        
+        if (hasNewExpansion || isAnalyzingDeepInsights) {
+            autoScrollWindowUntil = System.currentTimeMillis() + 2500 // 2.5s window to capture expansion
+            
+            // Active Follow-up Pattern: Frame-by-frame tracking of height expansion
+            val startTime = System.currentTimeMillis()
+            var lastTarget = scrollState.maxValue
+            while (System.currentTimeMillis() - startTime < 1200) {
+                // Only follow if the content is expanding downward
+                if (scrollState.maxValue > lastTarget) {
+                    scrollState.animateScrollTo(
+                        scrollState.maxValue,
+                        animationSpec = spring(stiffness = Spring.StiffnessLow)
+                    )
+                    lastTarget = scrollState.maxValue
+                }
+                withFrameNanos { }
+            }
+        }
+        lastEventsCount = totalExpansionEvents
+        lastCuisineSlotsSize = cuisineSlots.size
+    }
+
+    // Reactively scroll to bottom fallback (Height-Observer) - Only for expansion
+    LaunchedEffect(scrollState.maxValue) {
+        if (System.currentTimeMillis() < autoScrollWindowUntil && scrollState.maxValue > lastMaxValue) {
+            scrollState.animateScrollTo(
+                scrollState.maxValue,
+                animationSpec = spring(stiffness = Spring.StiffnessLow)
+            )
+        }
+        lastMaxValue = scrollState.maxValue
+    }
     
     /* Permission Guide State */
     var showPermissionGuide by remember { mutableStateOf(false) }
@@ -236,13 +312,22 @@ fun HomeScreen(
     }
 
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFFACC15)) // Yellow-400
-            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 0.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFFFACC15)) // Yellow-400
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 0.dp)
+                .graphicsLayer {
+                    // High-End Seamless Blur Animation (Requires API 31+)
+                    if (blurRadius > 0.1f && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                        this.renderEffect = android.graphics.RenderEffect.createBlurEffect(
+                            blurRadius, blurRadius, android.graphics.Shader.TileMode.DECAL
+                        ).asComposeRenderEffect()
+                    }
+                },
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
         NeoHeader(
             title = "吃点什么？",
             subtitle = "让灵感碰撞随机分配你的下一顿",
@@ -424,28 +509,17 @@ fun HomeScreen(
                     .fillMaxWidth()
                     .padding(vertical = 8.dp),
                 backgroundColor = if (isReady) Color(0xFF9CA3AF) else Color(0xFFF3F4F6),
-                shadowOffset = 4.dp, // Reduced from 6.dp to 4.dp
+                shadowOffset = 6.dp, // 恢复至豪华版 6.dp (Restore to deluxe 6.dp)
                 enabled = !isLoading
             )
         }
 
-        // Results Section
-        if (cuisineSlots.isNotEmpty()) {
-            // 逻辑 A: 监听生成结束（无论成功或失败），触发聚焦滚动
-            val triggerScrollCount = cuisineSlots.count { it.recipe != null || it.error != null }
-            LaunchedEffect(triggerScrollCount) {
-                if (triggerScrollCount > 0) {
-                    delay(300)
-                    scrollState.animateScrollTo(scrollState.maxValue)
-                }
-            }
-
-            // 逻辑 B: 保持原有的初始生成滚动
-            LaunchedEffect(cuisineSlots) {
-                 scrollState.animateScrollTo(scrollState.maxValue)
-            }
-            
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        // Results Section - Only reveal when at least one recipe or error exists AND generation is DONE
+        if (!isLoading && cuisineSlots.any { it.recipe != null || it.error != null }) {
+            Column(
+                modifier = Modifier.padding(bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 Text("3. 菜谱结果", fontWeight = FontWeight.Black, color = NeoBlack, fontSize = 18.sp)
                 
                 cuisineSlots.forEach { slot ->
@@ -470,15 +544,6 @@ fun HomeScreen(
                                 }
                             }
                         )
-                    } else if (slot.isLoading) {
-                        NeoCard(modifier = Modifier.fillMaxWidth()) {
-                            Text("${slot.name} 创作中...", fontWeight = FontWeight.Black, color = NeoBlack)
-                            LinearProgressIndicator(
-                                modifier = Modifier.fillMaxWidth().height(8.dp).border(1.dp, NeoBlack, RoundedCornerShape(4.dp)),
-                                color = Color(0xFF22C55E), // Changed Blue to NeoGreen
-                                trackColor = Color.White
-                            )
-                        }
                     } else if (slot.error != null) {
                         NeoCard(
                             modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
@@ -528,6 +593,101 @@ fun HomeScreen(
             }
         }
     }
+    } // Closes main Column (the blurred one)
+
+    // --- High-End Loading Overlay (HomeScreen Ritual Version) ---
+    AnimatedVisibility(
+        visible = isLoading,
+        enter = fadeIn(animationSpec = tween(400)),
+        exit = fadeOut(animationSpec = tween(600)) // Match blur animation duration
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Transparent) // Truly seamless: Pure blur with no color tint
+                .neoClickable(enabled = false) {}, // Block interaction
+            contentAlignment = Alignment.Center
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                // Lottie with Floating & Spring Entrance Effect
+                AnimatedVisibility(
+                    visible = isLoading,
+                    enter = scaleIn(
+                        initialScale = 0.5f,
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessLow
+                        )
+                    ) + fadeIn(),
+                    modifier = Modifier.graphicsLayer { translationY = dy }
+                ) {
+                    val composition by rememberLottieComposition(
+                        LottieCompositionSpec.RawRes(R.raw.prepare_food)
+                    )
+                    val lottieProgress by animateLottieCompositionAsState(
+                        composition,
+                        iterations = LottieConstants.IterateForever
+                    )
+                    LottieAnimation(
+                        composition = composition,
+                        progress = { lottieProgress },
+                        modifier = Modifier.size(280.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(26.dp))
+                
+                // Custom Neo-Brutalism Progress Bar (Matches Blind Box)
+                HomeLoadingProgress()
+            }
+        }
+    }
+    } // Closes outer Box (the fillMaxSize one)
+}
+
+@Composable
+fun HomeLoadingProgress() {
+    val infiniteTransition = rememberInfiniteTransition(label = "filling")
+    val progress by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(3000, easing = LinearOutSlowInEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "progress"
+    )
+
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(
+            modifier = Modifier
+                .width(220.dp)
+                .height(16.dp)
+                .background(Color.White, RoundedCornerShape(8.dp))
+                .border(2.5.dp, NeoBlack, RoundedCornerShape(8.dp))
+                .clip(RoundedCornerShape(8.dp))
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .fillMaxWidth(progress)
+                    .background(Color(0xFFFB923C)) // Theme Orange-400 (Matches Title Card)
+            )
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            "美味即将出炉...",
+            color = Color.White,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Black,
+            letterSpacing = 1.sp,
+            style = androidx.compose.ui.text.TextStyle(
+                shadow = androidx.compose.ui.graphics.Shadow(
+                    color = Color.Black.copy(alpha = 0.5f),
+                    blurRadius = 8f
+                )
+            )
+        )
     }
 }
 

@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.async
+import kotlinx.coroutines.joinAll
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -141,7 +142,7 @@ class HomeViewModel(
             }
             _cuisineSlots.value = slots
 
-            slots.forEach { slot ->
+            val jobs = slots.map { slot ->
                 launch {
                     val cuisine = ConfigData.cuisines.find { it.id == slot.id } 
                         ?: CuisineType(slot.id, slot.name, "", "", "", "")
@@ -162,7 +163,8 @@ class HomeViewModel(
                 }
             }
             
-            // Note: In a real app, we'd wait for all or handle completion better
+            // Wait for all recipes to be generated before finishing the loading ritual
+            jobs.joinAll()
             _isLoading.value = false
         }
     }

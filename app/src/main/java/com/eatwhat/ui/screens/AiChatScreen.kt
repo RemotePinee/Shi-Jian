@@ -39,6 +39,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
+import androidx.compose.animation.core.*
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.text.*
@@ -47,11 +49,10 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.*
 import com.eatwhat.ui.components.*
 import com.eatwhat.ui.theme.NeoBlack
 import com.eatwhat.ui.theme.NeoYellow
@@ -84,7 +85,6 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.ui.text.TextStyle
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -92,6 +92,41 @@ fun AiChatScreen(viewModel: AiChatViewModel) {
     val messages = viewModel.messages
     val isLoading by viewModel.isLoading
     val listState = rememberLazyListState()
+
+    // --- Scroll Focus Management (Top-level for persistence) ---
+    val lastMsg = messages.lastOrNull()
+    var lastKnownSize by remember { mutableIntStateOf(messages.size) }
+    var lastKnownContent by remember { mutableStateOf(lastMsg?.content) }
+    var lastKnownRecipeJson by remember { mutableStateOf(lastMsg?.recipeJson) }
+
+    LaunchedEffect(messages.size, lastMsg?.content, lastMsg?.isRecipeLoading, lastMsg?.recipeJson) {
+        val currentSize = messages.size
+        val currentContent = lastMsg?.content
+        val currentRecipeJson = lastMsg?.recipeJson
+        
+        if (currentSize > 0) {
+            val isNewMessage = currentSize > lastKnownSize
+            val isContentUpdate = currentSize == lastKnownSize && currentContent != lastKnownContent
+            val isRecipeArrival = currentRecipeJson != null && lastKnownRecipeJson == null
+            
+            if (isNewMessage || isContentUpdate || isRecipeArrival) {
+                val isRecipeVisible = currentRecipeJson != null
+                val startTime = System.currentTimeMillis()
+                val duration = if (isRecipeVisible) 1200 else 600
+                
+                while (System.currentTimeMillis() - startTime < duration) {
+                    listState.animateScrollToItem(
+                        messages.size, 
+                        scrollOffset = 0
+                    )
+                    withFrameNanos { } 
+                }
+            }
+        }
+        lastKnownSize = currentSize
+        lastKnownContent = currentContent
+        lastKnownRecipeJson = currentRecipeJson
+    }
     var inputText by remember { mutableStateOf("") }
     val context = LocalContext.current
     /* Custom History Drawer State */
@@ -416,31 +451,6 @@ fun AiChatScreen(viewModel: AiChatViewModel) {
                 enter = fadeIn(animationSpec = tween(800)) + slideInVertically { it / 3 },
                 exit = fadeOut()
             ) {
-                LaunchedEffect(
-                    messages.size, 
-                    messages.lastOrNull()?.content,
-                    messages.lastOrNull()?.isRecipeLoading,
-                    messages.lastOrNull()?.recipeJson
-                ) {
-                    if (messages.isNotEmpty()) {
-                        val lastMsg = messages.lastOrNull()
-                        val isRecipeVisible = lastMsg?.recipeJson != null
-                        
-                        if (isLoading && !isRecipeVisible) {
-                            // Standard streaming text, snap scroll is enough
-                            listState.scrollToItem(messages.size) 
-                        } else {
-                            // Aggressively stick to the bottom during any transition (growing bubble or generation complete)
-                            // This ensures that as the bubble grows with animateContentSize, the list 'follows' its expansion.
-                            val startTime = System.currentTimeMillis()
-                            while (System.currentTimeMillis() - startTime < 800) {
-                                listState.scrollToItem(messages.size)
-                                withFrameNanos { } // Sync with VSync (Supports 90Hz, 120Hz, etc.)
-                            }
-                        }
-                    }
-                }
-
                 LazyColumn(
                     state = listState,
                     modifier = Modifier.fillMaxSize(),

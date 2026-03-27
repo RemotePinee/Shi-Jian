@@ -72,6 +72,7 @@ fun NeoCard(
     val shape = RoundedCornerShape(cornerRadius)
     Box(
         modifier = modifier
+            .padding(end = shadowOffset, bottom = shadowOffset) // 新丑风核心：让布局包含阴影 (Include shadow in layout)
             .drawBehind {
                 drawRoundRect(
                     color = NeoBlack,
@@ -124,6 +125,7 @@ fun NeoButton(
     
     Box(
         modifier = modifier
+            .padding(end = shadowOffset, bottom = shadowOffset) // 新丑风核心：让布局包含阴影 (Include shadow in layout)
             .neoClickable(enabled = enabled, onClick = onClick)
             .drawBehind {
                 if (enabled) {

@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.animation.core.*
 import com.eatwhat.data.model.Recipe
 import com.eatwhat.data.model.RecipeStep
 
@@ -122,12 +123,27 @@ fun RecipeCard(
         val internalScrollState = rememberScrollState()
         
         // Auto-scroll when insights updated (for Overlay/Dialog usage)
-        LaunchedEffect(recipe.nutritionAnalysis != null, recipe.winePairing != null) {
-            if (isContentScrollable && (recipe.nutritionAnalysis != null || recipe.winePairing != null)) {
-                // Wait for content layout update
-                kotlinx.coroutines.delay(100)
-                internalScrollState.animateScrollTo(internalScrollState.maxValue)
+        var lastNutrition by remember { mutableStateOf(recipe.nutritionAnalysis != null) }
+        var lastPairing by remember { mutableStateOf(recipe.winePairing != null) }
+        
+        LaunchedEffect(recipe.nutritionAnalysis != null, recipe.winePairing != null, isAnalyzingDeepInsights) {
+            val hasNutrition = recipe.nutritionAnalysis != null
+            val hasPairing = recipe.winePairing != null
+            
+            // Trigger on start of generation or when new data arrives
+            if (isContentScrollable && ((hasNutrition && !lastNutrition) || (hasPairing && !lastPairing) || isAnalyzingDeepInsights)) {
+                // Zero-delay: start immediately and follow the expansion smoothly for 1s
+                val startTime = System.currentTimeMillis()
+                while (System.currentTimeMillis() - startTime < 1000) {
+                    internalScrollState.animateScrollTo(
+                        internalScrollState.maxValue, 
+                        animationSpec = spring(stiffness = Spring.StiffnessLow)
+                    )
+                    withFrameNanos { } 
+                }
             }
+            lastNutrition = hasNutrition
+            lastPairing = hasPairing
         }
 
         val contentModifier = if (isContentScrollable) {

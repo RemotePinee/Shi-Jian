@@ -227,7 +227,7 @@ class AiRepository(private val context: Context, private val settings: SettingsR
                 请按照以下JSON格式返回菜谱：
                 {
                   "name": "菜品名称",
-                  "ingredients": ["主料1 300g", "调料1 2勺", "配菜1 100g"],
+                  "ingredients": ["猪肉 300g", "生抽 2勺", "青椒 100g"],
                   "steps": [
                     {
                       "step": 1,
@@ -289,7 +289,11 @@ class AiRepository(private val context: Context, private val settings: SettingsR
             
             result.map { it.trim() }
                 .filter { it.isNotEmpty() }
-                .map { if (it.startsWith("调料：") || it.startsWith("调料:")) it.substring(3).trim() else it }
+                .map { 
+                    // 移除冗余的前缀标签，如 "主料1", "调料2", "必备调味1", "主要食材" 等
+                    val pattern = "^(主料|调料|配料|主要食材|必备调味|主要成分|辅料|食材)\\d*[:：\\s]*".toRegex()
+                    it.replace(pattern, "").trim()
+                }
                 .filter { it.isNotEmpty() }
         }
     }
@@ -369,7 +373,7 @@ class AiRepository(private val context: Context, private val settings: SettingsR
             请按照以下JSON格式返回：
             {
               "name": "$dishName",
-              "ingredients": ["主要食材1 200g", "必备调味1 1勺"],
+              "ingredients": ["猪肉 200g", "生抽 1勺"],
               "steps": [
                 {
                   "step": 1,
@@ -442,14 +446,15 @@ class AiRepository(private val context: Context, private val settings: SettingsR
               "dishName": "菜名",
               "mysticalMessage": "一句充满玄学色彩的神秘寄语",
               "description": "基于星座生肖的今日运势深度解读",
-              "luckyIndex": 95,
-              "reason": "推荐理由解析",
-              "tips": ["厨艺建议1"],
+              "luckyIndex": 随机且合理的60-100整数,
+              "reason": "推荐理由解析 (要求: 必须根据星座运势动态生成的 60-100 之间的整数，严禁每次都用固定数字)",
+              "tips": ["针对该菜品的厨艺建议"],
               "difficulty": "easy",
               "cookingTime": 15,
-              "ingredients": ["主要食材 200g", "配料 10g"],
-              "steps": ["1. 描述", "2. 描述"]
+              "ingredients": ["具体食材名 份量(如: 200g, 1颗, 适量等)", "调料名 份量(如: 1勺, 5g等)"],
+              "steps": ["1. 针对该菜品的具体操作步骤", "2. 针对该菜品的具体操作步骤"]
             }
+            重要要求：生成的食材 (ingredients) 和制作步骤 (steps) 必须与生成的菜名 (dishName) 严格对应，严禁照抄示例中的内容，严禁出现“菜名是鸡、食材是猪肉”这种低级逻辑错误。
         """.trimIndent()
         val res = callAi("你是一位神秘的料理占卜师。请严格按JSON返回。每个食材/调料必须是独立的数组项，严禁合并。", prompt, FortuneResult::class.java)
         return res.map { it.copy(
@@ -468,14 +473,15 @@ class AiRepository(private val context: Context, private val settings: SettingsR
               "dishName": "治愈菜名",
               "mysticalMessage": "一句温暖治愈的心情语录",
               "description": "针对当前心情的情感寄语",
-              "luckyIndex": 88,
-              "reason": "推荐逻辑",
-              "tips": ["厨艺小贴士"],
+              "luckyIndex": 随机且合理的60-100整数,
+              "reason": "推荐逻辑 (要求: 必须根据心情强度动态生成的 60-100 之间的整数，严禁每次都用固定数字)",
+              "tips": ["针对该菜品的厨艺小贴士"],
               "difficulty": "medium",
               "cookingTime": 20,
-              "ingredients": ["食材1 100g", "调料2"],
-              "steps": ["1. 操作说明", "2. 操作说明"]
+              "ingredients": ["心情食材名 份量(如: 100g, 5ML, 1把等)"],
+              "steps": ["1. 针对该心情菜品的具体操作", "2. 针对该心情菜品的具体操作"]
             }
+            重要要求：生成的食材 (ingredients) 和制作步骤 (steps) 必须与生成的菜名 (dishName) 严格对应，严禁照抄示例中的内容。
         """.trimIndent()
         val res = callAi("你是一位温暖的情感治愈料理占卜师。请严格按JSON返回。每个食材/调料必须是独立的数组项，严禁合并。", prompt, FortuneResult::class.java)
         return res.map { it.copy(
@@ -493,14 +499,15 @@ class AiRepository(private val context: Context, private val settings: SettingsR
               "dishName": "幸运菜名",
               "mysticalMessage": "关于这个数字的神秘寄语",
               "description": "数字占卜解析",
-              "luckyIndex": 99,
-              "reason": "寓意解析",
-              "tips": ["小贴士"],
+              "luckyIndex": 随机且合理的60-100整数,
+              "reason": "寓意解析 (要求: 必须根据数字寓意动态生成的 60-100 之间的整数，严禁每次都用固定数字)",
+              "tips": ["针对数字寓意的小贴士"],
               "difficulty": "easy",
               "cookingTime": 10,
-              "ingredients": ["对应食材"],
-              "steps": ["1. 步骤", "2. 步骤"]
+              "ingredients": ["幸运食材及其精准份量(如: 300g, 2片, 适量)"],
+              "steps": ["1. 具体的制作步骤描述", "2. 具体的制作步骤描述"]
             }
+            重要要求：生成的食材 (ingredients) 和制作步骤 (steps) 必须与生成的菜名 (dishName) 严格对应，严禁照抄示例中的内容。
         """.trimIndent()
         val res = callAi("你是一位精通数字占卜的料理大师。请严格按JSON返回。每个食材/调料必须是独立的数组项，严禁合并。", prompt, FortuneResult::class.java)
         return res.map { it.copy(
@@ -530,25 +537,34 @@ class AiRepository(private val context: Context, private val settings: SettingsR
 
     suspend fun getWinePairing(recipe: Recipe): Result<WinePairing> {
         val prompt = """
-            请为菜品'${recipe.name}'推荐一款绝佳的灵魂饮品。
+            请为菜品'${recipe.name}'推荐一款绝佳的佐餐灵魂饮品。
             食材组成：${recipe.ingredients.joinToString("、")}
             
             要求：
-            1. 饮品种类要多样化，不要局限于绿茶或白开水。可以是特色中式茶（如大红袍、鸭屎香）、鲜煎果蔬汁、手作特饮、气泡水、甚至是适合佐餐的无酒精鸡尾酒。
-            2. 推荐逻辑要专业：根据菜品的主味调（油腻度、辣度、咸甜口）进行精准匹配，实现解腻、提味或口感上的奇妙碰撞。
-            3. 饮品名称要诱人，理由要专业且有趣。
-            4. 给出建议的饮用温度。
+            1. **严禁创作**：饮品必须是现实生活中真实存在、符合大众审美且极其正常的市售或成熟单品（如：特定的商业品牌饮料、连锁咖啡厅/奶茶店常驻单品）。
+            2. **绝对防雷**：禁止任何将菜品调料或特色食材混入饮品的尝试（例如严禁出现：大蒜咖啡、辣酱苏打、香菜奶茶、韭菜果汁等）。
+            3. **品类范围**（优先考虑现代感、多样性）：
+               - **经典苏打/气泡饮**（如：鲜榨西柚气泡、接骨木花苏打、经典莫吉托无酒精版、圣培露矿泉水加青柠等）
+               - **精品咖啡/冷萃**（如：冰美式、手冲瑰夏、椰青美式、燕麦拿铁等）
+               - **现代果茶/奶露**（如：多肉葡萄、芝士芒芒、鸭屎香柠檬茶、厚椰乳等）
+               - **传统消食饮品**（如：冰镇酸梅汤、日式煎茶/大麦茶、洛神花茶、马蹄水等）
+               - **专业中式茶**（如：陈皮普洱、大红袍、铁观音、正山小种等）
+            4. **科学逻辑与温度**：
+               - **解辣必备**：辛辣川湘菜优先推荐冰镇乳制品（厚椰乳、燕麦奶）或冰镇甜性气泡型饮料。
+               - **去腻首选**：油腻红肉或煎炸食品优先推荐冰美式、冷萃或重焙火乌龙（如大红袍）。
+               - **清淡平衡**：清淡海鲜或白肉优先推荐清新果香系气泡水或花果香系茶。
+               - **温度建议**：除非是特定的暖胃需求，否则优先考虑更具清爽感的 5°C 冰镇或常温建议。
             
             请按照以下JSON格式返回：
             {
-              "name": "饮品全名",
+              "name": "真实规范的饮品名",
               "type": "饮品类别",
-              "reason": "为什么它与这道菜是绝配？",
-              "servingTemperature": "常温/冰镇/热水/55℃温饮",
-              "flavor": "口感细节描述"
+              "reason": "专业、感性且基于口味科学的互补理由",
+              "servingTemperature": "饮用温度建议（如：5°C 冰镇 / 常温 / 85°C 热饮）",
+              "flavor": "口感细节特征（如：酸甜平衡、清新果香、醇厚回甘）"
             }
         """.trimIndent()
-        return callAi("你是一位精致生活的饮品搭配师。请严格按JSON返回结果。", prompt, WinePairing::class.java)
+        return callAi("你是一位精致生活的顶级侍酒/侍茶师，深谙佐餐逻辑。请严格按JSON返回结果，严禁推荐黑暗料理。", prompt, WinePairing::class.java)
     }
 
     suspend fun generateImage(recipe: Recipe): Result<String> = withContext(Dispatchers.IO) {
@@ -757,7 +773,7 @@ class AiRepository(private val context: Context, private val settings: SettingsR
         
         return try {
             fixUnterminatedJson(clean)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             clean
         }
     }

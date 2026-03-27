@@ -1,10 +1,12 @@
 package com.eatwhat.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.draw.clip
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,11 +16,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.asComposeRenderEffect
+import com.airbnb.lottie.compose.*
+import com.eatwhat.R
 import com.eatwhat.ui.theme.NeoBlack
 import com.eatwhat.data.model.*
 import com.eatwhat.ui.components.*
 import com.eatwhat.ui.viewmodel.FortuneCookingViewModel
 import com.eatwhat.ui.viewmodel.FortuneType
+import kotlinx.coroutines.delay
+import androidx.compose.runtime.withFrameNanos
 
 @Composable
 fun FortuneCookingScreen(
@@ -30,294 +42,507 @@ fun FortuneCookingScreen(
     val zodiac by viewModel.zodiac
     val luckyNumber by viewModel.luckyNumber
     val fortuneResult by viewModel.fortuneResult
+    val animal by viewModel.animal
     val isLoading by viewModel.isLoading
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFFACC15)) // Yellow-400
-            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 0.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        NeoHeader(
-            title = "料理占卜",
-            subtitle = "让星星告诉你今天该吃什么",
-            backgroundColor = Color(0xFFFDA4AF), // Soft Pink
-            onBack = onBack,
-            heroEmoji = "🔮"
-        )
+    val blurRadius by animateFloatAsState(
+        targetValue = if (isLoading) 30f else 0f,
+        animationSpec = tween(600, easing = LinearOutSlowInEasing),
+        label = "blur_radius"
+    )
 
+    // --- Scroll Focus Management (Height-Observer Pattern) ---
+    var lastFortuneId by remember { mutableStateOf(fortuneResult?.id) }
+    var lastNutrition by remember { mutableStateOf(fortuneResult?.nutritionAnalysis != null) }
+    var lastPairing by remember { mutableStateOf(fortuneResult?.winePairing != null) }
+    var autoScrollWindowUntil by remember { mutableLongStateOf(0L) }
+    var lastMaxValue by remember { mutableIntStateOf(scrollState.maxValue) }
+    val isAnalyzingDeepInsights by viewModel.isAnalyzingDeepInsights
+
+    LaunchedEffect(fortuneResult?.id, fortuneResult?.nutritionAnalysis != null, fortuneResult?.winePairing != null, isAnalyzingDeepInsights) {
+        val hasNewResult = fortuneResult != null && fortuneResult?.id != lastFortuneId
+        val hasNewNutrition = fortuneResult?.nutritionAnalysis != null && !lastNutrition
+        val hasNewPairing = fortuneResult?.winePairing != null && !lastPairing
+
+        if (hasNewResult || hasNewNutrition || hasNewPairing || isAnalyzingDeepInsights) {
+            autoScrollWindowUntil = System.currentTimeMillis() + 2500
+            
+            // For a new result, we reset the ceiling to force an initial scroll-to-bottom
+            if (hasNewResult) {
+                lastMaxValue = 0
+            }
+
+            // Active Follow-up (The "Favorites" Pattern)
+            val startTime = System.currentTimeMillis()
+            var lastTarget = if (hasNewResult) 0 else scrollState.maxValue
+            while (System.currentTimeMillis() - startTime < 1200) {
+                if (scrollState.maxValue > lastTarget) {
+                    scrollState.animateScrollTo(
+                        scrollState.maxValue,
+                        animationSpec = spring(stiffness = Spring.StiffnessLow)
+                    )
+                    lastTarget = scrollState.maxValue
+                }
+                withFrameNanos { }
+            }
+        }
+
+        lastFortuneId = fortuneResult?.id
+        lastNutrition = fortuneResult?.nutritionAnalysis != null
+        lastPairing = fortuneResult?.winePairing != null
+    }
+
+    LaunchedEffect(scrollState.maxValue) {
+        if (System.currentTimeMillis() < autoScrollWindowUntil && scrollState.maxValue > lastMaxValue) {
+            scrollState.animateScrollTo(
+                scrollState.maxValue,
+                animationSpec = spring(stiffness = Spring.StiffnessLow)
+            )
+        }
+        lastMaxValue = scrollState.maxValue
+    }
+
+    // Explicitly kill any active scroll window when starting a new divination
+    LaunchedEffect(isLoading) {
+        if (isLoading) {
+            autoScrollWindowUntil = 0
+            lastMaxValue = scrollState.maxValue 
+        }
+    }
+
+    // Compensation Scroll: when changing zodiac, scroll down to ensure animals are visible.
+    // Fixed: Only trigger if animal hasn't been selected yet to avoid jarring jumps for existing selections.
+    LaunchedEffect(zodiac) {
+        if (zodiac.isNotEmpty() && animal.isEmpty() && selectedType == FortuneType.DAILY && fortuneResult == null) {
+            delay(100)
+            scrollState.animateScrollTo(
+                value = (scrollState.value + 400).coerceAtMost(scrollState.maxValue),
+                animationSpec = spring(stiffness = Spring.StiffnessLow)
+            )
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
-                .weight(1f)
-                .verticalScroll(scrollState)
-                .padding(top = 10.dp, bottom = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+                .fillMaxSize()
+                .background(Color(0xFFFACC15)) // Yellow-400
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 0.dp)
+                .graphicsLayer {
+                    // High-End Seamless Blur Animation (Requires API 31+)
+                    if (blurRadius > 0.1f && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                        this.renderEffect = android.graphics.RenderEffect.createBlurEffect(
+                            blurRadius, blurRadius, android.graphics.Shader.TileMode.DECAL
+                        ).asComposeRenderEffect()
+                    }
+                },
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-        // Step 1: Select Fortune Type
-        NeoCard(
-            modifier = Modifier.fillMaxWidth(),
-            backgroundColor = Color.White,
-            shadowOffset = 4.dp,
-            borderWidth = 3
-        ) {
-            Text("1. 选择占卜类型", fontWeight = FontWeight.Black, color = Color(0xFFFDA4AF), fontSize = 16.sp)
-            Spacer(modifier = Modifier.height(16.dp))
+            NeoHeader(
+                title = "料理占卜",
+                subtitle = "让星星告诉你今天该吃什么",
+                backgroundColor = Color(0xFFFDA4AF), // Soft Pink
+                onBack = onBack,
+                heroEmoji = "🔮"
+            )
 
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                FortuneType.entries.forEach { type ->
-                    val isSelected = selectedType == type
-                    Surface(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .neoClickable { viewModel.selectType(type) },
-                        color = if (isSelected) Color(0xFFFDA4AF) else Color.White,
-                        shape = RoundedCornerShape(12.dp),
-                        border = rowBorder(3.dp, NeoBlack) // Thicker border
-                    ) {
-                        Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Text(type.icon, fontSize = 24.sp)
-                            Spacer(modifier = Modifier.width(12.dp))
-                             Column {
-                                 Text(type.label, fontWeight = FontWeight.Black, color = if (isSelected) Color.White else NeoBlack)
-                                 Text(type.description, fontSize = 12.sp, color = if (isSelected) Color.White.copy(alpha = 0.9f) else NeoBlack.copy(alpha = 0.7f))
-                             }
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(scrollState)
+                    .padding(top = 10.dp, bottom = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp)
+            ) {
+            // Step 1: Select Fortune Type
+            NeoCard(
+                modifier = Modifier.fillMaxWidth(),
+                backgroundColor = Color.White,
+                shadowOffset = 4.dp,
+                borderWidth = 3
+            ) {
+                Text("1. 选择占卜类型", fontWeight = FontWeight.Black, color = Color(0xFFFDA4AF), fontSize = 16.sp)
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FortuneType.entries.forEach { type ->
+                        val isSelected = selectedType == type
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .neoClickable { viewModel.selectType(type) },
+                            color = if (isSelected) Color(0xFFFDA4AF) else Color.White,
+                            shape = RoundedCornerShape(12.dp),
+                            border = rowBorder(3.dp, NeoBlack) // Thicker border
+                        ) {
+                            Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Text(type.icon, fontSize = 24.sp)
+                                Spacer(modifier = Modifier.width(12.dp))
+                                 Column {
+                                     Text(type.label, fontWeight = FontWeight.Black, color = if (isSelected) Color.White else NeoBlack)
+                                     Text(type.description, fontSize = 12.sp, color = if (isSelected) Color.White.copy(alpha = 0.9f) else NeoBlack.copy(alpha = 0.7f))
+                                 }
+                            }
                         }
                     }
                 }
             }
-        }
 
 
 
-        // Step 2: Params
-        NeoCard(
-            modifier = Modifier.fillMaxWidth(),
-            backgroundColor = Color.White,
-            shadowOffset = 4.dp,
-            borderWidth = 3
-        ) {
-            Text("2. 配置占卜参数", fontWeight = FontWeight.Black, color = Color(0xFFFDA4AF), fontSize = 16.sp)
-            Spacer(modifier = Modifier.height(16.dp))
+            // Step 2: Params
+            NeoCard(
+                modifier = Modifier.fillMaxWidth(),
+                backgroundColor = Color.White,
+                shadowOffset = 4.dp,
+                borderWidth = 3
+            ) {
+                Text("2. 配置占卜参数", fontWeight = FontWeight.Black, color = Color(0xFFFDA4AF), fontSize = 16.sp)
+                Spacer(modifier = Modifier.height(16.dp))
 
-            when (selectedType) {
-                FortuneType.DAILY -> {
-                    Text("选择你的星座", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        ConfigData.zodiacConfigs.chunked(6).forEach { rowZodiacs ->
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceEvenly,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                rowZodiacs.forEach { z ->
-                                    val isSelected = zodiac == z.id
-                                    Surface(
-                                        modifier = Modifier
-                                            .requiredSize(50.dp)
-                                            .neoClickable { viewModel.setZodiac(z.id) },
-                                        color = if (isSelected) Color(0xFFFDA4AF) else Color.White,
-                                        shape = RoundedCornerShape(8.dp),
-                                        border = rowBorder(2.dp, NeoBlack) // Thicker border
+                when (selectedType) {
+                    FortuneType.DAILY -> {
+                        Text("选择你的星座", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            ConfigData.zodiacConfigs.chunked(6).forEach { rowZodiacs ->
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceEvenly,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    rowZodiacs.forEach { z ->
+                                        val isSelected = zodiac == z.id
+                                        Surface(
+                                            modifier = Modifier
+                                                .requiredSize(50.dp)
+                                                .neoClickable { viewModel.setZodiac(z.id) },
+                                            color = if (isSelected) Color(0xFFFDA4AF) else Color.White,
+                                            shape = RoundedCornerShape(8.dp),
+                                            border = rowBorder(2.dp, NeoBlack) // Thicker border
+                                            ) {
+                                                Column(
+                                                    modifier = Modifier.fillMaxSize(),
+                                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                                    verticalArrangement = Arrangement.Center
+                                                ) {
+                                                    Spacer(modifier = Modifier.height(2.dp)) // Move icon down 2dp
+                                                    Text(z.symbol, fontSize = 21.sp)
+                                                    Text(z.name, fontSize = 9.sp, fontWeight = FontWeight.Black, color = if (isSelected) Color.White else NeoBlack, modifier = Modifier.offset(y = (-2).dp)) // Text up 2dp
+                                                }
+                                            }
+                                    }
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text("选择你的生肖", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            ConfigData.animalConfigs.chunked(6).forEach { rowAnimals ->
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceEvenly,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    rowAnimals.forEach { a ->
+                                        val isSelected = viewModel.animal.value == a.id
+                                        Surface(
+                                            modifier = Modifier
+                                                .requiredSize(50.dp)
+                                                .neoClickable { viewModel.setAnimal(a.id) },
+                                            color = if (isSelected) Color(0xFF10B981) else Color.White,
+                                            shape = RoundedCornerShape(8.dp),
+                                            border = rowBorder(2.dp, NeoBlack) // Thicker border
+                                            ) {
+                                                Column(
+                                                    modifier = Modifier.fillMaxSize(),
+                                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                                    verticalArrangement = Arrangement.Center
+                                                ) {
+                                                    Spacer(modifier = Modifier.height(2.dp)) // Move icon down 2dp
+                                                    Text(a.symbol, fontSize = 21.sp)
+                                                    Text(a.name, fontSize = 9.sp, fontWeight = FontWeight.Black, color = if (isSelected) Color.White else NeoBlack, modifier = Modifier.offset(y = (-2).dp)) // Text up 2dp
+                                                }
+                                            }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    FortuneType.MOOD -> {
+                        Text("选择你的心情", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            ConfigData.moodConfigs.chunked(4).forEach { rowMoods ->
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally)
+                                ) {
+                                    rowMoods.forEach { m ->
+                                        val isSelected = viewModel.selectedMoods.contains(m.id)
+                                        Surface(
+                                            modifier = Modifier
+                                                .requiredSize(60.dp)
+                                                .neoClickable { viewModel.toggleMood(m.id) },
+                                            color = if (isSelected) Color(0xFFEC4899) else Color.White,
+                                            shape = RoundedCornerShape(10.dp),
+                                            border = rowBorder(2.dp, NeoBlack) // Thicker border
                                         ) {
                                             Column(
                                                 modifier = Modifier.fillMaxSize(),
                                                 horizontalAlignment = Alignment.CenterHorizontally,
                                                 verticalArrangement = Arrangement.Center
                                             ) {
-                                                Spacer(modifier = Modifier.height(2.dp)) // Move icon down 2dp
-                                                Text(z.symbol, fontSize = 21.sp)
-                                                Text(z.name, fontSize = 9.sp, fontWeight = FontWeight.Black, color = if (isSelected) Color.White else NeoBlack, modifier = Modifier.offset(y = (-2).dp)) // Text up 2dp
+                                                Text(m.emoji, fontSize = 22.sp)
+                                                Text(m.name, fontSize = 11.sp, fontWeight = FontWeight.Black, color = if (isSelected) Color.White else NeoBlack)
                                             }
-                                        }
-                                }
-                            }
-                        }
-                    }
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text("选择你的生肖", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        ConfigData.animalConfigs.chunked(6).forEach { rowAnimals ->
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceEvenly,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                rowAnimals.forEach { a ->
-                                    val isSelected = viewModel.animal.value == a.id
-                                    Surface(
-                                        modifier = Modifier
-                                            .requiredSize(50.dp)
-                                            .neoClickable { viewModel.setAnimal(a.id) },
-                                        color = if (isSelected) Color(0xFF10B981) else Color.White,
-                                        shape = RoundedCornerShape(8.dp),
-                                        border = rowBorder(2.dp, NeoBlack) // Thicker border
-                                        ) {
-                                            Column(
-                                                modifier = Modifier.fillMaxSize(),
-                                                horizontalAlignment = Alignment.CenterHorizontally,
-                                                verticalArrangement = Arrangement.Center
-                                            ) {
-                                                Spacer(modifier = Modifier.height(2.dp)) // Move icon down 2dp
-                                                Text(a.symbol, fontSize = 21.sp)
-                                                Text(a.name, fontSize = 9.sp, fontWeight = FontWeight.Black, color = if (isSelected) Color.White else NeoBlack, modifier = Modifier.offset(y = (-2).dp)) // Text up 2dp
-                                            }
-                                        }
-                                }
-                            }
-                        }
-                    }
-                }
-                FortuneType.MOOD -> {
-                    Text("选择你的心情", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        ConfigData.moodConfigs.chunked(4).forEach { rowMoods ->
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally)
-                            ) {
-                                rowMoods.forEach { m ->
-                                    val isSelected = viewModel.selectedMoods.contains(m.id)
-                                    Surface(
-                                        modifier = Modifier
-                                            .requiredSize(60.dp)
-                                            .neoClickable { viewModel.toggleMood(m.id) },
-                                        color = if (isSelected) Color(0xFFEC4899) else Color.White,
-                                        shape = RoundedCornerShape(10.dp),
-                                        border = rowBorder(2.dp, NeoBlack) // Thicker border
-                                    ) {
-                                        Column(
-                                            modifier = Modifier.fillMaxSize(),
-                                            horizontalAlignment = Alignment.CenterHorizontally,
-                                            verticalArrangement = Arrangement.Center
-                                        ) {
-                                            Text(m.emoji, fontSize = 22.sp)
-                                            Text(m.name, fontSize = 11.sp, fontWeight = FontWeight.Black, color = if (isSelected) Color.White else NeoBlack)
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                }
-                FortuneType.NUMBER -> {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // Lucky Number Card
-                        NeoCard(
-                            backgroundColor = Color(0xFFF5F3FF), // Light Purple
-                            shadowOffset = 4.dp,
-                            borderWidth = 3,
-                            padding = 0.dp,
-                            fullWidth = false // Fix: don't take up entire Row width
+                    FortuneType.NUMBER -> {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Box(
-                                modifier = Modifier.size(width = 80.dp, height = 70.dp),
-                                contentAlignment = Alignment.Center
+                            // Lucky Number Card
+                            NeoCard(
+                                backgroundColor = Color(0xFFF5F3FF), // Light Purple
+                                shadowOffset = 4.dp,
+                                borderWidth = 3,
+                                padding = 0.dp,
+                                fullWidth = false // Fix: don't take up entire Row width
                             ) {
-                                Text(
-                                    text = luckyNumber.toString(),
-                                    fontSize = 40.sp,
-                                    fontWeight = FontWeight.Black,
-                                    color = NeoBlack
-                                )
+                                Box(
+                                    modifier = Modifier.size(width = 80.dp, height = 70.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = luckyNumber.toString(),
+                                        fontSize = 40.sp,
+                                        fontWeight = FontWeight.Black,
+                                        color = NeoBlack
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.width(20.dp))
+
+                            // Random Button with matching height and constrained width
+                            NeoButton(
+                                text = "🎲 随机",
+                                onClick = { viewModel.generateRandomNumber() },
+                                modifier = Modifier.height(70.dp).width(120.dp), // Constrain width
+                                backgroundColor = Color(0xFFFB923C),
+                                shadowOffset = 4.dp
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                viewModel.errorMessage.value?.let { error ->
+                    Text(
+                        text = error,
+                        color = Color.Red,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+
+                NeoButton(
+                    text = if (isLoading) "占卜中..." else "开始占卜",
+                    onClick = { viewModel.startFortune() },
+                    modifier = Modifier.fillMaxWidth(),
+                    backgroundColor = Color(0xFFFDA4AF),
+                    shadowOffset = 4.dp, // Reduced to match homepage standard
+                    enabled = !isLoading && viewModel.isInputValid()
+                )
+            }
+
+            // Step 3: Result Reveal (Render behind blur for zero-latency scroll)
+            if (!isLoading && fortuneResult != null) {
+                // Removed animateContentSize(tween(400)) to prevent conflict with scroll-follow
+                Box {
+                fortuneResult?.let { fortune ->
+                    val context = androidx.compose.ui.platform.LocalContext.current
+
+                    // Detail section follows naturally
+
+                    // Removed extra 24.dp spacer - parent Column Arrangement.spacedBy(16.dp) handles it
+                    val isFavorite = viewModel.isFavorite(fortune.id)
+                    FortuneCard(
+                        fortune = fortune,
+                        isFavorite = isFavorite,
+                        isGenerating = viewModel.isGeneratingImage.value,
+                        isAnalyzingDeepInsights = viewModel.isAnalyzingDeepInsights.value,
+                        onUnlockDeepInsights = {
+                            viewModel.unlockDeepInsights(fortune)
+                        },
+                        onFavoriteClick = { viewModel.toggleFavorite(fortune) },
+                        onGenerateImage = {
+                            val recipe = Recipe(
+                                id = fortune.id,
+                                name = fortune.dishName,
+                                cuisine = when(fortune.type) {
+                                    "daily" -> "今日占卜"
+                                    "mood" -> "心情占卜"
+                                    "number" -> "数字占卜"
+                                    else -> "神秘占卜"
+                                },
+                                ingredients = fortune.ingredients ?: emptyList(),
+                                steps = fortune.steps?.mapIndexed { index, s -> RecipeStep(index + 1, s) } ?: emptyList(),
+                                cookingTime = fortune.cookingTime,
+                                difficulty = fortune.difficulty,
+                                tips = fortune.tips
+                            )
+                            android.widget.Toast.makeText(context, "🪄 正在为 '${fortune.dishName}' 创作图鉴...", android.widget.Toast.LENGTH_LONG).show()
+                            viewModel.generateImage(recipe) { url ->
+                                if (url != null) {
+                                    android.widget.Toast.makeText(context, "创作成功！已收录至 GALLERY", android.widget.Toast.LENGTH_LONG).show()
+                                } else {
+                                    android.widget.Toast.makeText(context, "创作失败，请检查设置或重试", android.widget.Toast.LENGTH_SHORT).show()
+                                }
                             }
                         }
-
-                        Spacer(modifier = Modifier.width(20.dp))
-
-                        // Random Button with matching height and constrained width
-                        NeoButton(
-                            text = "🎲 随机",
-                            onClick = { viewModel.generateRandomNumber() },
-                            modifier = Modifier.height(70.dp).width(120.dp), // Constrain width
-                            backgroundColor = Color(0xFFFB923C),
-                            shadowOffset = 4.dp
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-            
-            viewModel.errorMessage.value?.let { error ->
-                Text(
-                    text = error,
-                    color = Color.Red,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-
-            NeoButton(
-                text = if (isLoading) "占卜中..." else "开始占卜",
-                onClick = { viewModel.startFortune() },
-                modifier = Modifier.fillMaxWidth(),
-                backgroundColor = Color(0xFFFDA4AF),
-                shadowOffset = 4.dp, // Reduced to match homepage standard
-                enabled = !isLoading && viewModel.isInputValid()
-            )
-        }
-
-        // Result
-        fortuneResult?.let { fortune ->
-            val context = androidx.compose.ui.platform.LocalContext.current
-            
-            // Auto-scroll whenever result ID changes OR deep insights content expands
-            LaunchedEffect(fortune, fortune.nutritionAnalysis != null, fortune.winePairing != null) {
-                scrollState.animateScrollTo(scrollState.maxValue)
-            }
-            // Removed extra 24.dp spacer - parent Column Arrangement.spacedBy(16.dp) handles it
-            val isFavorite = viewModel.isFavorite(fortune.id)
-            FortuneCard(
-                fortune = fortune,
-                isFavorite = isFavorite,
-                isGenerating = viewModel.isGeneratingImage.value,
-                isAnalyzingDeepInsights = viewModel.isAnalyzingDeepInsights.value,
-                onUnlockDeepInsights = {
-                    viewModel.unlockDeepInsights(fortune)
-                },
-                onFavoriteClick = { viewModel.toggleFavorite(fortune) },
-                onGenerateImage = {
-                    val recipe = Recipe(
-                        id = fortune.id,
-                        name = fortune.dishName,
-                        cuisine = when(fortune.type) {
-                            "daily" -> "今日占卜"
-                            "mood" -> "心情占卜"
-                            "number" -> "数字占卜"
-                            else -> "神秘占卜"
-                        },
-                        ingredients = fortune.ingredients ?: emptyList(),
-                        steps = fortune.steps?.mapIndexed { index, s -> RecipeStep(index + 1, s) } ?: emptyList(),
-                        cookingTime = fortune.cookingTime,
-                        difficulty = fortune.difficulty,
-                        tips = fortune.tips
                     )
-                    android.widget.Toast.makeText(context, "🪄 正在为 '${fortune.dishName}' 创作图鉴...", android.widget.Toast.LENGTH_LONG).show()
-                    viewModel.generateImage(recipe) { url ->
-                        if (url != null) {
-                            android.widget.Toast.makeText(context, "创作成功！已收录至 GALLERY", android.widget.Toast.LENGTH_LONG).show()
-                        } else {
-                            android.widget.Toast.makeText(context, "创作失败，请检查设置或重试", android.widget.Toast.LENGTH_SHORT).show()
-                        }
-                    }
                 }
-            )
+            }
         }
     }
 }
+
+    // --- High-End Seamless Loading Overlay (Gradient Fading) ---
+    AnimatedVisibility(
+        visible = isLoading,
+        enter = fadeIn(tween(400)),
+        exit = fadeOut(tween(600)) // Match blur animation duration
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Transparent) // Truly seamless: Pure blur with no color tint
+                .neoClickable(enabled = false) {}, // Block interaction
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                // Floating Animation State
+                val infiniteTransition = rememberInfiniteTransition(label = "floating")
+                val dy by infiniteTransition.animateFloat(
+                    initialValue = -15f,
+                    targetValue = 15f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(2000, easing = LinearOutSlowInEasing),
+                        repeatMode = RepeatMode.Reverse
+                    ),
+                    label = "float_y"
+                )
+
+                // Entrance Animation for the Crystal Ball
+                AnimatedVisibility(
+                    visible = isLoading,
+                    enter = scaleIn(
+                        initialScale = 0.5f,
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessLow
+                        )
+                    ) + fadeIn(),
+                    modifier = Modifier.graphicsLayer { translationY = dy }
+                ) {
+                    val composition by rememberLottieComposition(
+                        LottieCompositionSpec.RawRes(R.raw.divination_loading)
+                    )
+                    val progress by animateLottieCompositionAsState(
+                        composition,
+                        iterations = LottieConstants.IterateForever
+                    )
+
+                    LottieAnimation(
+                        composition = composition,
+                        progress = { progress },
+                        modifier = Modifier.size(320.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(26.dp))
+                FortuneLoadingProgress()
+            }
+        }
+    }
+    } // Closes Box at 73
+} // Closes FortuneCookingScreen at 33
+
+@Composable
+fun FortuneLoadingProgress() {
+    val infiniteTransition = rememberInfiniteTransition(label = "filling")
+    val progress by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(3000, easing = LinearOutSlowInEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "progress"
+    )
+
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        // Neo-Brutalism Style Progress Bar
+        Box(
+            modifier = Modifier
+                .width(220.dp)
+                .height(16.dp)
+                .background(Color.White, RoundedCornerShape(8.dp))
+                .border(3.dp, NeoBlack, RoundedCornerShape(8.dp))
+                .clip(RoundedCornerShape(8.dp))
+        ) {
+            // Animated Progress Fill (Rose Pink Energy)
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .fillMaxWidth(progress)
+                    .background(Color(0xFFFDA4AF))
+            )
+
+            // Scanning Highlight Glow
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(40.dp)
+                    .offset(x = (progress * 220).dp - 40.dp)
+                    .background(
+                        androidx.compose.ui.graphics.Brush.horizontalGradient(
+                            listOf(Color.Transparent, Color.White.copy(0.3f), Color.Transparent)
+                        )
+                    )
+            )
+        }
+        
+        Spacer(modifier = Modifier.height(12.dp))
+        Text(
+            "能量汇聚中...",
+            color = Color.White.copy(0.8f),
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Black,
+            letterSpacing = 2.sp,
+            style = TextStyle(
+                shadow = Shadow(color = Color.Black.copy(0.5f), blurRadius = 8f)
+            )
+        )
+    }
 }
+
 
 @Composable
 fun FortuneCard(
@@ -441,7 +666,7 @@ fun FortuneCard(
                             Text("幸运指数", fontSize = 12.sp, color = Color.White, fontWeight = FontWeight.Black)
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "${fortune.luckyIndex}/10",
+                                text = "${fortune.luckyIndex}/100",
                                 fontWeight = FontWeight.Black,
                                 fontSize = 18.sp,
                                 color = Color.White
