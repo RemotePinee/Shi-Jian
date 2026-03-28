@@ -127,25 +127,71 @@ class AiRepository(private val context: Context, private val settings: SettingsR
         }
     }
 
-    fun chatStream(messages: List<ChatMessage>): Flow<String> = flow {
-        val model = settings.chatModel
-        val baseUrl = settings.chatBaseUrl
-        val apiKey = settings.chatApiKey
+    fun chatStream(messages: List<ChatMessage>, imageUri: String? = null): Flow<String> = flow {
+        // Plan B: Detection logic for vision session
+        // It's a vision session if it has a new image OR if any message in history is multimodal
+        val isVision = imageUri != null || messages.any { it.content is List<*> }
+        
+        // Use dedicated settings per role, no fallback
+        val model = if (isVision) settings.visionModel else settings.chatModel
+        val baseUrl = if (isVision) settings.visionBaseUrl else settings.chatBaseUrl
+        val apiKey = if (isVision) settings.visionApiKey else settings.chatApiKey
 
         if (baseUrl.isEmpty() || apiKey.isEmpty() || model.isEmpty()) {
-            throw Exception("请先在设置中配置对话接口参数")
+            val category = if (isVision) "识图 (Vision)" else "对话 (Chat)"
+            val help = if (isVision) "\n\n提示：此对话包含图片，需配置识图模型。如果你想共用对话模型，请将对话配置复制一份到识图配置中。" else ""
+            throw Exception("请先在设置中配置 $category 的接口地址、Key 和模型。$help")
         }
+
+        // Messages are now prepared by ViewModel for multimodal history (Plan B).
+        // For vision sessions, some providers (Ark, ZhipuAI) have strict requirements:
+        // 1. Ark: Do not allow 'system' role; system instructions must be merged into the first user message.
+        // 2. ZhipuAI: Large 'maxTokens' or non-default 'temperature' can cause 400.
+        
+        val isArk = baseUrl.contains("volces.com") || baseUrl.contains("ark")
+        val isZhipu = baseUrl.contains("bigmodel.cn") || baseUrl.contains("zhipuai")
+
+        val finalMessages = if (isVision) {
+            val systemMsg = messages.firstOrNull { it.role == "system" }
+            val otherMessages = messages.filter { it.role != "system" }
+            
+            if (isArk && systemMsg != null) {
+                // Merge system into first available user message
+                val firstUserMsg = otherMessages.firstOrNull { it.role == "user" }
+                if (firstUserMsg != null) {
+                    val updatedFirstUser = firstUserMsg.copy(
+                        content = if (firstUserMsg.content is String) {
+                            "${systemMsg.content}\n\n${firstUserMsg.content}"
+                        } else if (firstUserMsg.content is List<*>) {
+                            // Multimodal: Prepend system text to the text part
+                            firstUserMsg.content.map { part ->
+                                if (part is ChatContentPart && part.type == "text") {
+                                    part.copy(text = "${systemMsg.content}\n\n${part.text}")
+                                } else part
+                            }
+                        } else firstUserMsg.content
+                    )
+                    otherMessages.map { if (it === firstUserMsg) updatedFirstUser else it }
+                } else otherMessages
+            } else {
+                messages // Standard OpenAI style
+            }
+        } else messages
 
         val api = ApiClient.getService(baseUrl, apiKey)
         val request = ChatRequest(
             model = model,
-            messages = messages,
-            temperature = 0.7f,
-            maxTokens = 2000,
+            messages = finalMessages,
+            temperature = if (isVision && isZhipu) null else 0.7f,
+            maxTokens = if (isVision && isZhipu) null else 2000,
             stream = true
         )
 
-        val responseBody = api.getChatCompletionStream(request)
+        val responseBody = try {
+            api.getChatCompletionStream(request)
+        } catch (e: Exception) {
+            throw Exception("连接服务器失败: ${e.localizedMessage}")
+        }
 
         responseBody.use { body ->
             val reader = body.source().inputStream().bufferedReader()
@@ -440,23 +486,36 @@ class AiRepository(private val context: Context, private val settings: SettingsR
 
     suspend fun generateDailyFortune(zodiac: String, animal: String): Result<FortuneResult> {
         val prompt = """
-            星座：$zodiac，生肖：$animal。请深度结合星座生肖，为用户推荐今日幸运菜并给出神秘占卜寄语。
-            请严格按照以下JSON格式返回（寄语与菜名置于顶部）：
+            用户身份：星座[$zodiac]，生肖[$animal]。
+            作为一位精通周易五行与西方占星术的【料理占卜师】，请为用户推演今日运势并推荐一道“开运料理”。
+            
+            【起名与推演逻辑 - 核心规范】：
+            1. **严禁复读示例**：下文提供的示例（如离火、墨池）仅为逻辑参考，严禁直接使用。
+            2. **生肖冲突避让**：绝对禁止推荐以用户生肖动物[$animal]为主要肉类来源的菜品。
+            3. **推导式命名**：菜名严禁直接包含“$zodiac”或“$animal”字眼。必须通过五行色彩、星象能量空间或祈愿寓意进行二次创作推导。
+               - 示例逻辑：辛辣/温补 -> 离火/赤焰；黑色滋补 -> 墨池/北冥；清新/嫩叶 -> 晨曦/春华。请通过你的文字底蕴创造更高级的名称。
+            4. **文案艺术**：`mysticalMessage` 需具备大师般的诗意与预言感；`description` 需深度解析该菜品如何从玄学层面调和今日运势。
+            5. **忌宜系统**：必须提供“宜”与“忌”的建议，涵盖饮食、心态或小仪式线索。
+
+            请严格按照以下JSON格式返回：
             {
-              "dishName": "菜名",
-              "mysticalMessage": "一句充满玄学色彩的神秘寄语",
-              "description": "基于星座生肖的今日运势深度解读",
-              "luckyIndex": 随机且合理的60-100整数,
-              "reason": "推荐理由解析 (要求: 必须根据星座运势动态生成的 60-100 之间的整数，严禁每次都用固定数字)",
-              "tips": ["针对该菜品的厨艺建议"],
-              "difficulty": "easy",
-              "cookingTime": 15,
-              "ingredients": ["具体食材名 份量(如: 200g, 1颗, 适量等)", "调料名 份量(如: 1勺, 5g等)"],
-              "steps": ["1. 针对该菜品的具体操作步骤", "2. 针对该菜品的具体操作步骤"]
+              "dishName": "创意推导出的雅致菜名",
+              "mysticalMessage": "充满玄学美感与治愈力的诗意预言",
+              "description": "基于星座生肖特质与五行调和理论的深度运势解析",
+              "luckyIndex": 60-100之间的整数,
+              "reason": "玄学层面的推荐动机（如：风象星座今日思虑过载，宜用根茎类食材固本培元）",
+              "tips": ["厨艺方面的点睛之笔"],
+              "luckyAdvice": ["今日宜执行的具体开运建议"],
+              "tabooAdvice": ["今日应避开的行为或雷区"],
+              "difficulty": "easy/medium/hard",
+              "cookingTime": 整数(分钟),
+              "ingredients": ["具体食材名 份量", "调料名 份量"],
+              "steps": ["1. 详细步骤说明", "2. 详细步骤说明"]
             }
-            重要要求：生成的食材 (ingredients) 和制作步骤 (steps) 必须与生成的菜名 (dishName) 严格对应，严禁照抄示例中的内容，严禁出现“菜名是鸡、食材是猪肉”这种低级逻辑错误。
         """.trimIndent()
-        val res = callAi("你是一位神秘的料理占卜师。请严格按JSON返回。每个食材/调料必须是独立的数组项，严禁合并。", prompt, FortuneResult::class.java)
+        
+        val systemMsg = "你是一位游历四方、精通星象易理与食疗哲学的神秘料理占卜师。你说话优雅且富有禅意。请严格按照JSON格式返回，严禁任何多余解释。"
+        val res = callAi(systemMsg, prompt, FortuneResult::class.java)
         return res.map { it.copy(
             id = "fortune-${System.currentTimeMillis()}", 
             type = "daily", 
@@ -467,23 +526,33 @@ class AiRepository(private val context: Context, private val settings: SettingsR
 
     suspend fun generateMoodCooking(moods: List<String>, intensity: Int): Result<FortuneResult> {
         val prompt = """
-            当前心情：${moods.joinToString("、")}，强度：$intensity/5。请推荐一道治愈菜品并给出情感解析。
-            请严格按照以下JSON格式返回（寄语与菜名置于顶部）：
+            当前心情：${moods.joinToString("、")}，情绪感应强度：$intensity/5。
+            作为一位【情感治愈料理占卜师】，请通过食物的质感、温度与营养成分来调理用户的心情。
+            
+            【要求】：
+            1. **情感共鸣**：`mysticalMessage` 应如深夜电台般温暖且富有哲理；`description` 需解析食材如何对应其情绪（如：碳水化合物带来的安全感，水果酸甜带来的多巴胺释放）。
+            2. **起名艺术**：菜名应体现“治愈”与“意象”，严禁平铺直叙。
+            3. **生活指引**：必须产出针对该心情的“今日宜/忌”建议。
+
+            请严格按照以下JSON格式返回：
             {
-              "dishName": "治愈菜名",
-              "mysticalMessage": "一句温暖治愈的心情语录",
-              "description": "针对当前心情的情感寄语",
-              "luckyIndex": 随机且合理的60-100整数,
-              "reason": "推荐逻辑 (要求: 必须根据心情强度动态生成的 60-100 之间的整数，严禁每次都用固定数字)",
-              "tips": ["针对该菜品的厨艺小贴士"],
-              "difficulty": "medium",
-              "cookingTime": 20,
-              "ingredients": ["心情食材名 份量(如: 100g, 5ML, 1把等)"],
-              "steps": ["1. 针对该心情菜品的具体操作", "2. 针对该心情菜品的具体操作"]
+              "dishName": "治愈系雅致菜名",
+              "mysticalMessage": "温暖治愈的心情语录",
+              "description": "针对当前情绪的料理疗愈解析",
+              "luckyIndex": 60-100之间的整数,
+              "reason": "推荐逻辑（解析食材与心理压力的科学或玄学联结）",
+              "tips": ["厨艺方面的点睛之笔"],
+              "luckyAdvice": ["今日宜执行的心灵/生活建议"],
+              "tabooAdvice": ["今日应避开的负能量雷区"],
+              "difficulty": "easy/medium/hard",
+              "cookingTime": 整数(分钟),
+              "ingredients": ["食材名 份量"],
+              "steps": ["1. 制作步骤", "2. 制作步骤"]
             }
-            重要要求：生成的食材 (ingredients) 和制作步骤 (steps) 必须与生成的菜名 (dishName) 严格对应，严禁照抄示例中的内容。
         """.trimIndent()
-        val res = callAi("你是一位温暖的情感治愈料理占卜师。请严格按JSON返回。每个食材/调料必须是独立的数组项，严禁合并。", prompt, FortuneResult::class.java)
+        
+        val systemMsg = "你是一位极度温柔且擅长情感疗愈的神秘料理师。你的话语能抚平焦虑。请严格按照JSON格式返回，严禁任何多余解释。"
+        val res = callAi(systemMsg, prompt, FortuneResult::class.java)
         return res.map { it.copy(
             id = "mood-${System.currentTimeMillis()}", 
             type = "mood",
@@ -493,23 +562,33 @@ class AiRepository(private val context: Context, private val settings: SettingsR
 
     suspend fun generateNumberFortune(number: Int): Result<FortuneResult> {
         val prompt = """
-            幸运数字：$number。请深度解析数字寓意并推荐幸运菜。
-            请严格按照以下JSON格式返回（寄语与菜名置于顶部）：
+            幸运数字：[$number]。
+            作为一位精通【数秘学】与【能量平衡】的料理大师，请解析该数字背后的命运振动，并推荐一道“契合能量”的开运菜。
+            
+            【要求】：
+            1. **数字寓意**：`mysticalMessage` 应揭示数字深层含义；`description` 需解析数字能量与食材性质的对应关系。
+            2. **起名艺术**：菜名应基于数字的神秘几何或历史寓意进行推演。
+            3. **行为指引**：必须产出针对该数字能量的“今日宜/忌”建议。
+
+            请严格按照以下JSON格式返回：
             {
-              "dishName": "幸运菜名",
-              "mysticalMessage": "关于这个数字的神秘寄语",
-              "description": "数字占卜解析",
-              "luckyIndex": 随机且合理的60-100整数,
-              "reason": "寓意解析 (要求: 必须根据数字寓意动态生成的 60-100 之间的整数，严禁每次都用固定数字)",
-              "tips": ["针对数字寓意的小贴士"],
-              "difficulty": "easy",
-              "cookingTime": 10,
-              "ingredients": ["幸运食材及其精准份量(如: 300g, 2片, 适量)"],
-              "steps": ["1. 具体的制作步骤描述", "2. 具体的制作步骤描述"]
+              "dishName": "基于数字背景推导出的雅致菜名",
+              "mysticalMessage": "关于数字命理的神秘寄语",
+              "description": "数字占卜与料理能量的深度对等分析",
+              "luckyIndex": 60-100之间的整数,
+              "reason": "推荐逻辑（解析数字频率如何与食材共振）",
+              "tips": ["厨艺方面的点睛之笔"],
+              "luckyAdvice": ["今日宜执行的开运小仪式"],
+              "tabooAdvice": ["今日绝对要避开的混乱区域"],
+              "difficulty": "easy/medium/hard",
+              "cookingTime": 整数(分钟),
+              "ingredients": ["食材名 份量"],
+              "steps": ["1. 制作步骤", "2. 制作步骤"]
             }
-            重要要求：生成的食材 (ingredients) 和制作步骤 (steps) 必须与生成的菜名 (dishName) 严格对应，严禁照抄示例中的内容。
         """.trimIndent()
-        val res = callAi("你是一位精通数字占卜的料理大师。请严格按JSON返回。每个食材/调料必须是独立的数组项，严禁合并。", prompt, FortuneResult::class.java)
+        
+        val systemMsg = "你是一位冷静睿智、精通数秘学与食材能量的料理占卜师。你洞悉万物律动。请严格按照JSON格式返回，严禁任何多余解释。"
+        val res = callAi(systemMsg, prompt, FortuneResult::class.java)
         return res.map { it.copy(
             id = "num-${System.currentTimeMillis()}", 
             type = "number",
@@ -682,6 +761,20 @@ class AiRepository(private val context: Context, private val settings: SettingsR
         return res.map { (it["ingredients"] as? List<*>)?.map { item -> item.toString() } ?: emptyList() }
     }
 
+    suspend fun getImageSummary(imageUri: String): Result<String> {
+        val prompt = "请以顶级大厨的视角，非常详细地描述这张图片中的所有内容。包括食材种类、新鲜程度、可能的用途以及任何视觉细节。这个描述将作为后续对话的文字背景，请务必客观且详尽。150字以内。"
+        return callAi("你是一位专业的视觉描述专家。", prompt, Map::class.java, isVision = true, imageUri = imageUri)
+            .map { it["summary"]?.toString() ?: it.values.firstOrNull()?.toString() ?: "" }
+            .mapCatching { 
+                it.ifEmpty { 
+                    // Try direct string response if JSON parsing failed or returned empty
+                    val res = callAi("你是一位专业的视觉描述专家。", prompt, String::class.java, isVision = true, imageUri = imageUri)
+                    res.getOrThrow()
+                }
+
+            }
+    }
+
     suspend fun fetchModels(baseUrl: String, apiKey: String): Result<List<String>> = withContext(Dispatchers.IO) {
         try {
             if (baseUrl.contains("volces.com") || baseUrl.contains("ark")) {
@@ -723,7 +816,7 @@ class AiRepository(private val context: Context, private val settings: SettingsR
         }
     }
 
-    private fun uriToBase64(uriString: String): String? {
+    fun uriToBase64(uriString: String): String? {
         return try {
             val uri = uriString.toUri()
             val inputStream = context.contentResolver.openInputStream(uri)

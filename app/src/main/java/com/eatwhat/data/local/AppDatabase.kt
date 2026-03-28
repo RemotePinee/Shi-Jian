@@ -6,7 +6,9 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.eatwhat.data.model.ChatMessageItem
 
-@Database(entities = [ChatMessageItem::class], version = 4, exportSchema = false)
+@Database(entities = [ChatMessageItem::class], version = 9, exportSchema = false)
+
+
 abstract class AppDatabase : RoomDatabase() {
     abstract fun chatDao(): ChatDao
 

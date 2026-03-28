@@ -30,7 +30,10 @@ import com.eatwhat.ui.components.*
 import com.eatwhat.ui.viewmodel.FortuneCookingViewModel
 import com.eatwhat.ui.viewmodel.FortuneType
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.withFrameNanos
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 
 @Composable
 fun FortuneCookingScreen(
@@ -51,31 +54,23 @@ fun FortuneCookingScreen(
         label = "blur_radius"
     )
 
-    // --- Scroll Focus Management (Height-Observer Pattern) ---
+    // --- Scroll Focus Management (Observation Pattern) ---
     var lastFortuneId by remember { mutableStateOf(fortuneResult?.id) }
-    var lastNutrition by remember { mutableStateOf(fortuneResult?.nutritionAnalysis != null) }
-    var lastPairing by remember { mutableStateOf(fortuneResult?.winePairing != null) }
     var autoScrollWindowUntil by remember { mutableLongStateOf(0L) }
     var lastMaxValue by remember { mutableIntStateOf(scrollState.maxValue) }
-    val isAnalyzingDeepInsights by viewModel.isAnalyzingDeepInsights
 
-    LaunchedEffect(fortuneResult?.id, fortuneResult?.nutritionAnalysis != null, fortuneResult?.winePairing != null, isAnalyzingDeepInsights) {
+    // Global Scroll-to-Bottom only when a NEW fortune result is generated
+    LaunchedEffect(fortuneResult?.id) {
         val hasNewResult = fortuneResult != null && fortuneResult?.id != lastFortuneId
-        val hasNewNutrition = fortuneResult?.nutritionAnalysis != null && !lastNutrition
-        val hasNewPairing = fortuneResult?.winePairing != null && !lastPairing
-
-        if (hasNewResult || hasNewNutrition || hasNewPairing || isAnalyzingDeepInsights) {
-            autoScrollWindowUntil = System.currentTimeMillis() + 2500
+        
+        if (hasNewResult) {
+            autoScrollWindowUntil = System.currentTimeMillis() + 2500 // 2.5s window
+            lastMaxValue = 0 // Reset to force scroll for new result
             
-            // For a new result, we reset the ceiling to force an initial scroll-to-bottom
-            if (hasNewResult) {
-                lastMaxValue = 0
-            }
-
-            // Active Follow-up (The "Favorites" Pattern)
+            // Initial follow-up for the first 1s of divination display
             val startTime = System.currentTimeMillis()
-            var lastTarget = if (hasNewResult) 0 else scrollState.maxValue
-            while (System.currentTimeMillis() - startTime < 1200) {
+            var lastTarget = 0
+            while (System.currentTimeMillis() - startTime < 1000) {
                 if (scrollState.maxValue > lastTarget) {
                     scrollState.animateScrollTo(
                         scrollState.maxValue,
@@ -86,13 +81,13 @@ fun FortuneCookingScreen(
                 withFrameNanos { }
             }
         }
-
         lastFortuneId = fortuneResult?.id
-        lastNutrition = fortuneResult?.nutritionAnalysis != null
-        lastPairing = fortuneResult?.winePairing != null
     }
 
+    // Windowed observer for automated scrolling during the expansion window
     LaunchedEffect(scrollState.maxValue) {
+        // PROFESSIONAL FIX: Only auto-scroll globally if we are NOT in an explicit focus operation
+        // and only during the initial generation window.
         if (System.currentTimeMillis() < autoScrollWindowUntil && scrollState.maxValue > lastMaxValue) {
             scrollState.animateScrollTo(
                 scrollState.maxValue,
@@ -102,11 +97,15 @@ fun FortuneCookingScreen(
         lastMaxValue = scrollState.maxValue
     }
 
-    // Explicitly kill any active scroll window when starting a new divination
+    // Explicitly kill any active scroll window when starting a new divination or when expansion happens
+    val cancelGlobalScroll = {
+        autoScrollWindowUntil = 0
+        lastMaxValue = scrollState.maxValue
+    }
+
     LaunchedEffect(isLoading) {
         if (isLoading) {
-            autoScrollWindowUntil = 0
-            lastMaxValue = scrollState.maxValue 
+            cancelGlobalScroll()
         }
     }
 
@@ -146,13 +145,19 @@ fun FortuneCookingScreen(
                 heroEmoji = "🔮"
             )
 
-            Column(
+            Box(
                 modifier = Modifier
                     .weight(1f)
-                    .verticalScroll(scrollState)
-                    .padding(top = 10.dp, bottom = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(24.dp)
+                    .fillMaxWidth()
+                    .fadingEdge(top = 10.dp, bottom = 16.dp)
             ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(scrollState)
+                        .padding(top = 10.dp, bottom = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(24.dp)
+                ) {
             // Step 1: Select Fortune Type
             NeoCard(
                 modifier = Modifier.fillMaxWidth(),
@@ -338,6 +343,7 @@ fun FortuneCookingScreen(
                                 onClick = { viewModel.generateRandomNumber() },
                                 modifier = Modifier.height(70.dp).width(120.dp), // Constrain width
                                 backgroundColor = Color(0xFFFB923C),
+                                fontSize = 24.sp,
                                 shadowOffset = 4.dp
                             )
                         }
@@ -409,16 +415,17 @@ fun FortuneCookingScreen(
                                 if (url != null) {
                                     android.widget.Toast.makeText(context, "创作成功！已收录至 GALLERY", android.widget.Toast.LENGTH_LONG).show()
                                 } else {
-                                    android.widget.Toast.makeText(context, "创作失败，请检查设置或重试", android.widget.Toast.LENGTH_SHORT).show()
+                                    android.widget.Toast.makeText(context, "创作失败，请检查设置 or 重试", android.widget.Toast.LENGTH_SHORT).show()
                                 }
                             }
                         }
                     )
+                        }
+                    }
                 }
             }
         }
     }
-}
 
     // --- High-End Seamless Loading Overlay (Gradient Fading) ---
     AnimatedVisibility(
@@ -552,8 +559,34 @@ fun FortuneCard(
     isAnalyzingDeepInsights: Boolean = false,
     onFavoriteClick: () -> Unit = {},
     onGenerateImage: () -> Unit = {},
-    onUnlockDeepInsights: () -> Unit = {}
+    onUnlockDeepInsights: () -> Unit = {},
+    onExpandedChange: () -> Unit = {}
 ) {
+    var isExpanded by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val bringIntoViewRequester = remember { BringIntoViewRequester() }
+    val bottomRequester = remember { BringIntoViewRequester() }
+    
+    // Smooth glide-follow when insights are generated
+    var lastNutritionState by remember { mutableStateOf(fortune.nutritionAnalysis != null) }
+    var lastPairingState by remember { mutableStateOf(fortune.winePairing != null) }
+    
+    LaunchedEffect(fortune.nutritionAnalysis != null, fortune.winePairing != null, isAnalyzingDeepInsights) {
+        val hasNewNutrition = fortune.nutritionAnalysis != null && !lastNutritionState
+        val hasNewPairing = fortune.winePairing != null && !lastPairingState
+        
+        if (hasNewNutrition || hasNewPairing || isAnalyzingDeepInsights) {
+            // PROFESSIONAL FOLLOW-UP: Increased to 1500ms to ensure visibility during content update
+            val startTime = System.currentTimeMillis()
+            while (System.currentTimeMillis() - startTime < 1500) {
+                bottomRequester.bringIntoView()
+                withFrameNanos { }
+            }
+        }
+        lastNutritionState = fortune.nutritionAnalysis != null
+        lastPairingState = fortune.winePairing != null
+    }
+
     NeoCard(modifier = Modifier.fillMaxWidth(), backgroundColor = Color.White) {
         Column(modifier = Modifier.fillMaxWidth()) {
             // Header with Buttons
@@ -710,8 +743,62 @@ fun FortuneCard(
                     color = NeoBlack.copy(alpha = 0.8f),
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth(),
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    lineHeight = 18.sp
                 )
+            }
+
+            // Today's Luck & Taboos (今日忌宜)
+            if (fortune.luckyAdvice.isNotEmpty() || fortune.tabooAdvice.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(24.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    // Lucky Advice (宜)
+                    if (fortune.luckyAdvice.isNotEmpty()) {
+                        Surface(
+                            modifier = Modifier.weight(1f).fillMaxHeight(),
+                            color = Color(0xFFF0FDF4),
+                            shape = RoundedCornerShape(12.dp),
+                            border = androidx.compose.foundation.BorderStroke(2.dp, NeoBlack)
+                        ) {
+                            Column(modifier = Modifier.padding(12.dp)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text("✅", fontSize = 12.sp)
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text("宜", fontWeight = FontWeight.Black, fontSize = 14.sp, color = Color(0xFF166534))
+                                }
+                                Spacer(modifier = Modifier.height(8.dp))
+                                fortune.luckyAdvice.forEach { advice ->
+                                    Text("• $advice", fontSize = 12.sp, color = NeoBlack, fontWeight = FontWeight.Bold)
+                                }
+                            }
+                        }
+                    }
+
+                    // Taboo Advice (忌)
+                    if (fortune.tabooAdvice.isNotEmpty()) {
+                        Surface(
+                            modifier = Modifier.weight(1f).fillMaxHeight(),
+                            color = Color(0xFFFEF2F2),
+                            shape = RoundedCornerShape(12.dp),
+                            border = androidx.compose.foundation.BorderStroke(2.dp, NeoBlack)
+                        ) {
+                            Column(modifier = Modifier.padding(12.dp)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text("❌", fontSize = 12.sp)
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text("忌", fontWeight = FontWeight.Black, fontSize = 14.sp, color = Color(0xFF991B1B))
+                                }
+                                Spacer(modifier = Modifier.height(8.dp))
+                                fortune.tabooAdvice.forEach { advice ->
+                                    Text("• $advice", fontSize = 12.sp, color = NeoBlack, fontWeight = FontWeight.Bold)
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             // Ingredients and Steps
@@ -739,7 +826,9 @@ fun FortuneCard(
                     Text("制作步骤", fontWeight = FontWeight.Black, fontSize = 18.sp, color = NeoBlack)
                 }
                 Spacer(modifier = Modifier.height(12.dp))
-                fortune.steps.forEachIndexed { index, step ->
+                
+                val displaySteps = if (isExpanded) fortune.steps else fortune.steps.take(3)
+                displaySteps.forEachIndexed { index, step ->
                     Row(modifier = Modifier.padding(vertical = 6.dp)) {
                         Box(
                             modifier = Modifier
@@ -753,15 +842,62 @@ fun FortuneCard(
                         Text(step, fontSize = 14.sp, color = NeoBlack, fontWeight = FontWeight.Bold, lineHeight = 20.sp)
                     }
                 }
+                
+                // Steps focus anchor
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .bringIntoViewRequester(bringIntoViewRequester)
+                )
+
+                if (fortune.steps.size > 3) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .neoClickable { 
+                                isExpanded = !isExpanded
+                                if (isExpanded) {
+                                    onExpandedChange()
+                                    scope.launch {
+                                        val startTime = System.currentTimeMillis()
+                                        while (System.currentTimeMillis() - startTime < 1000) {
+                                            bringIntoViewRequester.bringIntoView()
+                                            withFrameNanos { }
+                                        }
+                                    }
+                                }
+                            }
+                            .padding(vertical = 4.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = if (isExpanded) "收起步骤" else "还有 ${fortune.steps.size - 3} 个步骤，查看全部",
+                                color = if (isExpanded) Color.Gray else Color(0xFFF97316),
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = if (isExpanded) "▲" else "▼",
+                                fontSize = 10.sp,
+                                color = if (isExpanded) Color.Gray else Color(0xFFF97316)
+                            )
+                        }
+                    }
+                }
             }
 
-            // Deep Insights Section (Nutrition & Beverage)
-            DeepInsightsSection(
-                nutrition = fortune.nutritionAnalysis,
-                pairing = fortune.winePairing,
-                isLoading = isAnalyzingDeepInsights,
-                onUnlock = onUnlockDeepInsights
-            )
+            // Deep Insights Section (Focus Radar attached directly)
+            Box(modifier = Modifier.bringIntoViewRequester(bottomRequester)) {
+                DeepInsightsSection(
+                    nutrition = fortune.nutritionAnalysis,
+                    pairing = fortune.winePairing,
+                    isLoading = isAnalyzingDeepInsights,
+                    onUnlock = onUnlockDeepInsights
+                )
+            }
         }
     }
 }

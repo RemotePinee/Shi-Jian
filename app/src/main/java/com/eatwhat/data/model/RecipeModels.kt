@@ -18,6 +18,8 @@ data class Recipe(
     val cookingTime: Int = 0,
     val difficulty: String = "medium", // "easy", "medium", "hard"
     val tips: List<String> = emptyList(),
+    val luckyAdvice: List<String> = emptyList(),
+    val tabooAdvice: List<String> = emptyList(),
     val nutritionAnalysis: NutritionAnalysis? = null,
     val winePairing: WinePairing? = null,
     val isSauce: Boolean = false

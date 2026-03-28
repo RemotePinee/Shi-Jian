@@ -178,7 +178,9 @@ class FortuneCookingViewModel(
                 steps = fortune.steps?.mapIndexed { index, s -> RecipeStep(index + 1, s) } ?: emptyList(),
                 cookingTime = fortune.cookingTime,
                 difficulty = fortune.difficulty,
-                tips = fortune.tips
+                tips = fortune.tips,
+                luckyAdvice = fortune.luckyAdvice,
+                tabooAdvice = fortune.tabooAdvice
             )
             favoriteRepository.addFavorite(
                 FavoriteRecipe(

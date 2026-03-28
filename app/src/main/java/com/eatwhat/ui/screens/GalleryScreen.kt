@@ -7,6 +7,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -56,7 +59,7 @@ fun GalleryScreen(
             .fillMaxSize()
             .background(Color(0xFFFACC15)) // Yellow-400
             .padding(start = 16.dp, end = 12.dp, top = 16.dp, bottom = 0.dp), // Compensate for 4dp card shadows
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         // Header
         Box(modifier = Modifier.fillMaxWidth()) {
@@ -81,7 +84,7 @@ fun GalleryScreen(
                 }
             }
         }
-
+        
         Box(
             modifier = Modifier.weight(1f).fillMaxWidth()
         ) {
@@ -107,38 +110,26 @@ fun GalleryScreen(
                     }
                 )
             } else {
-                // Manual Waterfall Layout
-                val leftImages = images.filterIndexed { index, _ -> index % 2 == 0 }
-                val rightImages = images.filterIndexed { index, _ -> index % 2 != 0 }
-                
-                Row(
+                Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
-                        .padding(top = 10.dp, bottom = 12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        .fadingEdge(top = 10.dp, bottom = 16.dp)
                 ) {
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    LazyVerticalStaggeredGrid(
+                        columns = StaggeredGridCells.Fixed(2),
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalItemSpacing = 12.dp,
+                        contentPadding = PaddingValues(top = 10.dp, bottom = 16.dp)
                     ) {
-                        leftImages.forEach { image ->
-                            GalleryItem(image, viewModel, selectedImageState)
-                        }
-                    }
-                    
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        rightImages.forEach { image ->
+                        items(images, key = { it.id }) { image ->
                             GalleryItem(image, viewModel, selectedImageState)
                         }
                     }
                 }
-            }
         }
     }
+}
 
     // Image Preview Dialog
     selectedImage?.let { image ->
@@ -148,7 +139,17 @@ fun GalleryScreen(
                 padding = 0.dp,
                 shadowOffset = 6.dp
             ) {
-                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f, fill = false)
+                        .fadingEdge(top = 0.dp, bottom = 16.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .verticalScroll(rememberScrollState())
+                            .padding(top = 0.dp, bottom = 16.dp)
+                    ) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -273,6 +274,7 @@ fun GalleryScreen(
                     }
                 }
             }
+        }
         }
     }
 

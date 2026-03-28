@@ -9,12 +9,18 @@ data class ChatMessageItem(
     @PrimaryKey
     val id: String = UUID.randomUUID().toString(),
     val sessionId: String = "default",
-    val content: String,
-    val isUser: Boolean,
+    val content: String = "",
+    val isUser: Boolean = false,
     val timestamp: Long = System.currentTimeMillis(),
+
     val recipeJson: String? = null,
-    val isRecipeLoading: Boolean = false
+    val isRecipeLoading: Boolean = false,
+    val imageUri: String? = null,
+    val imageSummary: String? = null,
+    val generatedImageUrl: String? = null,
+    val isImageLoading: Boolean = false
 )
+
 
 data class ChatSessionSummary(
     val sessionId: String,

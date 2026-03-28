@@ -12,6 +12,8 @@ data class FortuneResult(
     val difficulty: String = "medium",
     val cookingTime: Int = 0,
     val mysticalMessage: String = "",
+    val luckyAdvice: List<String> = emptyList(),
+    val tabooAdvice: List<String> = emptyList(),
     val ingredients: List<String>? = emptyList(),
     val steps: List<String>? = emptyList(),
     val nutritionAnalysis: NutritionAnalysis? = null,

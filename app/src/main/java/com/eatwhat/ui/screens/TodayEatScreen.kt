@@ -55,30 +55,23 @@ fun TodayEatScreen(
         label = "blur_radius"
     )
 
-    // --- Scroll Focus Management (Height-Observer Pattern) ---
+    // --- Scroll Focus Management (Observation Pattern) ---
     var lastRecipeId by remember { mutableStateOf(recipe?.id) }
-    var lastNutrition by remember { mutableStateOf(recipe?.nutritionAnalysis != null) }
-    var lastPairing by remember { mutableStateOf(recipe?.winePairing != null) }
     var autoScrollWindowUntil by remember { mutableLongStateOf(0L) }
     var lastMaxValue by remember { mutableIntStateOf(scrollState.maxValue) }
 
-    LaunchedEffect(recipe?.id, recipe?.nutritionAnalysis != null, recipe?.winePairing != null, isAnalyzingDeepInsights) {
+    // Global Scroll-to-Bottom only when a NEW recipe is generated
+    LaunchedEffect(recipe?.id) {
         val hasNewResult = recipe != null && recipe?.id != lastRecipeId
-        val hasNewNutrition = recipe?.nutritionAnalysis != null && !lastNutrition
-        val hasNewPairing = recipe?.winePairing != null && !lastPairing
         
-        if (hasNewResult || hasNewNutrition || hasNewPairing || isAnalyzingDeepInsights) {
-            autoScrollWindowUntil = System.currentTimeMillis() + 2500
+        if (hasNewResult) {
+            autoScrollWindowUntil = System.currentTimeMillis() + 2500 // 2.5s window
+            lastMaxValue = 0 // Reset to force scroll for new result
             
-            // For a new result, we reset the ceiling to force an initial scroll-to-bottom
-            if (hasNewResult) {
-                lastMaxValue = 0
-            }
-
-            // Active Follow-up (The "Favorites" Pattern)
+            // Initial follow-up for the start of the result display
             val startTime = System.currentTimeMillis()
-            var lastTarget = if (hasNewResult) 0 else scrollState.maxValue
-            while (System.currentTimeMillis() - startTime < 1200) {
+            var lastTarget = 0
+            while (System.currentTimeMillis() - startTime < 1000) {
                 if (scrollState.maxValue > lastTarget) {
                     scrollState.animateScrollTo(
                         scrollState.maxValue,
@@ -89,13 +82,13 @@ fun TodayEatScreen(
                 withFrameNanos { }
             }
         }
-        
         lastRecipeId = recipe?.id
-        lastNutrition = recipe?.nutritionAnalysis != null
-        lastPairing = recipe?.winePairing != null
     }
 
+    // Windowed observer for automated scrolling during the result reveal window
     LaunchedEffect(scrollState.maxValue) {
+        // PROFESSIONAL FIX: Only auto-scroll globally if we are NOT in an explicit focus operation
+        // and only during the initial generation window.
         if (System.currentTimeMillis() < autoScrollWindowUntil && scrollState.maxValue > lastMaxValue) {
             scrollState.animateScrollTo(
                 scrollState.maxValue,
@@ -105,11 +98,15 @@ fun TodayEatScreen(
         lastMaxValue = scrollState.maxValue
     }
 
-    // Explicitly kill any active scroll window when starting a new generation
+    // Explicitly kill any active scroll window when starting a new generation or selection
+    val cancelGlobalScroll = {
+        autoScrollWindowUntil = 0
+        lastMaxValue = scrollState.maxValue 
+    }
+
     LaunchedEffect(isGenerating, isSelecting) {
         if (isGenerating || isSelecting) {
-            autoScrollWindowUntil = 0
-            lastMaxValue = scrollState.maxValue 
+            cancelGlobalScroll()
         }
     }
 
@@ -147,71 +144,79 @@ fun TodayEatScreen(
                 heroEmoji = "🎁"
             )
 
-            Column(
+            // Main Viewport Container with Fading Edge
+            Box(
                 modifier = Modifier
                     .weight(1f)
-                    .verticalScroll(scrollState)
-                    .padding(top = 10.dp, bottom = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(24.dp)
+                    .fillMaxWidth()
+                    .fadingEdge(top = 10.dp, bottom = 16.dp)
             ) {
-                // Hero Section / Start
-                if (!isSelecting && selectedDishes.isEmpty()) {
-                    NeoCard(modifier = Modifier.fillMaxWidth()) {
-                        Column(
-                            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Spacer(modifier = Modifier.height(32.dp))
-                            Text("🍱", fontSize = 80.sp)
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Text("准备好了吗？", fontSize = 28.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
-                            Text("点击下方按钮开启随机美食之旅", fontSize = 14.sp, color = NeoBlack, textAlign = TextAlign.Center)
-                            Spacer(modifier = Modifier.height(32.dp))
-                            
-                            NeoButton(
-                                text = "开始随机选择",
-                                onClick = { viewModel.startRandomSelection() },
-                                modifier = Modifier.padding(horizontal = 32.dp),
-                                shadowOffset = 4.dp // Consistent shadow
-                            )
-
-                            Spacer(modifier = Modifier.height(16.dp))
-
-                            // Preference Toggle
-                            Row(
-                                modifier = Modifier.neoClickable { viewModel.togglePreference() },
-                                verticalAlignment = Alignment.CenterVertically
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(scrollState)
+                        .padding(top = 10.dp, bottom = 16.dp), // Maintained to match Home Screen logic
+                    verticalArrangement = Arrangement.spacedBy(24.dp)
+                ) {
+                    // Hero Section / Start
+                    if (!isSelecting && selectedDishes.isEmpty()) {
+                        NeoCard(modifier = Modifier.fillMaxWidth()) {
+                            Column(
+                                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Text("偏好设置", color = NeoBlack, fontSize = 14.sp, fontWeight = FontWeight.Black)
-                                Icon(
-                                    imageVector = if (showPreference) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                                    contentDescription = null,
-                                    tint = NeoBlack
+                                Spacer(modifier = Modifier.height(32.dp))
+                                Text("🍱", fontSize = 80.sp)
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text("准备好了吗？", fontSize = 28.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
+                                Text("点击下方按钮开启随机美食之旅", fontSize = 14.sp, color = NeoBlack, textAlign = TextAlign.Center)
+                                Spacer(modifier = Modifier.height(32.dp))
+                                
+                                NeoButton(
+                                    text = "开始随机选择",
+                                    onClick = { viewModel.startRandomSelection() },
+                                    modifier = Modifier.padding(horizontal = 32.dp),
+                                    shadowOffset = 4.dp // Consistent shadow
                                 )
-                            }
 
-                            AnimatedVisibility(visible = showPreference) {
-                                Column(modifier = Modifier.padding(top = 8.dp)) {
-                                    Preference.entries.chunked(2).forEach { chunk ->
-                                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                            chunk.forEach { pref ->
-                                                Surface(
-                                                    modifier = Modifier
-                                                        .weight(1f)
-                                                        .neoClickable { viewModel.setPreference(pref) }
-                                                        .padding(vertical = 4.dp),
-                                                    color = if (preference == pref) Color(0xFFF97316) else Color.White,
-                                                    shape = RoundedCornerShape(8.dp),
-                                                    border = rowBorder(2.dp, NeoBlack) // Thicker border
-                                                ) {
-                                                    Text(
-                                                        text = "${pref.icon} ${pref.label}",
-                                                        modifier = Modifier.padding(8.dp),
-                                                        textAlign = TextAlign.Center,
-                                                        color = if (preference == pref) Color.White else Color.Black,
-                                                        fontSize = 12.sp,
-                                                        fontWeight = FontWeight.Bold
-                                                    )
+                                Spacer(modifier = Modifier.height(16.dp))
+
+                                // Preference Toggle
+                                Row(
+                                    modifier = Modifier.neoClickable { viewModel.togglePreference() },
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text("偏好设置", color = NeoBlack, fontSize = 14.sp, fontWeight = FontWeight.Black)
+                                    Icon(
+                                        imageVector = if (showPreference) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                                        contentDescription = null,
+                                        tint = NeoBlack
+                                    )
+                                }
+
+                                AnimatedVisibility(visible = showPreference) {
+                                    Column(modifier = Modifier.padding(top = 8.dp)) {
+                                        Preference.entries.chunked(2).forEach { chunk ->
+                                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                                chunk.forEach { pref ->
+                                                    Surface(
+                                                        modifier = Modifier
+                                                            .weight(1f)
+                                                            .neoClickable { viewModel.setPreference(pref) }
+                                                            .padding(vertical = 4.dp),
+                                                        color = if (preference == pref) Color(0xFFF97316) else Color.White,
+                                                        shape = RoundedCornerShape(8.dp),
+                                                        border = rowBorder(2.dp, NeoBlack) // Thicker border
+                                                    ) {
+                                                        Text(
+                                                            text = "${pref.icon} ${pref.label}",
+                                                            modifier = Modifier.padding(8.dp),
+                                                            textAlign = TextAlign.Center,
+                                                            color = if (preference == pref) Color.White else Color.Black,
+                                                            fontSize = 12.sp,
+                                                            fontWeight = FontWeight.Bold
+                                                        )
+                                                    }
                                                 }
                                             }
                                         }
@@ -220,163 +225,166 @@ fun TodayEatScreen(
                             }
                         }
                     }
-                }
 
-                // Selection Process
-                if (isSelecting) {
-                    NeoCard(modifier = Modifier.fillMaxWidth()) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(selectionStatus, fontWeight = FontWeight.Black, fontSize = 18.sp, color = NeoBlack)
-                            Spacer(modifier = Modifier.height(16.dp))
-                            LinearProgressIndicator(
-                                progress = { selectionProgress },
-                                modifier = Modifier.fillMaxWidth().height(8.dp).border(1.dp, NeoBlack, RoundedCornerShape(4.dp)),
-                                color = Color(0xFFF97316),
-                                trackColor = Color.White
-                            )
-                            Spacer(modifier = Modifier.height(24.dp))
-                            
-                            currentSelection?.let { item ->
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .background(Color(0xFFF3F4F6), RoundedCornerShape(12.dp))
-                                        .border(2.dp, NeoBlack, RoundedCornerShape(12.dp))
-                                        .padding(24.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Text(if (item.type == "dish") "🍱" else item.avatar, fontSize = 48.sp)
-                                    Text(item.name, fontWeight = FontWeight.Black, fontSize = 20.sp, color = NeoBlack)
-                                    if (item.specialty.isNotBlank()) {
-                                        Text(item.specialty, fontSize = 14.sp, color = NeoBlack, fontWeight = FontWeight.Bold)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Results
-                if (!isSelecting && selectedDishes.isNotEmpty()) {
-                    NeoCard(modifier = Modifier.fillMaxWidth()) {
-                        Text("今日推荐", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center, fontWeight = FontWeight.Black, fontSize = 22.sp, color = NeoBlack)
-                        Spacer(modifier = Modifier.height(24.dp))
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            Column(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .fillMaxHeight()
-                                    .background(Color(0xFFF0FDF4), RoundedCornerShape(12.dp))
-                                    .border(1.dp, NeoBlack, RoundedCornerShape(12.dp))
-                                    .padding(16.dp)
-                            ) {
-                                Text("🥗 推荐菜品", fontWeight = FontWeight.Black, color = NeoBlack, fontSize = 14.sp)
-                                Spacer(modifier = Modifier.height(12.dp))
-                                selectedDishes.forEach { dish ->
-                                    Text(text = "• $dish", fontSize = 14.sp, color = NeoBlack, fontWeight = FontWeight.Bold)
-                                }
-                            }
-
-                            Column(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .fillMaxHeight()
-                                    .background(Color(0xFFFAF5FF), RoundedCornerShape(12.dp))
-                                    .border(1.dp, NeoBlack, RoundedCornerShape(12.dp))
-                                    .padding(16.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                Text("👑 推荐主厨", fontWeight = FontWeight.Black, color = NeoBlack, fontSize = 14.sp, modifier = Modifier.align(Alignment.Start))
-                                Spacer(modifier = Modifier.weight(1f))
+                    // Selection Process
+                    if (isSelecting) {
+                        NeoCard(modifier = Modifier.fillMaxWidth()) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(selectionStatus, fontWeight = FontWeight.Black, fontSize = 18.sp, color = NeoBlack)
+                                Spacer(modifier = Modifier.height(16.dp))
+                                LinearProgressIndicator(
+                                    progress = { selectionProgress },
+                                    modifier = Modifier.fillMaxWidth().height(8.dp).border(1.dp, NeoBlack, RoundedCornerShape(4.dp)),
+                                    color = Color(0xFFF97316),
+                                    trackColor = Color.White
+                                )
+                                Spacer(modifier = Modifier.height(24.dp))
                                 
-                                selectedMaster?.let { master ->
-                                    Box(
+                                currentSelection?.let { item ->
+                                    Column(
                                         modifier = Modifier
-                                            .size(64.dp)
-                                            .background(Color.White, RoundedCornerShape(16.dp))
-                                            .border(2.dp, NeoBlack, RoundedCornerShape(16.dp)),
-                                        contentAlignment = Alignment.Center
+                                            .fillMaxWidth()
+                                            .background(Color(0xFFF3F4F6), RoundedCornerShape(12.dp))
+                                            .border(2.dp, NeoBlack, RoundedCornerShape(12.dp))
+                                            .padding(24.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
-                                        Text(master.avatar, fontSize = 40.sp)
-                                    }
-                                    Spacer(modifier = Modifier.height(12.dp))
-                                    Text(master.name, fontWeight = FontWeight.Black, color = NeoBlack, fontSize = 16.sp, textAlign = TextAlign.Center)
-                                    if (master.specialty.isNotBlank()) {
-                                        Spacer(modifier = Modifier.height(4.dp))
-                                        Text(
-                                            master.specialty, 
-                                            fontSize = 11.sp, 
-                                            color = NeoBlack, 
-                                            fontWeight = FontWeight.Bold,
-                                            textAlign = TextAlign.Center,
-                                            lineHeight = 14.sp
-                                        )
-                                    }
-                                }
-                                Spacer(modifier = Modifier.weight(1.2f))
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(24.dp))
-
-                        NeoButton(
-                            text = if (isGenerating) "正在生成..." else "生成菜谱",
-                            onClick = { viewModel.generateRecipe() },
-                            modifier = Modifier.fillMaxWidth(),
-                            textColor = NeoBlack,
-                            shadowOffset = 4.dp, // Consistent shadow
-                            enabled = !isGenerating
-                        )
-                        
-                        Spacer(modifier = Modifier.height(12.dp))
-                        
-                        NeoButton(
-                            text = "重新选择",
-                            onClick = { viewModel.reset() },
-                            modifier = Modifier.fillMaxWidth(),
-                            backgroundColor = Color(0xFFF3F4F6),
-                            textColor = NeoBlack,
-                            shadowOffset = 4.dp // Consistent shadow
-                        )
-                    }
-                    
-                    if (!isGenerating && recipe != null) {
-                        recipe?.let {
-                        // Removed animateContentSize(tween(400)) to prevent conflict with scroll-follow
-                        val context = androidx.compose.ui.platform.LocalContext.current
-                        Box {
-                            RecipeCard(
-                                recipe = it,
-                                isFavorite = viewModel.isFavorite(it.id),
-                                isGenerating = isGeneratingImage,
-                                isAnalyzingDeepInsights = isAnalyzingDeepInsights,
-                                shadowOffset = 6.dp, // 恢复至豪华版 6.dp (Restore to deluxe 6.dp)
-                                onFavoriteClick = { viewModel.toggleFavorite(it) },
-                                onUnlockDeepInsights = {
-                                    viewModel.recipe.value?.let { currentRecipe ->
-                                        viewModel.unlockDeepInsights(currentRecipe)
-                                    }
-                                },
-                                onGenerateImage = {
-                                    android.widget.Toast.makeText(context, "🪄 正在为 '${it.name}' 创作图鉴...", android.widget.Toast.LENGTH_LONG).show()
-                                    viewModel.generateImage(it) { url ->
-                                        if (url != null) {
-                                            android.widget.Toast.makeText(context, "创作成功！已收录至 GALLERY", android.widget.Toast.LENGTH_LONG).show()
-                                        } else {
-                                            android.widget.Toast.makeText(context, "创作失败，请检查设置或重试", android.widget.Toast.LENGTH_SHORT).show()
+                                        Text(if (item.type == "dish") "🍱" else item.avatar, fontSize = 48.sp)
+                                        Text(item.name, fontWeight = FontWeight.Black, fontSize = 20.sp, color = NeoBlack)
+                                        if (item.specialty.isNotBlank()) {
+                                            Text(item.specialty, fontSize = 14.sp, color = NeoBlack, fontWeight = FontWeight.Bold)
                                         }
                                     }
                                 }
+                            }
+                        }
+                    }
+
+                    // Results
+                    if (!isSelecting && selectedDishes.isNotEmpty()) {
+                        NeoCard(modifier = Modifier.fillMaxWidth()) {
+                            Text("今日推荐", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center, fontWeight = FontWeight.Black, fontSize = 22.sp, color = NeoBlack)
+                            Spacer(modifier = Modifier.height(24.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
+                                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                Column(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .fillMaxHeight()
+                                        .background(Color(0xFFF0FDF4), RoundedCornerShape(12.dp))
+                                        .border(1.dp, NeoBlack, RoundedCornerShape(12.dp))
+                                        .padding(16.dp)
+                                ) {
+                                    Text("🥗 推荐菜品", fontWeight = FontWeight.Black, color = NeoBlack, fontSize = 14.sp)
+                                    Spacer(modifier = Modifier.height(12.dp))
+                                    selectedDishes.forEach { dish ->
+                                        Text(text = "• $dish", fontSize = 14.sp, color = NeoBlack, fontWeight = FontWeight.Bold)
+                                    }
+                                }
+
+                                Column(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .fillMaxHeight()
+                                        .background(Color(0xFFFAF5FF), RoundedCornerShape(12.dp))
+                                        .border(1.dp, NeoBlack, RoundedCornerShape(12.dp))
+                                        .padding(16.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    Text("👑 推荐主厨", fontWeight = FontWeight.Black, color = NeoBlack, fontSize = 14.sp, modifier = Modifier.align(Alignment.Start))
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    
+                                    selectedMaster?.let { master ->
+                                        Box(
+                                            modifier = Modifier
+                                                .size(64.dp)
+                                                .background(Color.White, RoundedCornerShape(16.dp))
+                                                .border(2.dp, NeoBlack, RoundedCornerShape(16.dp)),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Text(master.avatar, fontSize = 40.sp)
+                                        }
+                                        Spacer(modifier = Modifier.height(12.dp))
+                                        Text(master.name, fontWeight = FontWeight.Black, color = NeoBlack, fontSize = 16.sp, textAlign = TextAlign.Center)
+                                        if (master.specialty.isNotBlank()) {
+                                            Spacer(modifier = Modifier.height(4.dp))
+                                            Text(
+                                                master.specialty, 
+                                                fontSize = 11.sp, 
+                                                color = NeoBlack, 
+                                                fontWeight = FontWeight.Bold,
+                                                textAlign = TextAlign.Center,
+                                                lineHeight = 14.sp
+                                            )
+                                        }
+                                    }
+                                    Spacer(modifier = Modifier.weight(1.2f))
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(24.dp))
+
+                            NeoButton(
+                                text = if (isGenerating) "正在生成..." else "生成菜谱",
+                                onClick = { viewModel.generateRecipe() },
+                                modifier = Modifier.fillMaxWidth(),
+                                textColor = NeoBlack,
+                                shadowOffset = 4.dp, // Consistent shadow
+                                enabled = !isGenerating
                             )
+                            
+                            Spacer(modifier = Modifier.height(12.dp))
+                            
+                            NeoButton(
+                                text = "重新选择",
+                                onClick = { viewModel.reset() },
+                                modifier = Modifier.fillMaxWidth(),
+                                backgroundColor = Color(0xFFF3F4F6),
+                                textColor = NeoBlack,
+                                shadowOffset = 4.dp // Consistent shadow
+                            )
+                        }
+                        
+                        if (!isGenerating && recipe != null) {
+                            recipe?.let {
+                                // Removed animateContentSize(tween(400)) to prevent conflict with scroll-follow
+                                val context = androidx.compose.ui.platform.LocalContext.current
+                                Box {
+                                    RecipeCard(
+                                        recipe = it,
+                                        isFavorite = viewModel.isFavorite(it.id),
+                                        isGenerating = isGeneratingImage,
+                                        isAnalyzingDeepInsights = isAnalyzingDeepInsights,
+                                        shadowOffset = 6.dp, // 恢复至豪华版 6.dp (Restore to deluxe 6.dp)
+                                        onFavoriteClick = { viewModel.toggleFavorite(it) },
+                                        onUnlockDeepInsights = {
+                                            viewModel.recipe.value?.let { currentRecipe ->
+                                                viewModel.unlockDeepInsights(currentRecipe)
+                                            }
+                                        },
+                                        onGenerateImage = {
+                                            android.widget.Toast.makeText(context, "🪄 正在为 '${it.name}' 创作图鉴...", android.widget.Toast.LENGTH_LONG).show()
+                                            viewModel.generateImage(it) { url ->
+                                                if (url != null) {
+                                                    android.widget.Toast.makeText(context, "创作成功！已收录至 GALLERY", android.widget.Toast.LENGTH_LONG).show()
+                                                } else {
+                                                    android.widget.Toast.makeText(context, "创作失败，请检查设置或重试", android.widget.Toast.LENGTH_SHORT).show()
+                                                }
+                                            }
+                                        },
+                                        onExpandedChange = {
+                                            autoScrollWindowUntil = System.currentTimeMillis() + 1500
+                                        }
+                                    )
+                                }
+                            }
                         }
                     }
                 }
-            }
             }
         }
 

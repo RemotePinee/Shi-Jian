@@ -80,13 +80,19 @@ fun SauceDesignScreen(
             heroEmoji = "🍯"
         )
 
-        Column(
+        Box(
             modifier = Modifier
                 .weight(1f)
-                .verticalScroll(scrollState)
-                .padding(top = 10.dp, bottom = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .fillMaxWidth()
+                .fadingEdge(top = 10.dp, bottom = 16.dp)
         ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+                    .padding(top = 10.dp, bottom = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
         // Step 1: Intelligent Recommendation
         NeoCard(
             modifier = Modifier.fillMaxWidth(),
@@ -250,11 +256,15 @@ fun SauceDesignScreen(
                                 android.widget.Toast.makeText(context, "创作失败，请检查设置或重试", android.widget.Toast.LENGTH_SHORT).show()
                             }
                         }
+                    },
+                    onExpandedChange = {
+                        autoScrollWindowUntil = System.currentTimeMillis() + 1500
                     }
                 )
             }
         }
     }
+}
 }
 }
 
@@ -285,8 +295,10 @@ fun SauceRecipeCard(
     isFavorite: Boolean,
     onFavoriteClick: () -> Unit,
     onGenerateImage: () -> Unit = {},
-    isGenerating: Boolean = false
+    isGenerating: Boolean = false,
+    onExpandedChange: () -> Unit = {}
 ) {
+    var isExpanded by remember { mutableStateOf(false) }
     NeoCard(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -350,7 +362,9 @@ fun SauceRecipeCard(
         Spacer(modifier = Modifier.height(16.dp))
         
         Text("📝 制作步骤", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-        sauce.steps.forEachIndexed { index, sauceStep ->
+        
+        val displaySteps = if (isExpanded) sauce.steps else sauce.steps.take(3)
+        displaySteps.forEachIndexed { index, sauceStep ->
             Row(modifier = Modifier.padding(vertical = 4.dp)) {
                 Box(
                     modifier = Modifier.size(20.dp).background(NeoBlack, RoundedCornerShape(4.dp)),
@@ -359,10 +373,38 @@ fun SauceRecipeCard(
                     Text((index + 1).toString(), color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(sauceStep.description, fontSize = 13.sp)
+                Text(sauceStep.description, fontSize = 13.sp, color = NeoBlack, fontWeight = FontWeight.Bold)
+            }
+        }
+        
+        if (sauce.steps.size > 3) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .neoClickable { 
+                        isExpanded = !isExpanded
+                        if (isExpanded) onExpandedChange()
+                    }
+                    .padding(vertical = 4.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = if (isExpanded) "收起步骤" else "还有 ${sauce.steps.size - 3} 个步骤，查看全部",
+                        color = if (isExpanded) Color.Gray else Color(0xFFF97316),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = if (isExpanded) "▲" else "▼",
+                        fontSize = 10.sp,
+                        color = if (isExpanded) Color.Gray else Color(0xFFF97316)
+                    )
+                }
+            }
         }
     }
-}
 }
 
 private fun rowBorder(width: androidx.compose.ui.unit.Dp, color: Color) = androidx.compose.foundation.BorderStroke(width, color)

@@ -15,9 +15,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.animation.core.*
 import com.eatwhat.data.model.Recipe
 import com.eatwhat.data.model.RecipeStep
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
+import androidx.compose.runtime.rememberCoroutineScope
 
 @Composable
 fun RecipeCard(
@@ -31,7 +35,8 @@ fun RecipeCard(
     onUnlockDeepInsights: () -> Unit = {},
     shadowOffset: androidx.compose.ui.unit.Dp = 6.dp,
     isFlat: Boolean = false,
-    isContentScrollable: Boolean = false
+    isContentScrollable: Boolean = false,
+    onExpandedChange: () -> Unit = {}
 ) {
     var isExpanded by remember { mutableStateOf(false) }
 
@@ -121,36 +126,49 @@ fun RecipeCard(
 
         // Content
         val internalScrollState = rememberScrollState()
+        val scope = rememberCoroutineScope()
         
-        // Auto-scroll when insights updated (for Overlay/Dialog usage)
-        var lastNutrition by remember { mutableStateOf(recipe.nutritionAnalysis != null) }
-        var lastPairing by remember { mutableStateOf(recipe.winePairing != null) }
+        // CONTENT ANCHORS for BringIntoViewRequester (Device-agnostic focusing)
+        val bottomRequester = remember { BringIntoViewRequester() }
+        
+        // Follow-up for standard non-scrollable layout (e.g. Home Screen)
+        var lastNutritionState by remember { mutableStateOf(recipe.nutritionAnalysis != null) }
+        var lastPairingState by remember { mutableStateOf(recipe.winePairing != null) }
         
         LaunchedEffect(recipe.nutritionAnalysis != null, recipe.winePairing != null, isAnalyzingDeepInsights) {
-            val hasNutrition = recipe.nutritionAnalysis != null
-            val hasPairing = recipe.winePairing != null
+            val hasNewNutrition = recipe.nutritionAnalysis != null && !lastNutritionState
+            val hasNewPairing = recipe.winePairing != null && !lastPairingState
             
-            // Trigger on start of generation or when new data arrives
-            if (isContentScrollable && ((hasNutrition && !lastNutrition) || (hasPairing && !lastPairing) || isAnalyzingDeepInsights)) {
-                // Zero-delay: start immediately and follow the expansion smoothly for 1s
+            if (hasNewNutrition || hasNewPairing || isAnalyzingDeepInsights) {
+                // PROFESSIONAL FOLLOW-UP: Added small delay to wait for layout sync before focusing
                 val startTime = System.currentTimeMillis()
-                while (System.currentTimeMillis() - startTime < 1000) {
-                    internalScrollState.animateScrollTo(
-                        internalScrollState.maxValue, 
-                        animationSpec = spring(stiffness = Spring.StiffnessLow)
-                    )
-                    withFrameNanos { } 
+                scope.launch {
+                    delay(50)
+                    while (System.currentTimeMillis() - startTime < 1500) {
+                        bottomRequester.bringIntoView()
+                        withFrameNanos { }
+                    }
                 }
             }
-            lastNutrition = hasNutrition
-            lastPairing = hasPairing
+            lastNutritionState = recipe.nutritionAnalysis != null
+            lastPairingState = recipe.winePairing != null
         }
 
         val contentModifier = if (isContentScrollable) {
             Modifier.weight(1f, fill = false).verticalScroll(internalScrollState)
         } else Modifier
 
-        Column(modifier = Modifier.padding(16.dp).then(contentModifier)) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .then(if (isContentScrollable) Modifier.weight(1f, fill = false).fadingEdge(top = 10.dp, bottom = 16.dp) else Modifier)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(if (isContentScrollable) PaddingValues(top = 0.dp, bottom = 16.dp, start = 16.dp, end = 16.dp) else PaddingValues(16.dp))
+                    .then(contentModifier)
+            ) {
             // Ingredients
             Text(text = "🥬 所需食材", fontWeight = FontWeight.Bold, fontSize = 14.sp)
             Spacer(modifier = Modifier.height(8.dp))
@@ -188,17 +206,40 @@ fun RecipeCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             // Steps Content
+            val bringIntoViewRequester = remember { BringIntoViewRequester() }
+            
             val displaySteps = if (isExpanded) recipe.steps else recipe.steps.take(3)
             displaySteps.forEach { step ->
                 RecipeStepItem(step = step)
                 Spacer(modifier = Modifier.height(8.dp))
             }
             
+            // Anchor for focusing on the last step
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .bringIntoViewRequester(bringIntoViewRequester)
+            )
+            
             if (recipe.steps.size > 3) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .neoClickable { isExpanded = !isExpanded }
+                        .neoClickable { 
+                            isExpanded = !isExpanded
+                            if (isExpanded) {
+                                onExpandedChange()
+                                scope.launch {
+                                    // Smoothly follow the expansion as it happens for 1s
+                                    val startTime = System.currentTimeMillis()
+                                    while (System.currentTimeMillis() - startTime < 1000) {
+                                        bringIntoViewRequester.bringIntoView()
+                                        withFrameNanos { }
+                                    }
+                                }
+                            }
+                        }
                         .padding(vertical = 4.dp),
                     contentAlignment = Alignment.Center
                 ) {
@@ -228,8 +269,17 @@ fun RecipeCard(
                     onUnlock = onUnlockDeepInsights
                 )
             }
+            
+            // Bottom anchor for focusing when insights are unlocked or loading
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .bringIntoViewRequester(bottomRequester)
+            )
         }
     }
+}
 
     if (isFlat) {
         Column(modifier = modifier.fillMaxWidth()) {

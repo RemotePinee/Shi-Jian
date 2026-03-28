@@ -1,5 +1,7 @@
 package com.eatwhat.ui.viewmodel
 
+import android.net.Uri
+
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -16,6 +18,10 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
+import android.util.Log
+import com.eatwhat.data.api.ChatContentPart
+import com.eatwhat.data.api.ImageUrlPart
 import java.util.UUID
 import com.eatwhat.data.repository.FavoriteRepository
 import com.eatwhat.data.model.Recipe
@@ -32,8 +38,10 @@ class AiChatViewModel(
     private val chatRepository: ChatRepository,
     private val favoriteRepository: FavoriteRepository,
     private val settingsRepository: com.eatwhat.data.repository.SettingsRepository,
+    private val galleryRepository: com.eatwhat.data.repository.GalleryRepository,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
     
     companion object {
         private const val KEY_SESSION_ID = "current_session_id"
@@ -120,37 +128,75 @@ class AiChatViewModel(
         // Optionally add a "Terminated" marker to the last message if it was incomplete
     }
 
-    fun recognizeIngredients(uri: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
-        viewModelScope.launch {
-            _isLoading.value = true
-            val result = aiRepository.recognizeIngredients(uri)
-            result.onSuccess { list ->
-                if (list.isNotEmpty()) {
-                    onSuccess(list.joinToString("、"))
-                }
-            }
-            result.onFailure { error ->
-                onFailure(error.message ?: "识别失败")
-            }
-            _isLoading.value = false
-        }
-    }
 
-    fun sendMessage(text: String) {
-        if (text.isBlank() || _isLoading.value) return
+    fun sendMessage(text: String, imageUri: Uri? = null) {
+        if ((text.isBlank() && imageUri == null) || _isLoading.value) return
 
         val sessionId = _currentSessionId.value
-        val userMsgItem = ChatMessageItem(sessionId = sessionId, content = text, isUser = true)
+        val userMsgItem = ChatMessageItem(
+            sessionId = sessionId, 
+            content = text, 
+            isUser = true,
+            imageUri = imageUri?.toString()
+        )
         
         // Add to UI state immediately for instant feedback
         _messages.add(userMsgItem)
+        
+        // Background: Generate vision summary for future context (Plan 2)
+        if (imageUri != null) {
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val summaryResult = aiRepository.getImageSummary(imageUri.toString())
+                    summaryResult.onSuccess { summary ->
+                        chatRepository.updateMessageSummary(userMsgItem.id, summary)
+                        // Also update the local list if it's still in the current session
+                        val index = _messages.indexOfFirst { it.id == userMsgItem.id }
+                        if (index != -1) {
+                            _messages[index] = _messages[index].copy(imageSummary = summary)
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e("AiChatViewModel", "Failed to generate image summary", e)
+                }
+            }
+        }
         
         aiJob = viewModelScope.launch {
             chatRepository.saveMessage(userMsgItem)
             _isLoading.value = true
 
             val apiMessages = _messages.takeLast(10).map { 
-                ChatMessage(role = if (it.isUser) "user" else "assistant", content = it.content)
+                val isLatestUserMessage = it.id == userMsgItem.id
+                
+                if (it.imageUri != null) {
+                    // Plan 2: Only send Base64 for the LATEST user message
+                    // For history, send the text summary instead to save tokens
+                    if (isLatestUserMessage) {
+                        val base64 = aiRepository.uriToBase64(it.imageUri)
+                        if (base64 != null) {
+                            ChatMessage(
+                                role = if (it.isUser) "user" else "assistant",
+                                content = listOf(
+                                    ChatContentPart(type = "text", text = it.content),
+                                    ChatContentPart(type = "image_url", imageUrl = ImageUrlPart(url = "data:image/jpeg;base64,$base64"))
+                                )
+                            )
+                        } else {
+                            ChatMessage(role = if (it.isUser) "user" else "assistant", content = it.content)
+                        }
+                    } else {
+                        // History message: Use summary if available, otherwise just text
+                        val summaryText = if (it.imageSummary != null) {
+                            "${it.content}\n\n[图片背景描述: ${it.imageSummary}]"
+                        } else {
+                            it.content
+                        }
+                        ChatMessage(role = if (it.isUser) "user" else "assistant", content = summaryText)
+                    }
+                } else {
+                    ChatMessage(role = if (it.isUser) "user" else "assistant", content = it.content)
+                }
             }
             
             val systemMsg = ChatMessage(
@@ -216,7 +262,7 @@ class AiChatViewModel(
             var lastDbSaveMillis = System.currentTimeMillis()
             
             try {
-                aiRepository.chatStream(listOf(systemMsg) + apiMessages).collect { token ->
+                aiRepository.chatStream(listOf(systemMsg) + apiMessages, imageUri?.toString()).collect { token ->
                     hasReceivedTokens = true
                     fullContent += token
                     
@@ -264,7 +310,12 @@ class AiChatViewModel(
                 isActuallyCancelled = true
                 throw e
             } catch (e: Exception) {
-                val errorText = "抱歉，由于网络波动，我现在的思绪有点乱：${e.message}"
+                val errorMsg = e.message ?: "未知错误"
+                val errorText = if (errorMsg.contains("配置") || errorMsg.contains("Key")) {
+                    "🍳 厨师提醒：$errorMsg"
+                } else {
+                    "抱歉，由于网络波动，我现在的思绪有点乱：$errorMsg"
+                }
                 val eIndex = _messages.indexOfFirst { it.id == aiMsgId }
                 if (eIndex != -1) {
                     _messages[eIndex] = _messages[eIndex].copy(content = errorText)
@@ -280,11 +331,17 @@ class AiChatViewModel(
                     }
 
                     // Handle termination cases using local flags
-                    if (isActuallyCancelled || !hasReceivedTokens) {
+                    if (isActuallyCancelled) {
                         displayContent = if (displayContent.isBlank() || displayContent == "厨师正在思考...") {
                             "对话已取消"
                         } else {
                             "$displayContent [已终止]"
+                        }
+                    } else if (!hasReceivedTokens && (displayContent.isBlank() || displayContent == "厨师正在思考...")) {
+                        // Recover error message set in catch block if tokens never arrived
+                        val recovered = _messages.find { it.id == aiMsgId }?.content
+                        if (recovered != null && recovered != "厨师正在思考...") {
+                            displayContent = recovered
                         }
                     }
                     
@@ -357,4 +414,85 @@ class AiChatViewModel(
             _messages[idx] = _messages[idx].copy() // Trigger a shallow copy update
         }
     }
+
+    fun generateImage(message: ChatMessageItem) {
+        val recipeJson = message.recipeJson ?: return
+        val recipe = try { Gson().fromJson(recipeJson, Recipe::class.java) } catch (_: Exception) { null } ?: return
+
+        // Check if image config exists
+        if (settingsRepository.imageApiKey.isBlank() || settingsRepository.imageBaseUrl.isBlank()) {
+            val index = _messages.indexOfFirst { it.id == message.id }
+            if (index != -1) {
+                // If it's a configuration error, we append a hint to content (AiChatScreen will show button)
+                if (!message.content.contains("🍳 厨师提醒")) {
+                     val updated = message.copy(
+                        content = message.content + "\n\n🍳 厨师提醒：请先在设置中完整配置图片生成的地址和 Key，以便为您创作精美图鉴。"
+                    )
+                    _messages[index] = updated
+                    viewModelScope.launch(Dispatchers.IO) {
+                        chatRepository.saveMessage(updated)
+                    }
+                }
+            }
+            return
+        }
+
+        viewModelScope.launch {
+            // Set loading state
+            updateMessageState(message.id, isLoading = true)
+
+            val result = aiRepository.generateImage(recipe)
+            result.onSuccess { url ->
+                if (url.isNotBlank()) {
+                    // 1. Initial UI update with online URL for speed
+                    updateMessageState(message.id, isLoading = false, imageUrl = url)
+                    
+                    // 2. SYNC TO GLOBAL GALLERY & DOWNLOAD
+                    try {
+                        val localPath = galleryRepository.addToGalleryWithDownload(
+                            id = "chat-img-${message.id}",
+                            url = url,
+                            recipeName = recipe.name,
+                            recipeId = recipe.id,
+                            cuisine = recipe.cuisine,
+                            ingredients = recipe.ingredients,
+                            generatedAt = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date())
+                        )
+                        
+                        // 3. CONVERT TO PERMANENT LOCAL PATH if download was successful
+                        if (localPath != null) {
+                            updateMessageState(message.id, isLoading = false, imageUrl = localPath)
+                            Log.d("AiChatViewModel", "Localized chat image: $localPath")
+                        }
+                    } catch (e: Exception) {
+                        Log.e("AiChatViewModel", "Gallery sync/download failed", e)
+                    }
+                } else {
+                    updateMessageState(message.id, isLoading = false)
+                }
+            }.onFailure { error ->
+
+                Log.e("AiChatViewModel", "Generation failed: ${error.message}")
+                updateMessageState(message.id, isLoading = false)
+            }
+        }
+    }
+
+    private fun updateMessageState(messageId: String, isLoading: Boolean, imageUrl: String? = null): ChatMessageItem? {
+        val index = _messages.indexOfFirst { it.id == messageId }
+        if (index != -1) {
+            val updated = _messages[index].copy(
+                isImageLoading = isLoading,
+                generatedImageUrl = imageUrl ?: _messages[index].generatedImageUrl
+            )
+            _messages[index] = updated
+            // Persist to DB asynchronously
+            viewModelScope.launch(Dispatchers.IO) {
+                chatRepository.saveMessage(updated)
+            }
+            return updated
+        }
+        return null
+    }
 }
+

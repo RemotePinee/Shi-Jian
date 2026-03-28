@@ -3,6 +3,8 @@ package com.eatwhat.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
@@ -39,7 +41,7 @@ fun FavoritesScreen(viewModel: FavoritesViewModel) {
             .fillMaxSize()
             .background(Color(0xFFFACC15)) // Yellow-400
             .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 0.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         NeoHeader(
             title = "美味回忆",
@@ -61,7 +63,11 @@ fun FavoritesScreen(viewModel: FavoritesViewModel) {
                 )
             }
             
-            Column(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier.fillMaxSize()
+                .padding(top = 10.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
                 // Search with Shadow (Only show if there are favorites or active search)
                 if (favorites.isNotEmpty() || searchQuery.isNotEmpty()) {
                     Box(
@@ -98,13 +104,18 @@ fun FavoritesScreen(viewModel: FavoritesViewModel) {
                 }
 
                 if (favorites.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(10.dp))
-                    LazyVerticalStaggeredGrid(
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                            .fadingEdge(top = 10.dp, bottom = 16.dp)
+                    ) {
+                        LazyVerticalStaggeredGrid(
                         columns = StaggeredGridCells.Fixed(2),
                         modifier = Modifier.fillMaxSize(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         verticalItemSpacing = 12.dp,
-                        contentPadding = PaddingValues(top = 10.dp, bottom = 12.dp)
+                        contentPadding = PaddingValues(top = 10.dp, bottom = 16.dp)
                     ) {
                         items(favorites, key = { it.recipe.id }) { fav ->
                             FavoriteCompactCard(
@@ -114,59 +125,74 @@ fun FavoritesScreen(viewModel: FavoritesViewModel) {
                             )
                         }
                     }
-                } else if (searchQuery.isNotEmpty()) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("未找到相关菜谱", color = NeoBlack.copy(alpha = 0.5f), fontWeight = FontWeight.Bold)
-                    }
+                }
+            } else if (searchQuery.isNotEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("未找到相关菜谱", color = NeoBlack.copy(alpha = 0.5f), fontWeight = FontWeight.Bold)
                 }
             }
         }
     }
+}
 
     // Detail Dialog with Sticky Header
     if (selectedRecipe.value != null) {
         Dialog(onDismissRequest = { selectedRecipe.value = null }) {
-            Surface(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
-                    .heightIn(max = 680.dp) // Limit maximum height but allow wrapping
-                    .padding(vertical = 24.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .border(3.dp, NeoBlack, RoundedCornerShape(16.dp)),
-                color = Color.White
+                    .padding(vertical = 24.dp),
+                contentAlignment = Alignment.Center
             ) {
-                RecipeCard(
-                    recipe = selectedRecipe.value!!,
-                    isFavorite = true,
-                    onFavoriteClick = { 
-                        selectedRecipe.value?.id?.let { viewModel.removeFavorite(it) }
-                        selectedRecipe.value = null
-                    },
-                    onGenerateImage = {
-                        val recipe = selectedRecipe.value!!
-                        android.widget.Toast.makeText(context, "🪄 正在为 '${recipe.name}' 创作图鉴...", android.widget.Toast.LENGTH_LONG).show()
-                        viewModel.generateImage(recipe) { url ->
-                            if (url != null) {
-                                android.widget.Toast.makeText(context, "创作成功！已收录至 GALLERY", android.widget.Toast.LENGTH_LONG).show()
-                            } else {
-                                android.widget.Toast.makeText(context, "创作失败，请检查设置或重试", android.widget.Toast.LENGTH_SHORT).show()
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .heightIn(max = 680.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .border(3.dp, NeoBlack, RoundedCornerShape(16.dp)),
+                    color = Color.White
+                ) {
+                    // WRAPPER: Scrollable Column to let focus bubble up
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        RecipeCard(
+                            recipe = selectedRecipe.value!!,
+                            isFavorite = true,
+                            onFavoriteClick = { 
+                                selectedRecipe.value?.id?.let { viewModel.removeFavorite(it) }
+                                selectedRecipe.value = null
+                            },
+                            onGenerateImage = {
+                                val recipe = selectedRecipe.value!!
+                                android.widget.Toast.makeText(context, "🪄 正在为 '${recipe.name}' 创作图鉴...", android.widget.Toast.LENGTH_LONG).show()
+                                viewModel.generateImage(recipe) { url ->
+                                    if (url != null) {
+                                        android.widget.Toast.makeText(context, "创作成功！已收录至 GALLERY", android.widget.Toast.LENGTH_LONG).show()
+                                    } else {
+                                        android.widget.Toast.makeText(context, "创作失败，请检查设置或重试", android.widget.Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            isFlat = true,
+                            isContentScrollable = false, // SIGNAL BUBBLING ENABLED: Bubbles up to Column
+                            isGenerating = viewModel.isGeneratingImage.value,
+                            isAnalyzingDeepInsights = viewModel.isAnalyzingDeepInsights.value,
+                            onUnlockDeepInsights = {
+                                viewModel.unlockDeepInsights(selectedRecipe.value!!) { updated ->
+                                    selectedRecipe.value = updated
+                                }
                             }
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    isFlat = true,
-                    isContentScrollable = true, // Enable the sticky header behavior
-                    isGenerating = viewModel.isGeneratingImage.value,
-                    isAnalyzingDeepInsights = viewModel.isAnalyzingDeepInsights.value,
-                    onUnlockDeepInsights = {
-                        viewModel.unlockDeepInsights(selectedRecipe.value!!) { updated ->
-                            selectedRecipe.value = updated
-                        }
+                        )
                     }
-                )
-            }
+                }
         }
+    }
     }
 }
 

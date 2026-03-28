@@ -87,16 +87,23 @@ class MainActivity : ComponentActivity() {
         // We use this factory to injection dependencies and enable state survival
         @SuppressLint("RestrictedApi")
         val aiChatViewModel: AiChatViewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST", "RestrictedApi", "VisibleForTesting")
+            @Suppress("UNCHECKED_CAST", "RestrictedApi")
             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                @Suppress("VisibleForTesting")
+                @SuppressLint("VisibleForTesting")
                 val handle = SavedStateHandle()
+
+
+
                 return AiChatViewModel(
                     aiRepository, 
                     chatRepository, 
                     favRepository, 
                     settingsRepository, 
+                    galleryRepository,
                     handle
                 ) as T
+
             }
         })[AiChatViewModel::class.java]
 
@@ -228,7 +235,10 @@ class MainActivity : ComponentActivity() {
                                         ) 
                                     }
                                     composable(Screen.Chat.route) {
-                                        AiChatScreen(viewModel = aiChatViewModel)
+                                        AiChatScreen(
+                                             viewModel = aiChatViewModel,
+                                             onNavigateToSettings = { navController.navigate(Screen.Settings.route) }
+                                         )
                                     }
                                     composable(Screen.Favorites.route) { FavoritesScreen(favoritesViewModel) }
                                     composable(Screen.Gallery.route) {

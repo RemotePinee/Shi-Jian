@@ -22,4 +22,8 @@ class ChatRepository(private val chatDao: ChatDao) {
         chatDao.deleteSession(sessionId)
     }
 
+    suspend fun updateMessageSummary(id: String, summary: String) {
+        chatDao.updateMessageSummary(id, summary)
+    }
+
 }

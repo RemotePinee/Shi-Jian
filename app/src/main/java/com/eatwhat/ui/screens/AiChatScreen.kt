@@ -14,6 +14,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.layout.ContentScale
@@ -32,6 +33,8 @@ import coil.compose.AsyncImage
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
@@ -88,10 +91,36 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun AiChatScreen(viewModel: AiChatViewModel) {
+fun AiChatScreen(
+    viewModel: AiChatViewModel,
+    onNavigateToSettings: () -> Unit = {}
+) {
     val messages = viewModel.messages
     val isLoading by viewModel.isLoading
     val listState = rememberLazyListState()
+
+    val density = LocalDensity.current
+    val imeInsets = WindowInsets.ime
+    val navInsets = WindowInsets.navigationBars
+    
+    // Capture the PaddingValues in Composable context
+    val imePaddingValues = imeInsets.asPaddingValues()
+    val navPaddingValues = navInsets.asPaddingValues()
+    
+    // Optimizing with derivedStateOf to minimize recomposition
+    val keyboardOffsetPx by remember {
+        derivedStateOf {
+            val imePx = with(density) { imePaddingValues.calculateBottomPadding().roundToPx() }
+            val navPx = with(density) { navPaddingValues.calculateBottomPadding().roundToPx() }
+            val barPx = with(density) { 68.dp.roundToPx() }
+            val restingPx = with(density) { 35.dp.roundToPx() }
+            val stickyPx = with(density) { 3.dp.roundToPx() }
+            
+            val totalBarPx = navPx + barPx
+            val incursion = (imePx - totalBarPx).coerceAtLeast(0)
+            if (incursion > 0) (incursion - (restingPx - stickyPx)).coerceAtLeast(0) else 0
+        }
+    }
 
     // --- Scroll Focus Management (Top-level for persistence) ---
     val lastMsg = messages.lastOrNull()
@@ -99,7 +128,8 @@ fun AiChatScreen(viewModel: AiChatViewModel) {
     var lastKnownContent by remember { mutableStateOf(lastMsg?.content) }
     var lastKnownRecipeJson by remember { mutableStateOf(lastMsg?.recipeJson) }
 
-    LaunchedEffect(messages.size, lastMsg?.content, lastMsg?.isRecipeLoading, lastMsg?.recipeJson) {
+    val isKeyboardActive = keyboardOffsetPx > 0
+    LaunchedEffect(messages.size, lastMsg?.content, lastMsg?.isRecipeLoading, lastMsg?.recipeJson, isKeyboardActive) {
         val currentSize = messages.size
         val currentContent = lastMsg?.content
         val currentRecipeJson = lastMsg?.recipeJson
@@ -108,8 +138,9 @@ fun AiChatScreen(viewModel: AiChatViewModel) {
             val isNewMessage = currentSize > lastKnownSize
             val isContentUpdate = currentSize == lastKnownSize && currentContent != lastKnownContent
             val isRecipeArrival = currentRecipeJson != null && lastKnownRecipeJson == null
+            val isKeyboardChange = isKeyboardActive // Trigger scroll on keyboard open
             
-            if (isNewMessage || isContentUpdate || isRecipeArrival) {
+            if (isNewMessage || isContentUpdate || isRecipeArrival || isKeyboardChange) {
                 val isRecipeVisible = currentRecipeJson != null
                 val startTime = System.currentTimeMillis()
                 val duration = if (isRecipeVisible) 1200 else 600
@@ -128,6 +159,7 @@ fun AiChatScreen(viewModel: AiChatViewModel) {
         lastKnownRecipeJson = currentRecipeJson
     }
     var inputText by remember { mutableStateOf("") }
+    
     val context = LocalContext.current
     /* Custom History Drawer State */
     var showHistory by remember { mutableStateOf(false) }
@@ -186,15 +218,6 @@ fun AiChatScreen(viewModel: AiChatViewModel) {
         if (success) {
             tempPhotoUri?.let { uri -> 
                 selectedImageUri = uri
-                viewModel.recognizeIngredients(
-                    uri.toString(), 
-                    onSuccess = { result ->
-                        inputText = if (inputText.isBlank()) result else "$inputText $result"
-                    },
-                    onFailure = { error ->
-                        Toast.makeText(context, error, Toast.LENGTH_LONG).show()
-                    }
-                )
             }
         }
     }
@@ -204,15 +227,6 @@ fun AiChatScreen(viewModel: AiChatViewModel) {
     ) { uri ->
         uri?.let { 
             selectedImageUri = it
-            viewModel.recognizeIngredients(
-                it.toString(),
-                onSuccess = { result ->
-                    inputText = if (inputText.isBlank()) result else "$inputText $result"
-                },
-                onFailure = { error ->
-                    Toast.makeText(context, error, Toast.LENGTH_LONG).show()
-                }
-            )
         }
     }
 
@@ -390,7 +404,7 @@ fun AiChatScreen(viewModel: AiChatViewModel) {
                     alpha = headerAlpha
                     translationY = headerTranslationY
                 }
-                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .padding(start = 16.dp, end = 22.dp, top = 8.dp, bottom = 8.dp)
                 .height(50.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
@@ -453,8 +467,36 @@ fun AiChatScreen(viewModel: AiChatViewModel) {
             ) {
                 LazyColumn(
                     state = listState,
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 0.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .graphicsLayer { alpha = 0.99f }
+                        .drawWithContent {
+                            drawContent()
+                            val topFadeHeight = 16.dp.toPx()
+                            drawRect(
+                                brush = Brush.verticalGradient(
+                                    colors = listOf(Color.Transparent, Color.Black),
+                                    startY = 0f,
+                                    endY = topFadeHeight
+                                ),
+                                blendMode = BlendMode.DstIn
+                            )
+                            val bottomFadeHeight = 20.dp.toPx()
+                            drawRect(
+                                brush = Brush.verticalGradient(
+                                    colors = listOf(Color.Black, Color.Transparent),
+                                    startY = size.height - bottomFadeHeight,
+                                    endY = size.height
+                                ),
+                                blendMode = BlendMode.DstIn
+                            )
+                        },
+                    contentPadding = PaddingValues(
+                        start = 16.dp, 
+                        top = 16.dp, 
+                        end = 16.dp, 
+                        bottom = with(density) { keyboardOffsetPx.toDp() }
+                    ),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(messages, key = { it.id }) { msg ->
@@ -465,8 +507,21 @@ fun AiChatScreen(viewModel: AiChatViewModel) {
                             onFavoriteClick = { recipe -> viewModel.toggleFavorite(recipe) },
                             isFavorite = { id -> 
                                 favVer.let { viewModel.isFavorite(id) } 
-                            }
+                            },
+                            onSettingsClick = onNavigateToSettings,
+                            onExpandedChange = {
+                                scope.launch {
+                                    val startTime = System.currentTimeMillis()
+                                    // Smoothly scroll to bottom during expansion animation
+                                    while (System.currentTimeMillis() - startTime < 600) {
+                                        listState.animateScrollToItem(messages.size)
+                                        withFrameNanos { }
+                                    }
+                                }
+                            },
+                            onGenerateImage = { viewModel.generateImage(it) }
                         )
+
                     }
                     
                     item(key = "bottom_anchor") {
@@ -549,40 +604,19 @@ fun AiChatScreen(viewModel: AiChatViewModel) {
             }
         }
 
-            // 3. Sticky Bottom Input (Redesigned for transition stability and corrected keyboard offset)
-            val density = LocalDensity.current
-            val imeInsets = WindowInsets.ime
-            val navInsets = WindowInsets.navigationBars
-            
-            val restingMarginPx = with(density) { 35.dp.roundToPx() } // Standard "up a bit"
-            val stickyMarginPx = with(density) { 3.dp.roundToPx() }
-            
-            
+            // 3. Sticky Bottom Input (Corrected with top-level reactive sync)
             Column(
                 modifier = Modifier
                         .align(Alignment.CenterHorizontally)
-                        .offset {
-                            val imePx = imeInsets.getBottom(this)
-                            val navPx = navInsets.getBottom(this)
-                            val barPx = with(this) { 68.dp.roundToPx() }
-                            val totalBarPx = navPx + barPx
-                            
-                            // Calculate how much the keyboard incurs beyond the bottom bar area
-                            val keyboardIncursion = (imePx - totalBarPx).coerceAtLeast(0)
-                            
-                            val yOffset = if (keyboardIncursion > 0) {
-                                // Important: Subtract (baseFloorPx - stickyMarginPx) to account for the resting 35dp padding
-                                -(keyboardIncursion - (restingMarginPx - stickyMarginPx))
-                            } else {
-                                0
-                            }
-                            IntOffset(x = 0, y = yOffset)
-                        }
-                        .padding(horizontal = 13.dp)
-                        .padding(bottom = with(density) { restingMarginPx.toDp() })
+                        .offset { IntOffset(0, -keyboardOffsetPx) }
+                        .padding(horizontal = 16.dp)
+                        .padding(bottom = 35.dp)
             ) {
                 Surface(
-                    modifier = Modifier.fillMaxWidth().height(60.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(end = 6.dp, bottom = 6.dp)
+                        .wrapContentHeight()
                         .drawBehind {
                             drawRoundRect(
                                 color = NeoBlack,
@@ -595,16 +629,18 @@ fun AiChatScreen(viewModel: AiChatViewModel) {
                     shape = RoundedCornerShape(20.dp),
                     border = BorderStroke(3.dp, NeoBlack)
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp, horizontal = 12.dp)
                     ) {
+                        // Top Layer: Image Preview
                         if (selectedImageUri != null) {
                             Box(
                                 modifier = Modifier
-                                    .padding(start = 4.dp, end = 8.dp)
-                                    .size(44.dp)
-                                    .background(Color.LightGray.copy(alpha = 0.2f), RoundedCornerShape(8.dp)) // Pre-fill color
+                                    .padding(bottom = 8.dp)
+                                    .size(60.dp)
+                                    .background(Color.LightGray.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
                             ) {
                                 AsyncImage(
                                     model = selectedImageUri,
@@ -612,92 +648,103 @@ fun AiChatScreen(viewModel: AiChatViewModel) {
                                     placeholder = androidx.compose.ui.graphics.painter.ColorPainter(Color.LightGray.copy(alpha = 0.2f)),
                                     modifier = Modifier
                                         .fillMaxSize()
-                                        .clip(RoundedCornerShape(8.dp))
-                                        .border(2.dp, NeoBlack, RoundedCornerShape(8.dp)),
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .border(2.dp, NeoBlack, RoundedCornerShape(12.dp)),
                                     contentScale = ContentScale.Crop
                                 )
                                 Box(
                                     modifier = Modifier
                                         .align(Alignment.TopEnd)
-                                        .offset(x = 4.dp, y = (-4).dp)
-                                        .size(16.dp)
+                                        .offset(x = 6.dp, y = (-6).dp)
+                                        .size(20.dp)
                                         .background(Color.Red, CircleShape)
-                                        .border(1.dp, NeoBlack, CircleShape)
+                                        .border(1.5.dp, NeoBlack, CircleShape)
                                         .neoClickable { selectedImageUri = null },
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Icon(Icons.Default.Close, null, tint = Color.White, modifier = Modifier.size(10.dp))
+                                    Icon(Icons.Default.Close, null, tint = Color.White, modifier = Modifier.size(12.dp))
                                 }
                             }
                         }
 
-                        BasicTextField(
-                            value = inputText,
-                            onValueChange = { inputText = it },
-                            modifier = Modifier.weight(1f).padding(start = if (selectedImageUri == null) 12.dp else 0.dp),
-                            textStyle = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold, color = NeoBlack),
-                            decorationBox = { innerTextField ->
-                                if (inputText.isEmpty()) {
-                                    Text("问点什么...", color = NeoBlack.copy(alpha = 0.3f), fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                                }
-                                innerTextField()
-                            }
-                        )
-
+                        // Bottom Layer: Text & Actions
                         Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(end = 4.dp)
+                            verticalAlignment = Alignment.Bottom,
+                            modifier = Modifier.fillMaxWidth()
                         ) {
-                            IconButton(onClick = {
-                                val permission = Manifest.permission.RECORD_AUDIO
-                                if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED) {
-                                    voiceManager.startListening()
-                                    showVoiceDialogState.value = true
-                                } else {
-                                    micPermissionLauncher.launch(permission)
-                                }
-                            }, modifier = Modifier.size(34.dp)) {
-                                Icon(Icons.Default.Mic, null, tint = NeoBlack, modifier = Modifier.size(22.dp))
-                            }
-                            
-                            IconButton(onClick = { 
-                                showImageSourceDialogState.value = true
-                            }, modifier = Modifier.size(34.dp)) {
-                                Icon(Icons.Default.CameraAlt, null, tint = NeoBlack, modifier = Modifier.size(20.dp))
-                            }
-                            
-                            Spacer(modifier = Modifier.width(6.dp))
-                            
-                            Surface(
+                            BasicTextField(
+                                value = inputText,
+                                onValueChange = { inputText = it },
                                 modifier = Modifier
-                                    .size(width = 46.dp, height = 38.dp)
-                                    .neoClickable(enabled = true) {
-                                        if (isLoading) {
-                                            viewModel.stopGeneration()
-                                        } else if (inputText.isNotBlank() || selectedImageUri != null) {
-                                            viewModel.sendMessage(inputText)
-                                            inputText = ""
-                                            selectedImageUri = null
+                                    .weight(1f)
+                                    .padding(bottom = 8.dp, top = 4.dp),
+                                textStyle = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold, color = NeoBlack),
+                                maxLines = 5,
+                                decorationBox = { innerTextField ->
+                                    Box {
+                                        if (inputText.isEmpty()) {
+                                            Text("问点什么...", color = NeoBlack.copy(alpha = 0.3f), fontSize = 16.sp, fontWeight = FontWeight.Bold)
                                         }
-                                    },
-                                color = if (isLoading) Color.Red else if (inputText.isNotBlank() || selectedImageUri != null) NeoBlack else Color.White,
-                                shape = RoundedCornerShape(12.dp),
-                                border = BorderStroke(2.dp, NeoBlack)
+                                        innerTextField()
+                                    }
+                                }
+                            )
+
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(start = 4.dp)
                             ) {
-                                Box(contentAlignment = Alignment.Center) {
-                                    if (isLoading) {
-                                        Box(
-                                            modifier = Modifier
-                                                .size(12.dp)
-                                                .background(Color.White, RoundedCornerShape(2.dp))
-                                        )
+                                IconButton(onClick = {
+                                    val permission = Manifest.permission.RECORD_AUDIO
+                                    if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED) {
+                                        voiceManager.startListening()
+                                        showVoiceDialogState.value = true
                                     } else {
-                                        Icon(
-                                            Icons.AutoMirrored.Filled.Send, 
-                                            null, 
-                                            tint = if (inputText.isNotBlank() || selectedImageUri != null) Color.White else NeoBlack.copy(alpha = 0.3f),
-                                            modifier = Modifier.size(18.dp)
-                                        )
+                                        micPermissionLauncher.launch(permission)
+                                    }
+                                }, modifier = Modifier.size(34.dp)) {
+                                    Icon(Icons.Default.Mic, null, tint = NeoBlack, modifier = Modifier.size(22.dp))
+                                }
+                                
+                                IconButton(onClick = { 
+                                    showImageSourceDialogState.value = true
+                                }, modifier = Modifier.size(34.dp)) {
+                                    Icon(Icons.Default.CameraAlt, null, tint = NeoBlack, modifier = Modifier.size(20.dp))
+                                }
+                                
+                                Spacer(modifier = Modifier.width(6.dp))
+                                
+                                Surface(
+                                    modifier = Modifier
+                                        .size(width = 46.dp, height = 38.dp)
+                                        .neoClickable(enabled = true) {
+                                            if (isLoading) {
+                                                viewModel.stopGeneration()
+                                            } else if (inputText.isNotBlank() || selectedImageUri != null) {
+                                                viewModel.sendMessage(inputText, selectedImageUri)
+                                                inputText = ""
+                                                selectedImageUri = null
+                                            }
+                                        },
+                                    color = if (isLoading) Color.Red else if (inputText.isNotBlank() || selectedImageUri != null) NeoBlack else Color.White,
+                                    shape = RoundedCornerShape(12.dp),
+                                    border = BorderStroke(2.dp, NeoBlack)
+                                ) {
+                                    Box(contentAlignment = Alignment.Center) {
+                                        if (isLoading) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(12.dp)
+                                                    .background(Color.White, RoundedCornerShape(2.dp))
+                                            )
+                                        } else {
+                                            Icon(
+                                                Icons.AutoMirrored.Filled.Send, 
+                                                null, 
+                                                tint = if (inputText.isNotBlank() || selectedImageUri != null) Color.White else NeoBlack.copy(alpha = 0.3f),
+                                                modifier = Modifier.size(18.dp)
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -1060,13 +1107,17 @@ fun ChatBubble(
     message: ChatMessageItem, 
     isGenerating: Boolean = false,
     onFavoriteClick: (Recipe) -> Unit = {},
-    isFavorite: (String) -> Boolean = { false }
+    isFavorite: (String) -> Boolean = { false },
+    onSettingsClick: () -> Unit = {},
+    onExpandedChange: () -> Unit = {},
+    onGenerateImage: (ChatMessageItem) -> Unit = {}
 ) {
     val recipe = remember(message.recipeJson) {
         if (message.recipeJson != null) {
             try { Gson().fromJson(message.recipeJson, Recipe::class.java) } catch (_: Exception) { null }
         } else null
     }
+    // ... (rest of alignment and time logic remains same)
     val alignment = if (message.isUser) Alignment.End else Alignment.Start
     val timeStr = remember(message.timestamp) {
         val now = Calendar.getInstance()
@@ -1100,7 +1151,25 @@ fun ChatBubble(
                 ) {
                         Column(modifier = Modifier.padding(start = 12.dp, top = 10.dp, end = 12.dp, bottom = 6.dp).animateContentSize()) {
                             if (message.isUser) {
-                                Text(text = message.content, fontSize = 15.sp, fontWeight = FontWeight.Medium, lineHeight = 22.sp, modifier = Modifier.padding(bottom = 4.dp))
+                                if (message.imageUri != null) {
+                                    Surface(
+                                        modifier = Modifier.widthIn(max = 240.dp).padding(bottom = 8.dp),
+                                        shape = RoundedCornerShape(12.dp),
+                                        border = BorderStroke(2.dp, NeoBlack)
+                                    ) {
+                                        Box(modifier = Modifier.clip(RoundedCornerShape(10.dp))) {
+                                            AsyncImage(
+                                                model = message.imageUri,
+                                                contentDescription = null,
+                                                modifier = Modifier.fillMaxWidth().heightIn(max = 200.dp),
+                                                contentScale = ContentScale.Crop
+                                            )
+                                        }
+                                    }
+                                }
+                                if (message.content.isNotBlank()) {
+                                    Text(text = message.content, fontSize = 15.sp, fontWeight = FontWeight.Medium, lineHeight = 22.sp, modifier = Modifier.padding(bottom = 4.dp))
+                                }
                             } else {
                                 if (message.content.trim().isEmpty() && isGenerating) {
                                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 4.dp)) {
@@ -1110,6 +1179,17 @@ fun ChatBubble(
                                     }
                                 } else {
                                     MarkdownText(text = message.content, modifier = Modifier.padding(bottom = 4.dp))
+                                    if (message.content.startsWith("🍳 厨师提醒") || message.content.contains("🍳 厨师提醒")) {
+                                        Spacer(modifier = Modifier.height(10.dp))
+                                        NeoButton(
+                                            text = "⚙️ 前往设置配置",
+                                            onClick = onSettingsClick,
+                                            modifier = Modifier.fillMaxWidth().height(48.dp),
+                                            backgroundColor = Color(0xFFFACC15), // NeoYellow
+                                            shadowOffset = 3.dp
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                    }
                                     if (message.isRecipeLoading) {
                                         Spacer(modifier = Modifier.height(8.dp))
                                         Row(modifier = Modifier.fillMaxWidth().background(Color(0xFFF3F4F6), RoundedCornerShape(8.dp)).border(1.dp, NeoBlack.copy(alpha = 0.1f), RoundedCornerShape(8.dp)).padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -1120,7 +1200,15 @@ fun ChatBubble(
                                     }
                                     if (recipe != null) {
                                         Spacer(modifier = Modifier.height(12.dp))
-                                        ChatRecipeLayout(recipe = recipe, isFavorite = isFavorite(recipe.id), onFavoriteClick = { onFavoriteClick(recipe) })
+                                        ChatRecipeLayout(
+                                            recipe = recipe, 
+                                            isFavorite = isFavorite(recipe.id), 
+                                            onFavoriteClick = { onFavoriteClick(recipe) },
+                                            onExpandedChange = onExpandedChange,
+                                            isImageLoading = message.isImageLoading,
+                                            generatedImageUrl = message.generatedImageUrl,
+                                            onGenerateImage = { onGenerateImage(message) }
+                                        )
                                     }
                                 }
                             }
@@ -1141,15 +1229,75 @@ fun ChatBubble(
 }
 
 @Composable
-fun ChatRecipeLayout(recipe: Recipe, isFavorite: Boolean, onFavoriteClick: () -> Unit) {
+fun ChatRecipeLayout(
+    recipe: Recipe, 
+    isFavorite: Boolean, 
+    onFavoriteClick: () -> Unit, 
+    onExpandedChange: () -> Unit = {},
+    isImageLoading: Boolean = false,
+    generatedImageUrl: String? = null,
+    onGenerateImage: () -> Unit = {}
+) {
     var isExpanded by remember { mutableStateOf(false) }
     Column(modifier = Modifier.fillMaxWidth().background(Color.White, RoundedCornerShape(12.dp)).border(2.dp, NeoBlack, RoundedCornerShape(12.dp))) {
-        Row(modifier = Modifier.fillMaxWidth().background(NeoOrange.copy(alpha = 0.1f), RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp)).padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+        // Recipe Image Area
+        if (generatedImageUrl != null) {
+            Box(modifier = Modifier.fillMaxWidth().height(160.dp).clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp)).border(BorderStroke(0.1.dp, NeoBlack.copy(alpha = 0.1f)), RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp))) {
+                AsyncImage(
+                    model = generatedImageUrl,
+                    contentDescription = recipe.name,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+                // Source Tag Overlay
+                Surface(
+                    color = NeoBlack.copy(alpha = 0.7f),
+                    shape = RoundedCornerShape(bottomStart = 8.dp),
+                    modifier = Modifier.align(Alignment.TopEnd)
+                ) {
+                    Text("AI 图鉴", color = Color.White, fontSize = 9.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
+                }
+            }
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    if (generatedImageUrl == null) NeoOrange.copy(alpha = 0.1f) else Color.Transparent, 
+                    if (generatedImageUrl == null) RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp) else RoundedCornerShape(0.dp)
+                )
+                .padding(12.dp), 
+            horizontalArrangement = Arrangement.SpaceBetween, 
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(recipe.name, fontWeight = FontWeight.Black, fontSize = 16.sp, color = NeoBlack)
                 Text("${recipe.cuisine} • ${recipe.cookingTime} min", fontSize = 11.sp, color = NeoBlack.copy(alpha = 0.6f))
             }
-            IconButton(onClick = onFavoriteClick, modifier = Modifier.size(36.dp).background(Color.White, RoundedCornerShape(8.dp)).border(1.5.dp, NeoBlack, RoundedCornerShape(8.dp))) { Text(if (isFavorite) "❤️" else "🤍", fontSize = 18.sp) }
+            
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                // Image Generation Button (Magic Wand)
+                if (generatedImageUrl == null) {
+                    IconButton(
+                        onClick = onGenerateImage, 
+                        modifier = Modifier.size(36.dp).background(Color.White, RoundedCornerShape(8.dp)).border(1.5.dp, NeoBlack, RoundedCornerShape(8.dp)),
+                        enabled = !isImageLoading
+                    ) { 
+                        if (isImageLoading) {
+                            CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.5.dp, color = NeoBlack)
+                        } else {
+                            Text("🪄", fontSize = 18.sp) 
+                        }
+                    }
+                    
+                    // Physical spacer to prevent sticking
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
+                
+                IconButton(onClick = onFavoriteClick, modifier = Modifier.size(36.dp).background(Color.White, RoundedCornerShape(8.dp)).border(1.5.dp, NeoBlack, RoundedCornerShape(8.dp))) { Text(if (isFavorite) "❤️" else "🤍", fontSize = 18.sp) }
+
+            }
         }
         Column(modifier = Modifier.padding(12.dp)) {
             Text("🥗 所需食材", fontWeight = FontWeight.Bold, fontSize = 12.sp); Spacer(modifier = Modifier.height(6.dp))
@@ -1174,12 +1322,16 @@ fun ChatRecipeLayout(recipe: Recipe, isFavorite: Boolean, onFavoriteClick: () ->
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { isExpanded = !isExpanded }
+                        .clickable { 
+                            isExpanded = !isExpanded 
+                            if (isExpanded) onExpandedChange()
+                        }
                         .padding(top = 4.dp, start = 26.dp)
                 )
             }
         }
     }
 }
+
 
 data class PermissionGuideData(val title: String, val message: String)

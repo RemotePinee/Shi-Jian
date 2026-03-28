@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.material3.Icon
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.composed
+
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.remember
 import androidx.compose.ui.draw.drawBehind
@@ -26,6 +27,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.BlendMode
+
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.foundation.Image
@@ -111,6 +116,7 @@ fun NeoButton(
     modifier: Modifier = Modifier,
     backgroundColor: Color = Color(0xFFFB923C), // Theme Orange
     textColor: Color = NeoBlack, // Default to Black for contrast
+    fontSize: androidx.compose.ui.unit.TextUnit = 16.sp, // Support custom sizing
     shadowOffset: Dp = 4.dp, // Standardized to 4.dp
     enabled: Boolean = true
 ) {
@@ -138,11 +144,19 @@ fun NeoButton(
                 }
             }
     ) {
+        // Background and border matching the parent Box size
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .background(backgroundColor, shape)
+                .border(2.dp, NeoBlack, shape)
+        )
+        
+        // Content that defines the base size of the button
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(backgroundColor, shape)
-                .border(2.dp, NeoBlack, shape)
+                .align(Alignment.Center) // FIX: Ensure text is centered if button has fixed height
                 .padding(horizontal = 12.dp, vertical = 8.dp),
             contentAlignment = Alignment.Center
         ) {
@@ -150,7 +164,7 @@ fun NeoButton(
                 text = text,
                 color = currentTextColor,
                 fontWeight = FontWeight.Black,
-                fontSize = 16.sp,
+                fontSize = fontSize,
                 textAlign = TextAlign.Center
             )
         }
@@ -498,3 +512,36 @@ fun FlowRow(
         }
     }
 }
+fun Modifier.fadingEdge(
+    top: Dp = 0.dp,
+    bottom: Dp = 0.dp
+): Modifier = this.graphicsLayer { alpha = 0.99f }
+    .drawWithContent {
+        drawContent()
+        val topPx = top.toPx()
+        val bottomPx = bottom.toPx()
+
+        if (topPx > 0f && size.height > 0f) {
+            drawRect(
+                brush = Brush.verticalGradient(
+                    0f to Color.Transparent,
+                    (topPx / size.height).coerceIn(0f, 1f) to Color.Black,
+                    startY = 0f,
+                    endY = size.height
+                ),
+                blendMode = BlendMode.DstIn
+            )
+        }
+        if (bottomPx > 0f && size.height > 0f) {
+            drawRect(
+                brush = Brush.verticalGradient(
+                    (1f - bottomPx / size.height).coerceIn(0f, 1f) to Color.Black,
+                    1f to Color.Transparent,
+                    startY = 0f,
+                    endY = size.height
+                ),
+                blendMode = BlendMode.DstIn
+            )
+        }
+    }
+
