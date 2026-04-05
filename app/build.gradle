@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace 'com.eatwhat'
+    namespace 'com.eatwhat.shijian'
     compileSdk 36
 
     defaultConfig {
-        applicationId "com.eatwhat"
+        applicationId "com.eatwhat.shijian"
         minSdk 26
         targetSdk 36
         versionCode 5
