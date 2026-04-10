@@ -25,9 +25,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.EatWhat"
-        android:name=".MainApplication">
+        android:name="com.shijian.MainApplication">
         <activity
-            android:name=".MainActivity"
+            android:name="com.shijian.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.App.Starting"
             android:windowSoftInputMode="adjustResize">
