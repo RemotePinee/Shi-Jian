@@ -207,7 +207,7 @@ fun CookbookDetailScreen(
                                     Spacer(modifier = Modifier.width(12.dp))
                                     
                                     Text(
-                                        text = step.description,
+                                        text = cleanMarkdown(step.description),
                                         fontSize = 15.sp,
                                         fontWeight = FontWeight.Medium,
                                         lineHeight = 22.sp,
@@ -246,7 +246,7 @@ fun CookbookDetailScreen(
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 recipe.tips.forEach { tip ->
-                                    Text("• $tip", fontSize = 14.sp, fontWeight = FontWeight.Medium, modifier = Modifier.padding(vertical = 4.dp))
+                                    Text("• ${cleanMarkdown(tip)}", fontSize = 14.sp, fontWeight = FontWeight.Medium, modifier = Modifier.padding(vertical = 4.dp))
                                 }
                             }
                         }
@@ -279,20 +279,7 @@ private fun PremiumControlCircle(
 
 @Composable
  private fun PortionItem(text: String, modifier: Modifier = Modifier) {
-    // Clean markdown artifacts like ![image](url) and ### headers
-    val cleanedText = remember(text) {
-        var result = text.replace(Regex("!\\[.*?\\]\\(.*?\\)"), "") // Remove images
-            .replace(Regex("#{1,6}\\s?"), "") // Remove markdown headers
-            .trim()
-            
-        // Auto-fix unbalanced parentheses if any were swallowed by markdown stripping
-        val openCount = result.count { it == '(' }
-        val closeCount = result.count { it == ')' }
-        if (openCount > closeCount) {
-            result += ")"
-        }
-        result
-    }
+    val cleanedText = remember(text) { cleanMarkdown(text) }
     
     if (cleanedText.isEmpty()) return
 
@@ -321,6 +308,25 @@ private fun PremiumControlCircle(
             )
         }
     }
+}
+
+private fun cleanMarkdown(text: String): String {
+    var result = text
+        .replace(Regex("""(?s)!\[.*?]\(.*?\)"""), "") // Remove images (anywhere)
+        .replace(Regex("""(?s)\[(.*?)]\(.*?\)"""), "$1") // Keep text part of links
+        .replace(Regex("""#{1,6}\s?"""), "") // Remove headers
+        .replace(Regex("""\*\*"""), "") // Remove bold markers
+        .replace(Regex(""">+!*"""), "") // Remove blockquote/alert symbols
+        .replace(Regex("""\*"""), "") // Remove all remaining asterisks
+        .trim()
+        
+    // Fix unbalanced parentheses (handling both half and full width)
+    val openCount = result.count { it == '(' || it == '（' }
+    val closeCount = result.count { it == ')' || it == '）' }
+    if (openCount > closeCount) {
+        result += if (result.contains('（')) "）" else ")"
+    }
+    return result
 }
 
 @Composable

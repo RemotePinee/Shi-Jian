@@ -17,10 +17,31 @@ class CookbookRepository(private val context: Context) {
 
     private fun ensureLoaded(): CookbookData {
         cachedData?.let { return it }
-        val json = context.assets.open("recipes.json").bufferedReader().use { it.readText() }
-        val data = Gson().fromJson(json, CookbookData::class.java)
-        cachedData = data
-        return data
+        
+        val gson = Gson()
+        // 1. 加载核心数据
+        val coreJson = context.assets.open("recipes_core.json").bufferedReader().use { it.readText() }
+        val coreData = gson.fromJson(coreJson, CookbookData::class.java)
+        
+        // 2. 搜索并加载所有 recipes_*.json 里的菜谱（排除 core）
+        val allRecipes = mutableListOf<CookbookRecipe>()
+        val assetFiles = context.assets.list("") ?: emptyArray()
+        
+        assetFiles.filter { it.startsWith("recipes_") && it != "recipes_core.json" && it.endsWith(".json") }
+            .forEach { filename ->
+                try {
+                    val json = context.assets.open(filename).bufferedReader().use { it.readText() }
+                    val categoryData = gson.fromJson(json, CookbookData::class.java)
+                    allRecipes.addAll(categoryData.recipes)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+            
+        // 3. 组合并缓存
+        val mergedData = coreData.copy(recipes = allRecipes)
+        cachedData = mergedData
+        return mergedData
     }
 
     fun getAllRecipes(): List<CookbookRecipe> = ensureLoaded().recipes

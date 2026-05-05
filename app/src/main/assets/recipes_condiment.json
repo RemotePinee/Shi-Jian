@@ -1,0 +1,462 @@
+{
+  "recipes": [
+    {
+      "id": "dac15aaad8d4",
+      "name": "油泼辣子",
+      "category": "condiment",
+      "categoryName": "酱料",
+      "difficulty": 3,
+      "ingredients": [
+        "蒜头",
+        "干辣椒面",
+        "盐",
+        "熟白芝麻",
+        "小米椒",
+        "花生油（可用菜籽油替换）",
+        "家庭小陶瓷碗",
+        "家庭铁勺子",
+        "五香粉 （可选）",
+        "草寇（可选）",
+        "小葱 （可选）",
+        "八角",
+        "花椒",
+        "香叶",
+        "白芷",
+        "姜片（可选）",
+        "糖",
+        "白醋"
+      ],
+      "portions": [
+        "蒜头 1 个",
+        "干辣椒面 100 克",
+        "盐 5 克",
+        "熟白芝麻 15 克",
+        "小米椒 1 个",
+        "花生油 150 毫升 （可用菜籽油替换）",
+        "五香粉 10 克（可选）",
+        "草寇 1 个（可选）",
+        "小葱 3-5 根（可选）",
+        "其他配料：八角(1)、花椒（20-50 粒都可，看个人口味）、香叶（2-3 片）、白芷（2-3 片）、姜片（大拇指粗细的姜切片）（可选）",
+        "糖 30 克",
+        "白醋 5 ml（大概就是小铁勺子的量）"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "拿出蒜头掰 2 个`小蒜头`去皮"
+        },
+        {
+          "step": 2,
+          "description": "拿出砧板剁碎`小蒜头`、`小米椒`"
+        },
+        {
+          "step": 3,
+          "description": "拿出碗倒入`花生油`"
+        },
+        {
+          "step": 4,
+          "description": "油热放入`其他配料`和`小葱`,等到香料变焦，捞出扔掉"
+        },
+        {
+          "step": 5,
+          "description": "拿出铁锅将碗内的油放入加热 2 分钟（菜籽油烧至冒烟）"
+        },
+        {
+          "step": 6,
+          "description": "此时是空碗"
+        },
+        {
+          "step": 7,
+          "description": "往空碗加入`干辣椒面`、`白芝麻`、`蒜末`、`小米椒`、`盐`、`五香粉`、`草寇`作为\"调料\""
+        },
+        {
+          "step": 8,
+          "description": "关火将油温冷却至 `210` 摄氏度"
+        },
+        {
+          "step": 9,
+          "description": "将锅内热油倒入碗内并用勺子搅拌即可（可以在 `165` 摄氏度时加入同样\"调料\"的碗最后进行混合进行增辣）"
+        },
+        {
+          "step": 10,
+          "description": "倒入热油稍微搅拌后放入白醋，此时会重新沸腾。继续进行搅拌，白醋增香。"
+        },
+        {
+          "step": 11,
+          "description": "油泼辣子冷却到温热放白糖和味精，白糖可以是辣味柔和，不会那么的呛口"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "a9452df02e39",
+      "name": "油酥",
+      "category": "condiment",
+      "categoryName": "酱料",
+      "difficulty": 2,
+      "ingredients": [
+        "面粉",
+        "油",
+        "盐"
+      ],
+      "portions": [
+        "油 = （要烙饼的张数 * 10ml）",
+        "盐 = （要烙饼的张数 / 2）g",
+        "面粉 = （要烙饼的张数 / 0.13）g"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "面粉盛小碗里，加入盐"
+        },
+        {
+          "step": 2,
+          "description": "加入 200 度的热油"
+        },
+        {
+          "step": 3,
+          "description": "用筷子将其搅拌成无固状物体的糊状。"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "1d74c64826e4",
+      "name": "炸串酱料",
+      "category": "condiment",
+      "categoryName": "酱料",
+      "difficulty": 2,
+      "ingredients": [
+        "干辣椒面（粗细都准备）",
+        "孜然粉",
+        "胡椒粉",
+        "五香粉",
+        "花椒粉",
+        "十三香",
+        "麻辣鲜",
+        "白芝麻"
+      ],
+      "portions": [
+        "干辣椒面 60 克",
+        "孜然粉 20 克",
+        "胡椒粉 10 克",
+        "五香粉 15 克",
+        "食盐 20 克",
+        "花椒粉 15 克",
+        "鸡精 8 克",
+        "十三香 5 克",
+        "麻辣鲜 5 克",
+        "白芝麻 30 克"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "所有原料在容器内混合，搅拌均匀。"
+        },
+        {
+          "step": 2,
+          "description": "锅里烧热油，油的用量以在容器内没过所有原材料为佳。"
+        },
+        {
+          "step": 3,
+          "description": "分三次淋入热油，每次 1/3，同时搅拌。"
+        },
+        {
+          "step": 4,
+          "description": "最后放入香油 10ml，生抽 10ml，花椒油 10ml，蚝油 10ml。"
+        }
+      ],
+      "tips": [
+        "最后一步的调味可按自己喜好添加。",
+        "不得一次性倒入所有热油，必须分次倒入并搅拌。"
+      ],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "f93be7617e9d",
+      "name": "简易版炒糖色",
+      "category": "condiment",
+      "categoryName": "酱料",
+      "difficulty": 4,
+      "ingredients": [
+        "糖（任选其一）：",
+        "冰糖：炒出来的`糖色`色泽最为鲜艳，红亮，必须水油炒，不加水融化会很慢",
+        "白砂糖：必须水油炒，不加水融化会很慢",
+        "绵白糖：可以不加水",
+        "炒糖色过程火不要太大！！！电磁炉温度不够，火候过了发苦，不够发甜"
+      ],
+      "portions": [
+        "`油`：100ml",
+        "`开水`：500ml",
+        "`糖`（这里以冰糖为例）"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "开火，并向锅中倒入 100ml 开水"
+        },
+        {
+          "step": 2,
+          "description": "再向锅中倒入 100ml 油，与第一步间隔越短越好，此时锅为大火中火都可以，着急的话可以大火"
+        },
+        {
+          "step": 3,
+          "description": "放入冰糖（如果冰糖过于耦合，可以提前敲碎，做到耦合度越低越好）"
+        },
+        {
+          "step": 4,
+          "description": "调整火力为中火"
+        },
+        {
+          "step": 5,
+          "description": "开始搅拌"
+        },
+        {
+          "step": 6,
+          "description": "要一直一直一直搅拌，变成棕褐色，此时**转为小火**"
+        },
+        {
+          "step": 7,
+          "description": "再变稀，变红茶色，再变成酱红色后起小泡泡，准备好执行下面的`操作1`or`操作2`"
+        },
+        {
+          "step": 8,
+          "description": "小泡泡会逐渐消失，之后会出现大泡泡，大泡泡出现时糖色完成"
+        },
+        {
+          "step": 9,
+          "description": "需要在此时快速进行下一步操作（无论哪种操作都一定要提前准备好并快速！否则火候过大糖色发苦），根据菜品派别以及个人口味作出选择"
+        },
+        {
+          "step": 10,
+          "description": "操作 1：可以直接加 400ml 开水降温"
+        },
+        {
+          "step": 11,
+          "description": "操作 2：也可以加入葱姜蒜花椒等调味品进行翻炒"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "e07c51ca95d9",
+      "name": "糖醋汁",
+      "category": "condiment",
+      "categoryName": "酱料",
+      "difficulty": 2,
+      "ingredients": [
+        "清水",
+        "白糖",
+        "白醋/米醋",
+        "料酒",
+        "生抽"
+      ],
+      "portions": [
+        "清水(50ml)",
+        "生抽(40ml)",
+        "白糖(30g)",
+        "白醋(20ml)",
+        "料酒(10ml)"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "按照比例将各调料在小碗中搅拌均匀"
+        },
+        {
+          "step": 2,
+          "description": "按不同菜肴的方式处理完毕后，将配制好的糖醋汁倒入锅中"
+        },
+        {
+          "step": 3,
+          "description": "根据各菜肴的不同，烹制 5-10 分钟"
+        },
+        {
+          "step": 4,
+          "description": "大火收汁，可增加菜的浓度、香味和光泽"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "c4d536d95e2d",
+      "name": "草莓酱",
+      "category": "condiment",
+      "categoryName": "酱料",
+      "difficulty": 2,
+      "ingredients": [
+        "草莓",
+        "白砂糖",
+        "保鲜膜"
+      ],
+      "portions": [
+        "草莓 1200 克",
+        "白糖 400 克 （如需要低糖饮食，可以考虑降低到 200g）"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "草莓洗净去叶"
+        },
+        {
+          "step": 2,
+          "description": "将草莓切碎放入合适的碗中"
+        },
+        {
+          "step": 3,
+          "description": "将白糖倒入碗中与草莓搅拌均匀"
+        },
+        {
+          "step": 4,
+          "description": "碗用保鲜膜覆盖静置 1 小时"
+        },
+        {
+          "step": 5,
+          "description": "将静置的草莓和糖的混合物倒入不粘锅中开大火烧开"
+        },
+        {
+          "step": 6,
+          "description": "烧开后转小火不断搅拌直至果酱呈粘稠状关火"
+        },
+        {
+          "step": 7,
+          "description": "待草莓酱冷却后装入准备好的密封罐中"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": "file:///android_asset/images/c4d536d95e2d_洗好的草莓.jpeg"
+    },
+    {
+      "id": "57bdbd4dcc63",
+      "name": "葱油",
+      "category": "condiment",
+      "categoryName": "酱料",
+      "difficulty": 3,
+      "ingredients": [
+        "油",
+        "葱（大葱小葱都可以）",
+        "姜",
+        "洋葱",
+        "料酒",
+        "香菜（可选）",
+        "开洋（可选）"
+      ],
+      "portions": [
+        "油 200g",
+        "葱 80g",
+        "姜 20g",
+        "料酒 10ml",
+        "洋葱 150g",
+        "开洋 50g"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "开洋泡入 50 度温水中，加入 10ml 料酒去腥，泡 10 分钟后取出沥干水分"
+        },
+        {
+          "step": 2,
+          "description": "葱，香菜洗净，切成 5cm 长的段，擦干表面水份"
+        },
+        {
+          "step": 3,
+          "description": "洋葱切成丝，在锅里用热水煮 5 分钟，取出沥干水份"
+        },
+        {
+          "step": 4,
+          "description": "姜去皮，切成片"
+        },
+        {
+          "step": 5,
+          "description": "锅里倒入全部油，放入上述预处理好的材料，开中小火炸 20 分钟"
+        }
+      ],
+      "tips": [
+        "渣后的开洋葱渣也可以食用，葱油可以滤掉这些料渣，也可以保留"
+      ],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "cbffa143b3e0",
+      "name": "蒜香酱油",
+      "category": "condiment",
+      "categoryName": "酱料",
+      "difficulty": 2,
+      "ingredients": [
+        "蒜头",
+        "白芝麻",
+        "花生油",
+        "酱油",
+        "蘸料碟"
+      ],
+      "portions": [
+        "蒜头 2 瓣",
+        "白芝麻 5 克",
+        "花生油 15 毫升",
+        "酱油 30 毫升",
+        "蘸料碟 1 个"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "拍碎蒜头"
+        },
+        {
+          "step": 2,
+          "description": "往蘸料碟中加入酱油"
+        },
+        {
+          "step": 3,
+          "description": "起锅，加入花生油，等到油温滚烫后加入拍好的蒜头，炸半分钟"
+        },
+        {
+          "step": 4,
+          "description": "半分钟后，关火，把热油倒入蘸料碟，用筷子搅拌即可"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "cffbf886b6bf",
+      "name": "蔗糖糖浆",
+      "category": "condiment",
+      "categoryName": "酱料",
+      "difficulty": 1,
+      "ingredients": [
+        "白砂糖",
+        "水 工具",
+        "可密封容器（建议使用高硼硅试剂瓶，便宜） ![bottle](./bottle.jpg)"
+      ],
+      "portions": [
+        "水 100 克",
+        "白砂糖 100 克"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "将称好的白砂糖的饮用水于容器混匀"
+        },
+        {
+          "step": 2,
+          "description": "容器封盖放冰箱冷藏"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": null
+    }
+  ]
+}

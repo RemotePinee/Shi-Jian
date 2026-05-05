@@ -79,6 +79,9 @@ fun CookbookScreen(
     }
     val isFilterVisible by remember {
         derivedStateOf {
+            // 如果菜谱数量很少（<= 6），没必要折叠，直接常驻显示，避免动画打架
+            if (recipes.size <= 6) return@derivedStateOf true
+            
             gridState.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset < 150
         }
     }
@@ -284,7 +287,7 @@ private fun CookbookBackToTopButton(
 
     Box(
         modifier = modifier
-            .padding(bottom = 32.dp, end = 36.dp) // 增加 end 边距，使其向左移动
+            .padding(bottom = 32.dp, end = 36.dp)
             .graphicsLayer { translationY = translateY }
     ) {
         AnimatedVisibility(
@@ -299,25 +302,14 @@ private fun CookbookBackToTopButton(
                 label = "scale"
             )
 
+            // 增加容器尺寸到 72dp，为 5dp 的阴影偏移留出足够空间，防止裁剪
             Box(
                 modifier = Modifier
-                    .size(width = 64.dp, height = 64.dp)
+                    .size(72.dp)
                     .graphicsLayer { 
                         scaleX = scale
                         scaleY = scale
                     }
-                    .drawBehind {
-                        // Neo-Shadow (更厚重的黑影)
-                        drawRoundRect(
-                            color = NeoBlack,
-                            topLeft = Offset(5.dp.toPx(), 5.dp.toPx()),
-                            size = size,
-                            cornerRadius = CornerRadius(20.dp.toPx())
-                        )
-                    }
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(Color(0xFF34D399)) // 呼应Header的绿色
-                    .border(2.5.dp, NeoBlack, RoundedCornerShape(20.dp))
                     .pointerInput(Unit) {
                         detectTapGestures(
                             onPress = {
@@ -327,26 +319,42 @@ private fun CookbookBackToTopButton(
                             },
                             onTap = { onClick() }
                         )
-                    },
-                contentAlignment = Alignment.Center
+                    }
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                // 1. 底层阴影：预留偏移量，且不超出 72dp 容器
+                Box(
+                    modifier = Modifier
+                        .size(64.dp)
+                        .offset(x = 5.dp, y = 5.dp)
+                        .background(NeoBlack, RoundedCornerShape(20.dp))
+                )
+                
+                // 2. 主体按钮：尺寸 64dp
+                Box(
+                    modifier = Modifier
+                        .size(64.dp)
+                        .background(Color(0xFF34D399), RoundedCornerShape(20.dp))
+                        .border(2.5.dp, NeoBlack, RoundedCornerShape(20.dp)),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.KeyboardDoubleArrowUp,
-                        contentDescription = "回到顶部",
-                        tint = NeoBlack,
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Text(
-                        "TOP",
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Black,
-                        color = NeoBlack,
-                        letterSpacing = 0.5.sp
-                    )
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.KeyboardDoubleArrowUp,
+                            contentDescription = "回到顶部",
+                            tint = NeoBlack,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Text(
+                            "TOP",
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Black,
+                            color = NeoBlack,
+                            letterSpacing = 0.5.sp
+                        )
+                    }
                 }
             }
         }

@@ -322,8 +322,27 @@ fun RecipeStepItem(step: RecipeStep) {
         ) {
             Text(text = step.step.toString(), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp)
         }
-        Text(text = step.description, fontSize = 13.sp, color = Color(0xFF374151))
+        Text(text = cleanMarkdown(step.description), fontSize = 13.sp, color = Color(0xFF374151))
     }
+}
+
+private fun cleanMarkdown(text: String): String {
+    var result = text
+        .replace(Regex("""(?s)!\[.*?]\(.*?\)"""), "") // Remove images
+        .replace(Regex("""(?s)\[(.*?)]\(.*?\)"""), "$1") // Keep text part of links
+        .replace(Regex("""#{1,6}\s?"""), "") // Remove headers
+        .replace(Regex("""\*\*"""), "") // Remove bold markers
+        .replace(Regex(""">+!*"""), "") // Remove blockquote/alert symbols
+        .replace(Regex("""\*"""), "") // Remove all remaining asterisks
+        .trim()
+        
+    // Fix unbalanced parentheses
+    val openCount = result.count { it == '(' || it == '（' }
+    val closeCount = result.count { it == ')' || it == '）' }
+    if (openCount > closeCount) {
+        result += if (result.contains('（')) "）" else ")"
+    }
+    return result
 }
 
 

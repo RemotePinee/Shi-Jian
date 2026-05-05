@@ -262,7 +262,9 @@ class MainActivity : ComponentActivity() {
                                                     // Smart Extraction: Merge name and quantity, but only strip "note-like" parentheses
                                                     val smartIngredients = if (cr.portions.isNotEmpty()) {
                                                         cr.portions.map { 
-                                                            it.replace(Regex("[(（][^)）]*?[喜不代可放看口味选][^)）]*?[)）]"), "").trim() 
+                                                            it.replace(Regex("[(（][^)）]*?[喜不代可放看口味选比如包含或者推荐][^)）]*?[)）]"), "")
+                                                              .replace(Regex("""[，\s]?推荐合计重量.*$"""), "")
+                                                              .trim() 
                                                         }
                                                     } else {
                                                         cr.ingredients

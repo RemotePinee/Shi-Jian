@@ -1,0 +1,4143 @@
+{
+  "recipes": [
+    {
+      "id": "151490c6f531",
+      "name": "上汤娃娃菜",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 3,
+      "ingredients": [
+        "娃娃菜",
+        "皮蛋",
+        "午餐肉（火腿肠）",
+        "葱",
+        "姜",
+        "蒜",
+        "盐",
+        "糖",
+        "淀粉"
+      ],
+      "portions": [
+        "娃娃菜 700g",
+        "金针菇 10g（看个人喜好, 不喜欢 see you tomorrow 的就不放 😂）",
+        "皮蛋 一个（没有也可以不放）",
+        "午餐肉（火腿肠都可以替代）"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "娃娃菜洗净, 竖着切开切成段。"
+        },
+        {
+          "step": 2,
+          "description": "葱 3g 切 小段。蒜 10g 切片。姜 10g 切小片。"
+        },
+        {
+          "step": 3,
+          "description": "皮蛋切成丁, 火腿肠或者午餐肉切成丁（1cm 大小的丁）"
+        },
+        {
+          "step": 4,
+          "description": "金针菇洗净撕开"
+        },
+        {
+          "step": 5,
+          "description": "烧热水娃娃菜放进去十秒钟出一下水捞出。"
+        },
+        {
+          "step": 6,
+          "description": "热锅凉油, 加热锅倒入油过一遍就倒出来, 重新倒入一点油。"
+        },
+        {
+          "step": 7,
+          "description": "调至小火加入葱姜蒜，煎炒出香味即可。"
+        },
+        {
+          "step": 8,
+          "description": "加入适 300g 清水（水量没过娃娃菜即可）, 放入娃娃菜, 金针菇, 午餐肉"
+        },
+        {
+          "step": 9,
+          "description": "加入调味料蚝油、糖、盐、味精烧开。"
+        },
+        {
+          "step": 10,
+          "description": "煮 3 分钟, 煮开后开始装盘, 盛出娃娃菜后皮蛋放在上面把汤汁浇上去就可以了"
+        },
+        {
+          "step": 11,
+          "description": "拍照技术有限, 味道还是很不错的"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": "file:///android_asset/images/151490c6f531_上汤娃娃菜.png"
+    },
+    {
+      "id": "4bc7041d555d",
+      "name": "凉拌木耳",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 2,
+      "ingredients": [
+        "干木耳 （湿木耳也可，但不能太久之前泡发的，必须是新鲜的湿木耳）",
+        "蒜瓣",
+        "白糖",
+        "小米辣",
+        "盐",
+        "香油",
+        "生抽",
+        "醋",
+        "芥末 （可以不用）"
+      ],
+      "portions": [
+        "干木耳: 20g / 湿木耳: 120g",
+        "蒜瓣: 2-3 个",
+        "小米辣: 2 个",
+        "盐: 2 g",
+        "糖: 5-10g（依个人口味）",
+        "生抽: 15ml",
+        "醋: 15ml",
+        "香油: 5ml",
+        "芥末: （约 2cm）"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "泡发干木耳, 水量约为 400ml, 泡发约 45 分钟。 （湿木耳跳过此步骤）"
+        },
+        {
+          "step": 2,
+          "description": "将泡发好的木耳, 进行去根处理（如图 4, 5, 6）, 并彻底洗净。"
+        },
+        {
+          "step": 3,
+          "description": "起锅烧水，水开后放入木耳, 大火煮 1.5-2 分钟。"
+        },
+        {
+          "step": 4,
+          "description": "将蒜瓣、小米辣切碎放入碗中 （可选取中大碗）, 并依次加入盐、糖、生抽、醋、香油、芥末, 用量如上。"
+        },
+        {
+          "step": 5,
+          "description": "木耳盛出后沥水, 放入上一步碗中。"
+        },
+        {
+          "step": 6,
+          "description": "搅拌充分，端盘。"
+        }
+      ],
+      "tips": [
+        "调味品的数量可以根据个人口味进行调整, 如果不喜欢芥末, 可以不加入。"
+      ],
+      "source": "HowToCook",
+      "imageUrl": "file:///android_asset/images/4bc7041d555d_1.jpg"
+    },
+    {
+      "id": "cc7502242587",
+      "name": "凉拌油麦菜",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 1,
+      "ingredients": [
+        "油麦菜",
+        "芝麻酱",
+        "酱油",
+        "醋",
+        "蚝油",
+        "白糖",
+        "香油",
+        "蒜",
+        "盐"
+      ],
+      "portions": [
+        "1 颗 油麦菜（约 200g） * 份数",
+        "15ml 醋 * 份数",
+        "5ml 酱油 * 份数",
+        "10ml 芝麻酱 * 份数",
+        "5ml 香油 * 份数",
+        "5g 糖 * 份数",
+        "10ml 蚝油 * 份数",
+        "两**头**蒜 * 份数"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "蒜拍碎切末"
+        },
+        {
+          "step": 2,
+          "description": "醋，酱油，芝麻酱，香油，糖，蚝油，蒜末放到碗里搅拌均匀"
+        },
+        {
+          "step": 3,
+          "description": "油麦菜切段，每段不超过 4cm"
+        },
+        {
+          "step": 4,
+          "description": "油麦菜放到一个大点的盆里,倒入上述碗中酱料,充分搅拌均匀."
+        }
+      ],
+      "tips": [
+        "芝麻酱可以用花生酱代替"
+      ],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "fd7319883112",
+      "name": "凉拌莴笋",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 2,
+      "ingredients": [
+        "莴笋",
+        "萝卜",
+        "小米辣",
+        "姜",
+        "蒜头",
+        "盐",
+        "食用油"
+      ],
+      "portions": [
+        "莴笋 1 根",
+        "萝卜 0.25 根",
+        "小米辣 2 个",
+        "姜 1 片",
+        "蒜头 2 粒",
+        "盐 5 g",
+        "食用油 25 ml"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "莴笋削皮，切小条。萝卜切条，一起放入大碗，加入盐搅拌，放置 10 分钟"
+        },
+        {
+          "step": 2,
+          "description": "放置后的莴笋用水清洗 1-2 遍"
+        },
+        {
+          "step": 3,
+          "description": "起锅烧水，放入莴笋，水煮 1 分钟 捞出，沥干水分，放入大碗"
+        },
+        {
+          "step": 4,
+          "description": "起锅烧油，放入姜片、蒜粒、小米椒煸炒 30-45 S ，倒入莴笋中"
+        },
+        {
+          "step": 5,
+          "description": "搅拌充分，端盘"
+        }
+      ],
+      "tips": [
+        "萝卜非必须，只是为了增加菜色",
+        "端盘后，可以根据个人口味，额外增加生抽、白砂糖、香醋、芝麻等佐料",
+        "莴笋条的大小看个人口感决定，但莴笋皮要尽量多削点，不然真的影响口感"
+      ],
+      "source": "HowToCook",
+      "imageUrl": "file:///android_asset/images/fd7319883112_1.jpeg"
+    },
+    {
+      "id": "6332d679eee9",
+      "name": "凉拌豆腐",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 2,
+      "ingredients": [
+        "豆腐 （推荐选用北豆腐或老豆腐）",
+        "小葱",
+        "大蒜",
+        "生抽",
+        "香油",
+        "醋（可选）",
+        "白糖（可选）",
+        "辣椒油（可选）"
+      ],
+      "portions": [
+        "豆腐 250 g （约 1 块常见大小的豆腐）",
+        "小葱 10 g",
+        "大蒜 2-3 瓣",
+        "生抽 15 ml",
+        "香油 5 ml",
+        "醋 5 ml（可选）",
+        "白糖 2 g（可选）",
+        "辣椒油 5 ml（可选）"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "将 豆腐 切成 2 cm 见方的小块，备用。"
+        },
+        {
+          "step": 2,
+          "description": "锅中加入 500 ml 饮用水，大火烧开。"
+        },
+        {
+          "step": 3,
+          "description": "放入 豆腐 块，煮 **1-2 分钟**，以去除豆腥味并使豆腐口感更紧实。"
+        },
+        {
+          "step": 4,
+          "description": "将 煮好的 豆腐 块捞出，沥干水分，放入碗中，备用。"
+        },
+        {
+          "step": 5,
+          "description": "将 小葱 洗净，切成葱花，备用。"
+        },
+        {
+          "step": 6,
+          "description": "将 大蒜 去皮，切成蒜末，备用。"
+        },
+        {
+          "step": 7,
+          "description": "在一个干净的小碗中，加入 15 ml 生抽，5 ml 香油，5 ml 醋（可选），2 g 白糖（可选）。"
+        },
+        {
+          "step": 8,
+          "description": "加入切好的 大蒜末。"
+        },
+        {
+          "step": 9,
+          "description": "搅拌均匀，使 白糖 充分溶解，酱汁混合均匀。"
+        },
+        {
+          "step": 10,
+          "description": "将制作好的酱汁均匀淋在 豆腐 块上。"
+        },
+        {
+          "step": 11,
+          "description": "撒上切好的 小葱花。"
+        },
+        {
+          "step": 12,
+          "description": "根据个人喜好，淋上 5 ml 辣椒油（可选）。"
+        },
+        {
+          "step": 13,
+          "description": "用 筷子 或勺子轻轻拌匀，即可食用。"
+        }
+      ],
+      "tips": [
+        "制作凉拌豆腐时，建议选用质地较硬的北豆腐或老豆腐，不易碎裂，口感更佳。",
+        "如果喜欢更清淡的口感，可以省略醋和辣椒油。"
+      ],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "b3b108e933bf",
+      "name": "凉拌金针菇",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 2,
+      "ingredients": [
+        "金针菇",
+        "小葱",
+        "大蒜",
+        "生抽",
+        "醋",
+        "白糖（可选）",
+        "香油（可选）",
+        "辣椒油（可选）"
+      ],
+      "portions": [
+        "金针菇 150 g （约 1 小包）",
+        "小葱 5 g",
+        "大蒜 2 瓣",
+        "生抽 15 ml",
+        "醋 10 ml",
+        "白糖 3 g（可选）",
+        "香油 5 ml（可选）",
+        "辣椒油 5 ml（可选）"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "将 金针菇 根部切除，用清水冲洗干净，备用。"
+        },
+        {
+          "step": 2,
+          "description": "将 小葱 洗净，切成葱花，备用。"
+        },
+        {
+          "step": 3,
+          "description": "将 大蒜 去皮，切成蒜末，备用。"
+        },
+        {
+          "step": 4,
+          "description": "锅中加入 1000 ml 饮用水，大火烧开。"
+        },
+        {
+          "step": 5,
+          "description": "放入 金针菇，煮 **1-2 分钟**，至金针菇变软。"
+        },
+        {
+          "step": 6,
+          "description": "将 煮好的 金针菇 捞出，沥干水分，放入一个较大的碗中，备用。"
+        },
+        {
+          "step": 7,
+          "description": "在另一个干净的小碗中，加入 15 ml 生抽，10 ml 醋，3 g 白糖（可选），5 ml 香油（可选）。"
+        },
+        {
+          "step": 8,
+          "description": "加入切好的 大蒜末。"
+        },
+        {
+          "step": 9,
+          "description": "搅拌均匀，使 白糖 充分溶解，酱汁混合均匀。"
+        },
+        {
+          "step": 10,
+          "description": "将制作好的酱汁均匀淋在 金针菇 上。"
+        },
+        {
+          "step": 11,
+          "description": "撒上切好的 小葱花。"
+        },
+        {
+          "step": 12,
+          "description": "根据个人喜好，淋上 5 ml 辣椒油（可选）。"
+        },
+        {
+          "step": 13,
+          "description": "用 筷子 轻轻拌匀，即可食用。"
+        }
+      ],
+      "tips": [
+        "金针菇焯水时间不宜过长，以免影响口感。",
+        "酱汁的比例可以根据个人口味喜好进行调整。"
+      ],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "3fbead25f2cf",
+      "name": "凉拌黄瓜",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 1,
+      "ingredients": [
+        "黄瓜",
+        "醋",
+        "酱油",
+        "蒜"
+      ],
+      "portions": [
+        "黄瓜 200 克  * 份数",
+        "醋 7.5 ml + 4 ml * 份数",
+        "酱油 5 ml + 2.5 ml * 份数",
+        "蒜 3 瓣 * 份数",
+        "盐 0.4 克 + 0.2 克 * 份数",
+        "香油 5 ml + 2 ml * 份数",
+        "蚝油 5 ml"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "用菜刀将黄瓜拍扁，再剁成长 3 厘米的碎块"
+        },
+        {
+          "step": 2,
+          "description": "将碎黄瓜装入碗中"
+        },
+        {
+          "step": 3,
+          "description": "将蒜拍碎切成碎末"
+        },
+        {
+          "step": 4,
+          "description": "将醋，酱油，盐，蚝油和蒜依次倒入碗中搅拌均匀并腌制 15 分钟"
+        },
+        {
+          "step": 5,
+          "description": "将香油倒入碗中并均匀搅拌"
+        }
+      ],
+      "tips": [
+        "部分情况下黄瓜端头有苦味，请洗净切下后确认",
+        "做好之后直接开吃，亦可先准备好后放入冰箱冷藏（并非冷冻）后食用",
+        "若放入冰箱冷藏，则需使用保鲜膜包紧，并在 8 小时内食用完毕，否则黄瓜会因过度腌制失去清脆口感"
+      ],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "341b955d6943",
+      "name": "包菜炒鸡蛋粉丝",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 3,
+      "ingredients": [
+        "包菜",
+        "鸡蛋",
+        "粉丝",
+        "胡萝卜",
+        "菜籽油",
+        "盐、生抽、老抽、蚝油",
+        "葱、蒜、干辣椒"
+      ],
+      "portions": [
+        "包菜 半 颗",
+        "鸡蛋 2 个",
+        "粉丝 1 把",
+        "胡萝卜 半 根",
+        "菜籽油 20 ml",
+        "盐 2 g、生抽 15 ml、老抽 10 ml、蚝油 10 ml",
+        "葱 半 根、蒜瓣 2 片、干辣椒 5 根"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "胡萝卜、包菜切丝备用"
+        },
+        {
+          "step": 2,
+          "description": "粉丝先用冷水浸泡 1 小时，然后将粉丝放入锅中，加入开水烧至粉丝烫软捞出备用"
+        },
+        {
+          "step": 3,
+          "description": "鸡蛋打入碗中，加入盐后搅拌 15 秒"
+        },
+        {
+          "step": 4,
+          "description": "葱、蒜、辣椒切成小粒备用"
+        },
+        {
+          "step": 5,
+          "description": "起锅烧油，倒入鸡蛋，打散炒熟盛出"
+        },
+        {
+          "step": 6,
+          "description": "再倒入油，放入葱、蒜、干辣椒翻炒 8 秒"
+        },
+        {
+          "step": 7,
+          "description": "下胡萝卜、包菜丝儿翻炒 30 秒"
+        },
+        {
+          "step": 8,
+          "description": "放入粉丝"
+        },
+        {
+          "step": 9,
+          "description": "放调料，生抽 15 ml，老抽 10 ml，蚝油 10 ml，盐 2 克"
+        },
+        {
+          "step": 10,
+          "description": "放入之前炒好的鸡蛋，翻炒约 15 秒"
+        },
+        {
+          "step": 11,
+          "description": "出锅摆盘"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": "file:///android_asset/images/341b955d6943_1.jpg"
+    },
+    {
+      "id": "ada8f903db03",
+      "name": "印度土豆花菜",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 3,
+      "ingredients": [
+        "土豆",
+        "花菜（菜花）",
+        "洋葱",
+        "番茄",
+        "生姜",
+        "大蒜",
+        "青辣椒",
+        "香菜",
+        "食用油",
+        "孜然籽",
+        "姜黄粉",
+        "红辣椒粉",
+        "香菜粉",
+        "印度综合香料粉(Garam Masala)",
+        "盐",
+        "炒锅（带盖）"
+      ],
+      "portions": [
+        "土豆 2 个（约 250g），去皮切块（约 2cm 大小）",
+        "花菜 1 个（约 300g），掰成小朵",
+        "洋葱 1 个（约 100g），切碎",
+        "番茄 1 个（约 100g），切碎",
+        "生姜 8g，磨碎",
+        "大蒜 3 瓣（约 9g），切碎",
+        "青辣椒 1 根，切碎",
+        "食用油 30ml",
+        "孜然籽 3g",
+        "姜黄粉 3g",
+        "红辣椒粉 3g",
+        "香菜粉 5g",
+        "印度综合香料粉 3g",
+        "盐 5g",
+        "香菜叶 15g（装饰用）"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "将土豆去皮切成约 2cm 的块状"
+        },
+        {
+          "step": 2,
+          "description": "将花菜掰成均匀的小朵，大朵可用刀切小"
+        },
+        {
+          "step": 3,
+          "description": "在炒锅中倒入 30ml 食用油，中火加热"
+        },
+        {
+          "step": 4,
+          "description": "油热后放入孜然籽 3g，炸至*孜然籽变深色且散发香味*（约 10 秒，注意不要炸糊）"
+        },
+        {
+          "step": 5,
+          "description": "放入切碎的洋葱，翻炒至*洋葱变透明微黄*（约 3-4 分钟）"
+        },
+        {
+          "step": 6,
+          "description": "加入生姜、大蒜和青辣椒，翻炒 1 分钟"
+        },
+        {
+          "step": 7,
+          "description": "加入切碎的番茄，翻炒至*番茄软烂*（约 2-3 分钟）"
+        },
+        {
+          "step": 8,
+          "description": "加入姜黄粉 3g、红辣椒粉 3g、香菜粉 5g、盐 5g"
+        },
+        {
+          "step": 9,
+          "description": "翻炒 1 分钟，使香料与蔬菜融合"
+        },
+        {
+          "step": 10,
+          "description": "放入土豆块，翻炒 2 分钟使土豆表面裹上香料"
+        },
+        {
+          "step": 11,
+          "description": "放入花菜朵，轻轻翻拌均匀"
+        },
+        {
+          "step": 12,
+          "description": "盖上锅盖，转中小火，**焖 12-15 分钟**，期间每 3-4 分钟打开翻炒一次防止粘锅"
+        },
+        {
+          "step": 13,
+          "description": "当*土豆用筷子可轻松戳透、花菜略有焦边*时，撒入印度综合香料粉 3g"
+        },
+        {
+          "step": 14,
+          "description": "翻炒 1 分钟"
+        },
+        {
+          "step": 15,
+          "description": "关火，撒上香菜叶，盛盘"
+        }
+      ],
+      "tips": [
+        "这道菜是干炒风格(Dry)，不需要加水。如果觉得太干容易粘锅，可以加入极少量水（约 15-30ml），但不宜过多。",
+        "土豆块不要切太小，否则容易炒散。",
+        "花菜的边缘略微焦黄是正常的，反而会增添风味。",
+        "Aloo Gobi 因 2001 年的英国喜剧电影\"Bend It Like Beckham\"（像贝克汉姆一样踢球）而在西方世界广为人知。"
+      ],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "f3485a7caa91",
+      "name": "印度葫芦丸子",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 4,
+      "ingredients": [
+        "瓠瓜（葫芦）",
+        "鹰嘴豆粉(Besan)",
+        "洋葱",
+        "番茄",
+        "生姜",
+        "大蒜",
+        "青辣椒",
+        "香菜",
+        "姜黄粉(Turmeric)",
+        "红辣椒粉",
+        "香菜粉(Coriander Powder)",
+        "孜然粉",
+        "印度综合香料粉(Garam Masala)",
+        "盐",
+        "食用油",
+        "深锅或炒锅"
+      ],
+      "portions": [
+        "瓠瓜（葫芦）1 根（约 400g）",
+        "鹰嘴豆粉 80g",
+        "盐 3g",
+        "红辣椒粉 3g",
+        "香菜粉 3g",
+        "食用油（炸丸子用）500ml **酱汁部分：**",
+        "洋葱 2 个（约 200g），切碎",
+        "番茄 3 个（约 300g），切碎",
+        "生姜 10g，磨碎",
+        "大蒜 4 瓣（约 12g），磨碎",
+        "青辣椒 1 根，切碎",
+        "食用油 30ml",
+        "姜黄粉 3g",
+        "红辣椒粉 5g",
+        "香菜粉 5g",
+        "孜然粉 3g",
+        "印度综合香料粉 3g",
+        "盐 5g",
+        "水 200ml",
+        "香菜叶（装饰用）10g"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "将瓠瓜去皮，用刨丝器刨成细丝"
+        },
+        {
+          "step": 2,
+          "description": "用手将瓠瓜丝中的水分挤干，*尽量挤干*，否则丸子炸不成型"
+        },
+        {
+          "step": 3,
+          "description": "在挤干水分的瓠瓜丝中加入鹰嘴豆粉 80g、盐 3g、红辣椒粉 3g、香菜粉 3g"
+        },
+        {
+          "step": 4,
+          "description": "用手充分混合均匀，揉成不粘手的面团状"
+        },
+        {
+          "step": 5,
+          "description": "将混合物搓成直径约 3cm 的小丸子，备用"
+        },
+        {
+          "step": 6,
+          "description": "在深锅中倒入 500ml 食用油，中火加热至油温约 170°C（放入一小块面团，能快速浮起且冒泡即可）"
+        },
+        {
+          "step": 7,
+          "description": "将丸子分批放入油中，**炸 4-5 分钟**，直至*表面金黄酥脆*"
+        },
+        {
+          "step": 8,
+          "description": "炸好的丸子用厨房纸吸去多余油分，备用 ### 制作酱汁"
+        },
+        {
+          "step": 9,
+          "description": "在炒锅中倒入 30ml 食用油，中火加热 10 秒"
+        },
+        {
+          "step": 10,
+          "description": "放入切碎的洋葱，翻炒至*洋葱变成金棕色*（约 5-7 分钟）"
+        },
+        {
+          "step": 11,
+          "description": "加入磨碎的生姜和大蒜，翻炒 1 分钟至*香味散出*"
+        },
+        {
+          "step": 12,
+          "description": "加入切碎的番茄，翻炒至*番茄完全软烂出油*（约 5 分钟）"
+        },
+        {
+          "step": 13,
+          "description": "加入姜黄粉 3g、红辣椒粉 5g、香菜粉 5g、孜然粉 3g、盐 5g"
+        },
+        {
+          "step": 14,
+          "description": "翻炒 2 分钟，使香料与番茄充分融合"
+        },
+        {
+          "step": 15,
+          "description": "加入 200ml 水，搅拌均匀，煮沸后转小火**炖 5 分钟**"
+        },
+        {
+          "step": 16,
+          "description": "将炸好的丸子轻轻放入酱汁中，小火**炖 3-5 分钟**，使丸子吸收酱汁"
+        },
+        {
+          "step": 17,
+          "description": "撒上印度综合香料粉 3g 和切碎的青辣椒"
+        },
+        {
+          "step": 18,
+          "description": "关火，撒上香菜叶装饰，盛盘"
+        }
+      ],
+      "tips": [
+        "瓠瓜挤水是关键步骤，水分过多会导致丸子散开无法成型。",
+        "丸子不宜在酱汁中炖太久，否则会变软失去口感。",
+        "此菜在印度通常搭配印度烤饼(Naan)或蒸米饭(Chawal)食用。"
+      ],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "ead945a32b42",
+      "name": "地三鲜",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 3,
+      "ingredients": [
+        "茄子",
+        "土豆",
+        "尖椒",
+        "葱",
+        "姜",
+        "蒜",
+        "豆瓣酱",
+        "生抽",
+        "糖",
+        "淀粉"
+      ],
+      "portions": [
+        "茄子 200g",
+        "土豆 150g",
+        "尖椒 3 - 4 个",
+        "淀粉 8g 使用上述条件，计算出计划使用的原材料比例。"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "土豆、茄子、尖椒洗净。"
+        },
+        {
+          "step": 2,
+          "description": "土豆去皮。"
+        },
+        {
+          "step": 3,
+          "description": "茄子、土豆均切成 15g 的不规则的小块。"
+        },
+        {
+          "step": 4,
+          "description": "尖椒用手顺着纹路撕即可，撕成比土豆、茄子略大 25%的块。"
+        },
+        {
+          "step": 5,
+          "description": "尽可能除去青椒表面的水分，避免后续炸的时候炸水。考虑使用厨房纸或风干半小时。"
+        },
+        {
+          "step": 6,
+          "description": "葱切 0.5cm 小段，共取 5g。蒜剁碎成蒜蓉取 15g，分成两份，各 7.5g。姜切沫取 5g。"
+        },
+        {
+          "step": 7,
+          "description": "拿一个空碗，放入生抽 10ml、糖 10g、淀粉 8g，加入 80ml 清水，彻底搅拌均匀，作为调料碗，备用。 ### 初步煎炸"
+        },
+        {
+          "step": 8,
+          "description": "热锅，加入 150ml 油。"
+        },
+        {
+          "step": 9,
+          "description": "加入土豆，煎炸大约 3-4 分钟，以显示金黄色、筷子能轻松扎透为准。"
+        },
+        {
+          "step": 10,
+          "description": "捞出土豆，留下油。"
+        },
+        {
+          "step": 11,
+          "description": "加入茄子，煎炸大约 2-3 分钟，待其到大约 7 分熟，以茄子变软、边缘微焦且吐出多余油脂为准。"
+        },
+        {
+          "step": 12,
+          "description": "捞出茄子，留下油。（也可能没有残余的油了）"
+        },
+        {
+          "step": 13,
+          "description": "如果锅内已经没有流动的油，可以考虑补充 15ml 油。"
+        },
+        {
+          "step": 14,
+          "description": "加入尖椒块，煎炸大约 15 秒，边缘稍微起虎皮后，立刻捞出。倒出锅里的油。 ### 最终煎炸"
+        },
+        {
+          "step": 15,
+          "description": "重新热锅，重新加入 15ml 新底油。"
+        },
+        {
+          "step": 16,
+          "description": "放入葱 5g，姜 5g，蒜 7.5g。中小火爆香。"
+        },
+        {
+          "step": 17,
+          "description": "放入豆瓣酱 15ml。转小火，炒出红油和酱香味。"
+        },
+        {
+          "step": 18,
+          "description": "倒入调料碗。立刻转大火，高速搅拌避免糊锅！大约 10 秒后汤汁就会开始冒泡并变得黏稠。"
+        },
+        {
+          "step": 19,
+          "description": "立刻放入之前准备好的全部土豆、茄子和尖椒。"
+        },
+        {
+          "step": 20,
+          "description": "翻炒 20 秒，让浓稠的酱汁均匀挂在食材上。"
+        },
+        {
+          "step": 21,
+          "description": "关火，撒入 7.5g 蒜。翻拌均匀，盛盘。"
+        }
+      ],
+      "tips": [
+        "糖比淀粉多是非常合理的。淀粉在这里不负责提供味道，它只是一种物理增稠剂。",
+        "茄子在煎炸以后，体积会缩小 4 倍。所以拿的时候可能会注意到茄子下锅很多，出锅很少。这是正常的。"
+      ],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "304920073ae6",
+      "name": "家常日本豆腐",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 3,
+      "ingredients": [
+        "日本豆腐（玉子豆腐）",
+        "青椒",
+        "胡萝卜",
+        "火腿肠（可选）",
+        "黑木耳（可选）",
+        "洋葱（可选）",
+        "生粉",
+        "蒜",
+        "油（煎豆腐用，能没过一大半就行）",
+        "生抽 8 ml",
+        "蚝油 15 ml",
+        "盐（咸鲜口）",
+        "鸡精（咸鲜口，可选）",
+        "番茄酱（酸甜口）",
+        "白砂糖（酸甜口）"
+      ],
+      "portions": [
+        "日本豆腐 300 g（约 3 个）",
+        "青椒 120 g（中等大小 1 个）",
+        "胡萝卜 50 g",
+        "火腿肠 50 g（约 1 根）",
+        "黑木耳 30 g（干黑木耳约 10 g 泡发）",
+        "生粉 80 g",
+        "洋葱 30 g",
+        "蒜 10 g（约 2 瓣）",
+        "油 160-165 ml",
+        "生抽 8 ml",
+        "蚝油 15 ml",
+        "盐 2 g（如果添加了鸡精，只放 0.5g 或不放）",
+        "鸡精 3 g",
+        "白砂糖 10 g",
+        "番茄酱 15 ml"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "胡萝卜切片，尖椒切薄块，葱蒜碎切好"
+        },
+        {
+          "step": 2,
+          "description": "把买好的日本豆腐打开袋子切好，切成大概 1 cm 厚的圆柱体"
+        },
+        {
+          "step": 3,
+          "description": "生粉放到平盘中，准备给豆腐裹面"
+        },
+        {
+          "step": 4,
+          "description": "轻轻把豆腐放到面粉上，上下两面和周边都裹上面粉，注意不要包裹的太厚"
+        },
+        {
+          "step": 5,
+          "description": "在平底锅里放 150 ml 油，油能没过豆腐一大半即可，看边缘颜色变成金黄，翻面煎就可以了"
+        },
+        {
+          "step": 6,
+          "description": "两边都煎好的时候捞出来放在干净的盘里备用"
+        },
+        {
+          "step": 7,
+          "description": "在炒锅中倒入 10-15 ml 油，放入葱蒜，爆香后放入青椒、胡萝卜、火腿肠、黑木耳"
+        },
+        {
+          "step": 8,
+          "description": "加入蚝油、生抽、盐、鸡精、白砂糖、番茄酱"
+        },
+        {
+          "step": 9,
+          "description": "轻轻翻炒至颜色均匀"
+        }
+      ],
+      "tips": [
+        "煎好的豆腐不要放太久，提前准备好配料"
+      ],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "46a7f0d33bdc",
+      "name": "小炒藕丁",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 3,
+      "ingredients": [
+        "大葱",
+        "小米辣",
+        "莲藕",
+        "生抽",
+        "老抽",
+        "耗油",
+        "油"
+      ],
+      "portions": [
+        "大葱 1 段",
+        "小米辣 1-2 根 （看个人吃辣程度）",
+        "莲藕 1 段",
+        "生抽 30 ml",
+        "老抽 15 ml",
+        "耗油 15 ml",
+        "食用油 10-15ml"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "大葱、小米辣切小段，备用"
+        },
+        {
+          "step": 2,
+          "description": "莲藕去皮，切成不超过 3cm 的小块，放入水中备用（防止氧化发黑）"
+        },
+        {
+          "step": 3,
+          "description": "取炒锅，锅内放入 500ml 凉水，煮沸"
+        },
+        {
+          "step": 4,
+          "description": "将藕丁下入沸水中，焯水 2 分钟后，取出放入盘中备用"
+        },
+        {
+          "step": 5,
+          "description": "将锅中水倒掉后，将锅加热干燥，加入 10-15 ml 食用油"
+        },
+        {
+          "step": 6,
+          "description": "待油温升高后，下入葱花，小米辣爆香"
+        },
+        {
+          "step": 7,
+          "description": "将处理好的藕丁下入锅中，大火翻炒"
+        },
+        {
+          "step": 8,
+          "description": "加入生抽、老抽、耗油"
+        },
+        {
+          "step": 9,
+          "description": "翻炒 2 分钟即可出锅"
+        }
+      ],
+      "tips": [
+        "食用莲藕要挑选外皮呈黄褐色、肉肥厚而白的。如果发黑，有异味，则不宜食用。"
+      ],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "ef4ca48daf0a",
+      "name": "干锅花菜",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 3,
+      "ingredients": [
+        "花菜",
+        "五花肉",
+        "辣椒",
+        "生抽",
+        "白糖",
+        "蒜",
+        "盐",
+        "油"
+      ],
+      "portions": [
+        "花菜 400 g",
+        "五花肉 100 g",
+        "辣椒 1-2 根",
+        "生抽 10 ml",
+        "白糖 5g",
+        "蒜瓣 3-4 个",
+        "盐 2 g",
+        "油 10 ml"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "花菜朵朝下，没入淡盐水中浸泡 20 分钟。然后洗净用小刀拆成小朵"
+        },
+        {
+          "step": 2,
+          "description": "入开水锅中焯水 1 分钟，捞出立即用冷水冲淋至完全凉透，沥水备用"
+        },
+        {
+          "step": 3,
+          "description": "五花肉切成薄片，大蒜白色切下用刀背拍扁，小红辣椒切成段"
+        },
+        {
+          "step": 4,
+          "description": "锅烧热放油，油热下大葱白爆香"
+        },
+        {
+          "step": 5,
+          "description": "下五花肉片入锅，用中火煸炒至表面全部变色，继续煸炒一会儿，把肥肉部分的油份逼出一部分"
+        },
+        {
+          "step": 6,
+          "description": "倒入红辣椒段和花菜，翻炒几下"
+        },
+        {
+          "step": 7,
+          "description": "加入 10 ml 生抽"
+        },
+        {
+          "step": 8,
+          "description": "再加入 5 g 白糖，转大火不断翻炒 1 分钟"
+        },
+        {
+          "step": 9,
+          "description": "把大蒜叶部分切成段，放入锅中，翻炒几下后，关火盖上盖子焖 1 分钟即可"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "d6af7eb90483",
+      "name": "手撕包菜",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 3,
+      "ingredients": [
+        "包菜",
+        "五花肉",
+        "小米辣",
+        "食用油",
+        "料酒",
+        "生抽",
+        "香醋",
+        "鸡精",
+        "姜",
+        "蒜头",
+        "蒜苗",
+        "盐"
+      ],
+      "portions": [
+        "包菜 1 颗",
+        "五花肉 200 g",
+        "小米辣 2 根",
+        "食用油 60 ml",
+        "料酒 5 ml",
+        "生抽 5 ml",
+        "香醋 5 ml",
+        "鸡精 2 g",
+        "姜 2 片",
+        "蒜头 2 粒",
+        "蒜苗 0.5 根",
+        "盐 5 g"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "包菜对半切开，去掉中间白色部分【参见图一】"
+        },
+        {
+          "step": 2,
+          "description": "手撕包菜，碗中放入 2 g 盐，清洗包菜并沥干备用【参见图二】"
+        },
+        {
+          "step": 3,
+          "description": "姜片、蒜头、小米辣、蒜苗处理后备用【参见图三】"
+        },
+        {
+          "step": 4,
+          "description": "五花肉切片，清水清洗后备用"
+        },
+        {
+          "step": 5,
+          "description": "锅中加入 30 ml 食用油，倒入包菜翻炒，大火翻炒 1 分钟 后，加入 3 g 盐 ，继续翻炒 2 分钟 后取出备用"
+        },
+        {
+          "step": 6,
+          "description": "锅中加入 30 ml 食用油，倒入五花肉，大火翻炒 1 分钟"
+        },
+        {
+          "step": 7,
+          "description": "倒入姜片等材料，翻炒 1 分钟"
+        },
+        {
+          "step": 8,
+          "description": "倒入包菜翻炒后，加入 香醋、料酒、鸡精、料酒，大火继续翻炒，2 分钟 后出锅"
+        }
+      ],
+      "tips": [
+        "步骤五中，翻炒时间需要实际情况做调整，一般是炒到包菜七分熟后即可。七分熟是指包菜已经出水质感变软",
+        "步骤五中，加盐的作用是锁住包菜水分的同时，给包菜上一点味道"
+      ],
+      "source": "HowToCook",
+      "imageUrl": "file:///android_asset/images/d6af7eb90483_1.jpeg"
+    },
+    {
+      "id": "e77926c85e47",
+      "name": "拔丝土豆",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 3,
+      "ingredients": [
+        "土豆",
+        "食用油",
+        "淀粉",
+        "白砂糖",
+        "水",
+        "芝麻"
+      ],
+      "portions": [
+        "土豆 2 个",
+        "食用油 300 ml （土豆能浮在油上面即可）",
+        "淀粉 30 g",
+        "白砂糖 120 g （要多放糖，这是为了在土豆上面裹上一层厚厚的糖浆，从而产生拔丝的效果）",
+        "水 100 ml",
+        "芝麻 5 g"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "土豆去皮，切均匀的小块。放入淀粉（不加水）搅拌，使得淀粉覆盖土豆表面"
+        },
+        {
+          "step": 2,
+          "description": "起锅烧油，放入土豆块，缓缓翻滚煎炸 5-7 分钟 ，直至筷子可以插进土豆"
+        },
+        {
+          "step": 3,
+          "description": "取出土豆，放入大碗备用"
+        },
+        {
+          "step": 4,
+          "description": "锅中加入水、白砂糖，沿着一个方向慢慢搅动白砂糖，直到白砂糖颜色变成褐色"
+        },
+        {
+          "step": 5,
+          "description": "重新倒入土豆，翻炒 30 S 后 出锅"
+        },
+        {
+          "step": 6,
+          "description": "土豆盛盘，散上芝麻"
+        }
+      ],
+      "tips": [
+        "土豆煎炸不可太熟透，否则在拔丝端盘时不容易定型，影响美观"
+      ],
+      "source": "HowToCook",
+      "imageUrl": "file:///android_asset/images/e77926c85e47_1.jpeg"
+    },
+    {
+      "id": "fbcf5f0dc46d",
+      "name": "松仁玉米",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 2,
+      "ingredients": [
+        "玉米粒（建议使用甜玉米）",
+        "熟松子仁",
+        "胡萝卜（可选，增加色彩）",
+        "食用油",
+        "白砂糖",
+        "盐",
+        "淀粉",
+        "水"
+      ],
+      "portions": [
+        "玉米粒 200 g（可用罐头甜玉米，也可自备煮熟）",
+        "熟松子仁 30 g",
+        "胡萝卜 50 g（切小丁，可省略）",
+        "食用油 15 ml",
+        "白砂糖 10 g",
+        "盐 1 g",
+        "淀粉 5 g",
+        "水 20 ml（用于调淀粉水）"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "玉米粒和胡萝卜丁提前焯水 1 分钟，捞出沥干备用"
+        },
+        {
+          "step": 2,
+          "description": "热锅凉油，放入胡萝卜丁略炒，再加入玉米粒翻炒"
+        },
+        {
+          "step": 3,
+          "description": "加入白砂糖和盐，炒匀"
+        },
+        {
+          "step": 4,
+          "description": "混合水与淀粉成水淀粉，倒入锅中快速翻炒使汤汁略稠"
+        },
+        {
+          "step": 5,
+          "description": "加入熟松仁翻炒均匀"
+        },
+        {
+          "step": 6,
+          "description": "出锅装盘"
+        }
+      ],
+      "tips": [
+        "松仁可以提前用小火干炒至微微金黄香脆，更加美味",
+        "使用罐头玉米时应先沥干水分，避免炒制过程中出水过多"
+      ],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "a55483382549",
+      "name": "椒盐玉米",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 3,
+      "ingredients": [
+        "玉米粒",
+        "椒盐",
+        "芝麻粒",
+        "油",
+        "淀粉",
+        "两个塑料簸箕",
+        "若干吸油纸"
+      ],
+      "portions": [
+        "玉米粒（袋装） 350g",
+        "淀粉（在锅里完全能盖住玉米粒表面为准，在 40 - 70g）",
+        "椒盐粉 10g",
+        "芝麻粒 10g"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "玉米粒都是剥好的，直接解冻即可，温水泡 15 分钟或者灶上开水煮 5 分钟。"
+        },
+        {
+          "step": 2,
+          "description": "拿出一个簸箕，将其假设为 BoxA，垫上吸油纸，倒进解冻好的玉米粒。"
+        },
+        {
+          "step": 3,
+          "description": "shaking shaking shaking! - 直到吸油纸全部变湿为止。"
+        },
+        {
+          "step": 4,
+          "description": "拿出第二个簸箕 BoxB，垫上吸油纸，将 BoxA 的玉米粒全部倒入 BoxB 中。"
+        },
+        {
+          "step": 5,
+          "description": "shaking shaking shaking! - 直到吸油纸全部变湿为止。"
+        },
+        {
+          "step": 6,
+          "description": "重复上述操作多次，直到玉米表面没有明显可见的水滴但保持湿润的状态。"
+        },
+        {
+          "step": 7,
+          "description": "倒入大量淀粉，能够完全盖住玉米粒。"
+        },
+        {
+          "step": 8,
+          "description": "shaking shaking shaking! - 直到淀粉裹住了玉米粒"
+        },
+        {
+          "step": 9,
+          "description": "开灶 - 放锅 - 倒入油 尽量铺满锅底 但不要太多。"
+        },
+        {
+          "step": 10,
+          "description": "油热 8 成，倒入裹上了淀粉的玉米粒。"
+        },
+        {
+          "step": 11,
+          "description": "中火先煎 30s，不要翻炒，不然淀粉会掉。"
+        },
+        {
+          "step": 12,
+          "description": "轻微翻炒 3 分钟即可出锅。"
+        },
+        {
+          "step": 13,
+          "description": "最重要的一步：撒上 3g 椒盐，撒上芝麻粒！"
+        },
+        {
+          "step": 14,
+          "description": "香喷喷的”椒盐玉米“就做好了"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "af6a6185f658",
+      "name": "榄菜肉末四季豆",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 3,
+      "ingredients": [
+        "四季豆",
+        "五花肉",
+        "橄榄菜",
+        "大蒜",
+        "小米辣（不吃辣可以不放）"
+      ],
+      "portions": [
+        "四季豆 220g",
+        "五花肉 100g",
+        "橄榄菜 20g",
+        "大蒜 10g",
+        "小米辣 10g"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "将四季豆洗净，并把筋撕干净，然后切成大小均匀的颗粒备用。"
+        },
+        {
+          "step": 2,
+          "description": "将大蒜拍碎剁成蒜末备用。"
+        },
+        {
+          "step": 3,
+          "description": "将小米辣切成大小均匀的颗粒备用。"
+        },
+        {
+          "step": 4,
+          "description": "将五花肉去皮，然后剁成肉末备用。"
+        },
+        {
+          "step": 5,
+          "description": "将锅烧热，然后加入 20ml 油滑锅，锅滑好之后将热油倒出，然后加入 10ml 冷油，这就是传说中热锅冷油，这么做主要是防止肉末粘锅。"
+        },
+        {
+          "step": 6,
+          "description": "如果家里没有晾油瓶的话，也可以不用滑锅，放入油之后，直接加入肉末开始煸炒，小火煸炒两分钟，炒出猪油。"
+        },
+        {
+          "step": 7,
+          "description": "肉末炒香之后加入蒜末，橄榄菜和小米辣，炒出香味。"
+        },
+        {
+          "step": 8,
+          "description": "加入四季豆开中火煸炒，四季豆至少要炒 5 分钟，一定要保证四季豆**熟透**，否则可能会食物中毒。"
+        },
+        {
+          "step": 9,
+          "description": "四季豆炒熟后加入 2ml 酱油从锅边淋入，然后加入 2g 盐、1g 鸡精、1g 胡椒粉和 0.5g 糖。"
+        },
+        {
+          "step": 10,
+          "description": "将调料翻炒均匀。"
+        },
+        {
+          "step": 11,
+          "description": "出锅，装盘。"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "a76b76db4121",
+      "name": "水油焖蔬菜",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 2,
+      "ingredients": [
+        "食用油",
+        "盐",
+        "蚝油（可选）",
+        "叶菜类蔬菜"
+      ],
+      "portions": [
+        "叶菜类蔬菜：300g ~ 500g"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "洗净蔬菜"
+        },
+        {
+          "step": 2,
+          "description": "锅中加入 150ml 水，并烧开。（水不需要能完全没过蔬菜）"
+        },
+        {
+          "step": 3,
+          "description": "加入 3g 盐"
+        },
+        {
+          "step": 4,
+          "description": "（可选）加入 3ml 蚝油"
+        },
+        {
+          "step": 5,
+          "description": "加入 2ml 食用油"
+        },
+        {
+          "step": 6,
+          "description": "下菜， 翻拌一下，然后盖上锅盖焖 1 分钟"
+        },
+        {
+          "step": 7,
+          "description": "盛盘"
+        }
+      ],
+      "tips": [
+        "不确定咸淡的情况， 可以先少放盐， 在出锅前尝味， 考虑调整加盐",
+        "可以用鸡汤、骨头汤等替代水， 更好吃"
+      ],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "3137b4411dd2",
+      "name": "油醋爆蛋",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 2,
+      "ingredients": [
+        "鸡蛋",
+        "小米辣",
+        "小葱",
+        "蒜",
+        "油",
+        "香醋",
+        "生抽",
+        "蚝油（可选但推荐）",
+        "白糖（可选）"
+      ],
+      "portions": [
+        "鸡蛋 4 个",
+        "小米辣 10 g（约 3 个）",
+        "食用油 35-50 mL",
+        "小葱 10 g",
+        "蒜 5 g",
+        "香醋 15 mL",
+        "生抽 10-15 mL",
+        "蚝油 10 g",
+        "白糖 0-5 g"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "鸡蛋不需打散，直接打入碗中备用"
+        },
+        {
+          "step": 2,
+          "description": "香葱切 3cm 长小段即可"
+        },
+        {
+          "step": 3,
+          "description": "蒜瓣和小米辣放入打蒜器，打成沫"
+        },
+        {
+          "step": 4,
+          "description": "将香醋、生抽、蚝油、白糖、水加入小碗，搅拌均匀作为糖醋料汁"
+        },
+        {
+          "step": 5,
+          "description": "油热倒入鸡蛋，等鸡蛋凝固之后铲成大块，倒入蒜沫、小米辣沫、倒入糖醋料汁"
+        },
+        {
+          "step": 6,
+          "description": "大火收汁、快出锅时加入葱段即可"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "3b3aece1e45f",
+      "name": "洋葱炒鸡蛋",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 2,
+      "ingredients": [
+        "鸡蛋",
+        "洋葱",
+        "食用油",
+        "盐",
+        "葱",
+        "料酒"
+      ],
+      "portions": [
+        "鸡蛋 2 个",
+        "洋葱 50 g",
+        "食用油 50 ml",
+        "盐 2 g",
+        "葱 半 根",
+        "料酒 2 ml"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "鸡蛋打入大碗中，加入洋葱片、盐后搅拌 60 S"
+        },
+        {
+          "step": 2,
+          "description": "起锅烧油，倒入鸡蛋，一面煎炸 30-45 S ，翻面继续翻炒，反复 2-3 分钟 后散上料酒出锅"
+        },
+        {
+          "step": 3,
+          "description": "鸡蛋装盘，散上葱花"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": "file:///android_asset/images/3b3aece1e45f_1.jpeg"
+    },
+    {
+      "id": "fb85cb9f69fd",
+      "name": "清炒花菜",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 2,
+      "ingredients": [
+        "花菜",
+        "大蒜",
+        "盐"
+      ],
+      "portions": [
+        "花菜 约 300 g （约 1/2 中等大小的花菜）",
+        "大蒜 2-3 瓣",
+        "盐 3 g",
+        "食用油 15 ml",
+        "饮用水 50 ml （用于炒制过程）"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "将 花菜 洗净，用刀或手掰成小朵，粗茎部分可以切片，备用。"
+        },
+        {
+          "step": 2,
+          "description": "将 大蒜 去皮，切成蒜片，备用。"
+        },
+        {
+          "step": 3,
+          "description": "锅中加入 1000 ml 饮用水，大火烧开。"
+        },
+        {
+          "step": 4,
+          "description": "放入 花菜 朵，煮 **2-3 分钟**，至花菜颜色变浅，口感稍微软化。"
+        },
+        {
+          "step": 5,
+          "description": "将 煮好的 花菜 捞出，沥干水分，备用。"
+        },
+        {
+          "step": 6,
+          "description": "热锅，加入 15 ml 食用油，大火烧热。"
+        },
+        {
+          "step": 7,
+          "description": "放入 蒜片，快速煸炒出香味。"
+        },
+        {
+          "step": 8,
+          "description": "放入 焯好水的 花菜 朵，转中大火，快速翻炒约 **2 分钟**，使花菜均匀受热。"
+        },
+        {
+          "step": 9,
+          "description": "加入 3 g 盐，继续翻炒均匀。"
+        },
+        {
+          "step": 10,
+          "description": "沿锅边淋入 50 ml 饮用水，盖上锅盖，焖 **1 分钟**，帮助花菜完全熟透入味。"
+        },
+        {
+          "step": 11,
+          "description": "开盖，快速翻炒均匀，即可出锅。"
+        }
+      ],
+      "tips": [
+        "提前将花菜焯水可以缩短炒制时间，并使花菜更容易熟透。"
+      ],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "196b1f08225b",
+      "name": "清蒸南瓜",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 1,
+      "ingredients": [
+        "南瓜",
+        "蒸锅"
+      ],
+      "portions": [
+        "南瓜 300 g",
+        "饮用水 1000 ml （用于蒸锅）"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "将 南瓜 外皮洗净，去除瓜瓤和籽。"
+        },
+        {
+          "step": 2,
+          "description": "将 南瓜 切成厚度大约 2 cm 的片，备用。"
+        },
+        {
+          "step": 3,
+          "description": "在 蒸锅 的锅中加入 1000 ml 饮用水。"
+        },
+        {
+          "step": 4,
+          "description": "将切好的 南瓜 片均匀摆放在盘中。"
+        },
+        {
+          "step": 5,
+          "description": "待蒸锅中的水烧开后，将装有 南瓜 的盘子放入蒸锅中。"
+        },
+        {
+          "step": 6,
+          "description": "盖上锅盖，保持大火蒸 **15-20 分钟**，直至南瓜变软，可以用筷子轻松穿透。"
+        },
+        {
+          "step": 7,
+          "description": "关火，小心取出盘子。"
+        }
+      ],
+      "tips": [
+        "南瓜的品种不同，甜度和口感会有差异。老南瓜通常更甜更面。",
+        "南瓜皮含有营养，如果喜欢也可以不去皮蒸，但需要彻底洗净。"
+      ],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "6b2382d75041",
+      "name": "炒滑蛋",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 1,
+      "ingredients": [
+        "鸡蛋（最好是无菌蛋）",
+        "牛奶"
+      ],
+      "portions": [
+        "鸡蛋 4 颗",
+        "牛奶 30ml",
+        "食用油 10ml"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "鸡蛋加入牛奶以及 5ml 食用油搅拌均匀，备用"
+        },
+        {
+          "step": 2,
+          "description": "大火烧热平底锅约 30s, 加入 5ml 食用油"
+        },
+        {
+          "step": 3,
+          "description": "烧 30s 转小火, 并且放入搅拌好的鸡蛋"
+        },
+        {
+          "step": 4,
+          "description": "在锅中静置 5 秒后，用锅铲将蛋液从边缘缓慢推向中间"
+        },
+        {
+          "step": 5,
+          "description": "翻炒至鸡蛋大致凝固后关火，装盘"
+        }
+      ],
+      "tips": [
+        "最后可根据个人口味撒些黑胡椒或者盐来调味。 参考资料"
+      ],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "41fb51188fff",
+      "name": "炒茄子",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 3,
+      "ingredients": [
+        "茄子",
+        "八角（可选）",
+        "虾皮（可选）",
+        "香葱（可选）",
+        "肉末（可选）",
+        "酱油",
+        "糖（可选）",
+        "醋（可选）",
+        "菜籽油或花生油"
+      ],
+      "portions": [
+        "茄子数量 = 份数 *  1.8 个",
+        "八角 = 份数 * 1 个",
+        "虾皮 = 份数 * 正常男子手抓半把",
+        "香葱 = 份数 * 2 颗",
+        "肉末 = 份数 * 50 g",
+        "酱油 = 份数 * 40 ml",
+        "糖 = 份数 * 5 g",
+        "醋 = 份数 * 10 ml > 注：油、酱油这俩种材料在操作中也有体现，大家可以交叉对比来确定添加材料的数量"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "将茄子洗净，一刀分为两段（竖切）。每段的茄子切菱形块，将切好的茄子放入碗中待命。"
+        },
+        {
+          "step": 2,
+          "description": "将香葱洗净，并切成葱花放到案板上待命。"
+        },
+        {
+          "step": 3,
+          "description": "切好八角，放到案板上待命。"
+        },
+        {
+          "step": 4,
+          "description": "如果打算放肉末，先用 10 ml（如果是纯瘦肉，用 15 ml）油中火炒至变色（约 1 分钟），然后盛出备用。"
+        },
+        {
+          "step": 5,
+          "description": "开火热锅，直至锅内没有水。"
+        },
+        {
+          "step": 6,
+          "description": "往锅内倒食用油，没过锅底的两倍（油可以多加，但不可少加）。"
+        },
+        {
+          "step": 7,
+          "description": "热油约 6 成熟，放入八角、虾皮、香葱这三种可选性材料。"
+        },
+        {
+          "step": 8,
+          "description": "如果没有八角等可选材料，热油至 9 成熟。"
+        },
+        {
+          "step": 9,
+          "description": "待锅内的油到 9 成熟，将碗中的茄子倒入锅内用锅铲进行翻炒。"
+        },
+        {
+          "step": 10,
+          "description": "翻炒约 40 秒，将锅铲悬空，与锅平行，把酱油倒入锅铲内。一人约 2.5 锅铲（酱油可以少加，但不可多加，会咸）。"
+        },
+        {
+          "step": 11,
+          "description": "茄子炒到半软时（约 1 分钟后），放回预炒的肉末，快速搅拌均匀。"
+        },
+        {
+          "step": 12,
+          "description": "如果打算加入糖和醋，加入糖和醋。"
+        },
+        {
+          "step": 13,
+          "description": "继续进行翻炒。"
+        },
+        {
+          "step": 14,
+          "description": "等到锅内所有茄子变色且变软时捞出。"
+        }
+      ],
+      "tips": [
+        "因为酱油的缘故，所以本菜不必加盐。出锅之前可以尝一下，如果不咸可以加微量的盐，下次炒时酱油量要增加",
+        "如果加了虾皮，可以将酱油量酌情减少。",
+        "炒本菜时，一直大火即可。",
+        "切忌！一定不可加水，会变成水煮茄子，口感差，所以油可多放，不可少放。",
+        "如果家用灶达到 7 成油温后温度不再继续明显上升，可直接进行下一步，不必强求 9 成油温。"
+      ],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "024f2a63a25f",
+      "name": "炒青菜",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 2,
+      "ingredients": [
+        "青菜"
+      ],
+      "portions": [
+        "青菜 100g * 份数",
+        "蒜瓣 2 粒 * 份数",
+        "食用油 10-15ml（覆盖锅底即可）",
+        "食盐 2g * 份数",
+        "饮用水 70ml * 份数",
+        "白糖 5g * 份数"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "青菜掰成小瓣，用清水洗净，备用。"
+        },
+        {
+          "step": 2,
+          "description": "将蒜瓣剁碎，备用"
+        },
+        {
+          "step": 3,
+          "description": "中火或大火热锅后，锅内放入 10-15ml 食用油。再等待 30 秒让油温升高。"
+        },
+        {
+          "step": 4,
+          "description": "将准备好的青菜倒入锅中，翻炒至青菜变软（约 1 分钟）。"
+        },
+        {
+          "step": 5,
+          "description": "放入剁碎的蒜瓣"
+        },
+        {
+          "step": 6,
+          "description": "倒入计算好的清水，水位应当完全浸润或即将没过青菜，加入食盐 （2g * 份数），继续翻炒约 1 分钟。"
+        },
+        {
+          "step": 7,
+          "description": "最后加入白糖小火加热 2 分钟，加热时盖上锅盖。"
+        },
+        {
+          "step": 8,
+          "description": "盛盘。"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "d94d981dc2e1",
+      "name": "烤茄子",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 3,
+      "ingredients": [
+        "茄子",
+        "食用油",
+        "酱油（生抽）",
+        "蒜蓉",
+        "辣椒",
+        "孜然",
+        "食用盐"
+      ],
+      "portions": [
+        "茄子 1 个 （大约 200g）",
+        "食用油 20-30 毫升",
+        "酱油 4-6 克",
+        "小米椒 1 个 （大约 20g）",
+        "蒜蓉 3-4 瓣",
+        "孜然 1-3 克",
+        "食用盐 0.5-2 克"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "将酱油、孜然、食用盐、蒜蓉和切碎的小米椒置于碗中，均匀搅拌备用"
+        },
+        {
+          "step": 2,
+          "description": "茄子洗净，用纸巾擦干表面的水分"
+        },
+        {
+          "step": 3,
+          "description": "用叉子在茄子的一侧扎 4-8 下"
+        },
+        {
+          "step": 4,
+          "description": "使用 15-25ml 的食用油涂满茄子表面"
+        },
+        {
+          "step": 5,
+          "description": "将烤箱温度设置为 200℃ （打开烤箱风扇 大火），预热 2 分钟"
+        },
+        {
+          "step": 6,
+          "description": "将茄子放入烤箱中层或者上层，烤制 12-15 分钟 （茄子表面有褶皱，且能按压 0.3-0.5cm 的深度即可）"
+        },
+        {
+          "step": 7,
+          "description": "取出茄子，用刀茄子上竖着划一个口子。口子居中，上下距 1-1.5cm"
+        },
+        {
+          "step": 8,
+          "description": "用小刀或者叉子伸入口子，竖着切割茄子内部"
+        },
+        {
+          "step": 9,
+          "description": "将口子微微掰开，倒入第一步准备的酱料"
+        },
+        {
+          "step": 10,
+          "description": "再次将茄子放入烤箱，将烤箱温度设置为 200℃ ，烤制 4-7 分钟"
+        },
+        {
+          "step": 11,
+          "description": "取出，关闭烤箱电源"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "2589d1c39e0d",
+      "name": "白灼菜心",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 2,
+      "ingredients": [
+        "新鲜菜心",
+        "生抽、蚝油、盐",
+        "大蒜、小米辣",
+        "食用油"
+      ],
+      "portions": [
+        "新鲜菜心 250g",
+        "食用油 10g",
+        "调一个灵魂料汁儿",
+        "生抽 5g",
+        "蚝油 5g",
+        "盐、糖 5g",
+        "大蒜四五瓣、小米辣一两根"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "菜心洗净，**去除根部比较硬或老的地方**。此处还用刀刮了**刮菜心根茎部分**，刮掉外面那层比较硬的，菜心内部更可口，但要注意根茎白灼时长，时间太长的话根茎不脆了"
+        },
+        {
+          "step": 2,
+          "description": "大蒜切成蒜末，有洋葱顺便加了点洋葱"
+        },
+        {
+          "step": 3,
+          "description": "调制灵魂料汁：生抽 5g 吧、蚝油 5g，加 3g 糖和 100g 清水半碗成一碗汁儿 >如果要是加淀粉，汤汁儿煮沸后更容易挂在菜心上，味道会更重一些，广东人可能吃不惯"
+        },
+        {
+          "step": 4,
+          "description": "一锅 500ml 清水加 5g 盐和 10g 食用油烧开"
+        },
+        {
+          "step": 5,
+          "description": "将菜心根茎在沸水中烫 1 分钟，直到根茎颜色变成深绿。再将整个菜心放到锅中烫熟 1 分钟，捞起来码入盘中"
+        },
+        {
+          "step": 6,
+          "description": "开另一小锅将兑好的料汁倒入，小火烧开，放入一半的蒜末，一点点姜丝和小米椒碎。在制作时加了一点点洋葱碎和大蒜，先在锅底倒油，五成热后倒入蒜末、洋葱，稍稍爆香后再加入料汁，加入小米辣煮开"
+        },
+        {
+          "step": 7,
+          "description": "料汁稍微收汁，煮沸后稍等十来秒吧，后直接浇在菜心上，不要特别多，但蒜末还是很给力的不要少蒜"
+        }
+      ],
+      "tips": [
+        "选择菜心一定要比较新鲜！新鲜！"
+      ],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "206ecf89d3d1",
+      "name": "皮蛋豆腐",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 1,
+      "ingredients": [
+        "皮蛋",
+        "内酯豆腐",
+        "生抽",
+        "白砂糖",
+        "醋（推荐镇江香醋）",
+        "香油（可选）",
+        "辣椒油（可选）",
+        "花生碎（可选）",
+        "葱花（可选）",
+        "香菜（可选）"
+      ],
+      "portions": [
+        "皮蛋 2 个",
+        "内酯豆腐 1 盒",
+        "生抽 15 ml",
+        "白砂糖 2.5g",
+        "醋 15 ml",
+        "香油 15 ml",
+        "辣椒油 10 ml",
+        "花生碎 10 g",
+        "葱花 15 g",
+        "香菜 1 株"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "先把皮蛋剥壳，切成四瓣。"
+        },
+        {
+          "step": 2,
+          "description": "嫩豆腐切块或者切片放中间。"
+        },
+        {
+          "step": 3,
+          "description": "将生抽、白砂糖、醋、香油、辣椒油调成酱汁，淋上去。"
+        },
+        {
+          "step": 4,
+          "description": "最后可选撒上花生碎、葱花、香菜。"
+        }
+      ],
+      "tips": [
+        "豆腐先焯水去豆腥味可以去除豆腥味",
+        "皮蛋切瓣时刀上可以抹点香油防止粘刀"
+      ],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "3a0ae3b40370",
+      "name": "糖拌西红柿",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 2,
+      "ingredients": [
+        "西红柿",
+        "白砂糖",
+        "冰箱"
+      ],
+      "portions": [
+        "西红柿 2 个（每个西红柿约 100g，共 200g）",
+        "白砂糖 20g"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "用刀将西红柿皮米字型划开"
+        },
+        {
+          "step": 2,
+          "description": "用筷子插入西红柿的菊花，在燃气上转动烤 10 秒（或用开水冲 30 秒），直到西红柿皮卷边"
+        },
+        {
+          "step": 3,
+          "description": "把西红柿的衣服脱光"
+        },
+        {
+          "step": 4,
+          "description": "再西红柿大卸八块（沿纹路切可以更多的留汁水），去掉头部根蒂部，备用"
+        },
+        {
+          "step": 5,
+          "description": "全部切好后，将西红柿在盘子中均匀码一层"
+        },
+        {
+          "step": 6,
+          "description": "撒上白糖，重复上面一步直到全部西红柿放完"
+        },
+        {
+          "step": 7,
+          "description": "放入冰箱冷藏 10 分钟"
+        },
+        {
+          "step": 8,
+          "description": "一盘糖拌西红柿就好了，营养美味，酸甜爽口，夏日解暑又解腻"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "3e5319df3480",
+      "name": "素炒豆角",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 2,
+      "ingredients": [
+        "豆角",
+        "小米椒",
+        "葱",
+        "蒜",
+        "生抽",
+        "老抽",
+        "耗油",
+        "盐"
+      ],
+      "portions": [
+        "豆角 250g",
+        "小米椒 2 个",
+        "葱 3 圈",
+        "蒜 2 颗",
+        "生抽 6ml",
+        "老抽 2ml",
+        "耗油 6ml",
+        "盐 6g"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "葱切花，蒜切沫，备用。"
+        },
+        {
+          "step": 2,
+          "description": "生抽、老抽、耗油、盐混合调料汁，备用。"
+        },
+        {
+          "step": 3,
+          "description": "小米椒切圈，备用。"
+        },
+        {
+          "step": 4,
+          "description": "豆角去筋，45° 斜切*4-10cm*小段，备用。"
+        },
+        {
+          "step": 5,
+          "description": "起锅烧油(10ml - 15ml)，冒烟后放入葱、小米椒，翻炒至闻到香味；"
+        },
+        {
+          "step": 6,
+          "description": "加入豆角，翻炒*30s*,"
+        },
+        {
+          "step": 7,
+          "description": "加入料汁，开大火翻炒*2分钟*"
+        },
+        {
+          "step": 8,
+          "description": "倒入 150ml 水"
+        },
+        {
+          "step": 9,
+          "description": "转中小火，盖上锅盖焖制 8-10 分钟"
+        },
+        {
+          "step": 10,
+          "description": "加入蒜切沫，出锅。"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "e53c2847a694",
+      "name": "红烧冬瓜",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 3,
+      "ingredients": [
+        "冬瓜",
+        "食用油",
+        "料酒",
+        "淀粉",
+        "生抽",
+        "老抽",
+        "鸡精",
+        "香葱",
+        "姜末",
+        "蚝油"
+      ],
+      "portions": [
+        "冬瓜 300 g",
+        "食用油 50 ml",
+        "料酒 2 ml",
+        "淀粉 10 g",
+        "生抽 10 ml",
+        "老抽 15 ml",
+        "鸡精 3 g",
+        "香葱 0.5 根",
+        "姜末 1 粒",
+        "蚝油 15 ml"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "冬瓜去皮，切 边长不超过 2cm 小块"
+        },
+        {
+          "step": 2,
+          "description": "起锅烧油，放入冬瓜，缓缓翻滚煎炸 2 分钟 ，直至冬瓜表面泛金黄色"
+        },
+        {
+          "step": 3,
+          "description": "取出冬瓜，放入大碗备用"
+        },
+        {
+          "step": 4,
+          "description": "利用锅中的剩余油，依次放入姜末、生抽、蚝油，翻炒 15 S"
+        },
+        {
+          "step": 5,
+          "description": "重新倒入冬瓜，翻炒 30 S 后，加入开水，水要没过冬瓜表面，大火煮 10 分钟"
+        },
+        {
+          "step": 6,
+          "description": "加入老抽上色，继续煮，直至冬瓜软糯（筷子可以轻松插近冬瓜）"
+        },
+        {
+          "step": 7,
+          "description": "加入鸡精、料酒、香葱翻炒后 30 S， 取出冬瓜到大碗中"
+        },
+        {
+          "step": 8,
+          "description": "锅中剩余汤汁保留，倒入水淀粉，煮开后汤汁浇灌在冬瓜表面"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": "file:///android_asset/images/e53c2847a694_1.jpeg"
+    },
+    {
+      "id": "e1269af3587c",
+      "name": "红烧茄子",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 4,
+      "ingredients": [
+        "大蒜",
+        "大葱",
+        "青辣椒",
+        "洋葱",
+        "西红柿",
+        "青茄子",
+        "盐",
+        "酱油",
+        "鸡蛋",
+        "面粉",
+        "淀粉"
+      ],
+      "portions": [
+        "青茄子的数量 = 份数 * 0.7 个",
+        "青辣椒 = 份数 * 0.5 个",
+        "洋葱 = 份数 * 0.3 个",
+        "西红柿 = 1 个",
+        "大葱 = 半颗",
+        "大蒜 = 3 瓣",
+        "鸡蛋 = 1 个",
+        "面粉 = 青茄子数量 * 150 克",
+        "淀粉 = 面粉 / 4 克",
+        "酱油 = 茄子数量 * 7 克（向上取整）"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "青茄子、青辣椒、西红柿、洋葱、大葱洗净。"
+        },
+        {
+          "step": 2,
+          "description": "大葱切 5 毫米宽的葱花，大蒜扒皮并拍碎，西红柿切 6 立方厘米的块，青辣椒、洋葱切 5g 的块。"
+        },
+        {
+          "step": 3,
+          "description": "茄子切菱形块（先切 2 公分厚的片，然后再把片切成 2 公分的条，最后斜刀切块儿...）。"
+        },
+        {
+          "step": 4,
+          "description": "将面粉倒入盆中，依次加入少量水，搅拌均匀，呈粘稠糊状。"
+        },
+        {
+          "step": 5,
+          "description": "加入淀粉，加入 30 克水，搅拌均匀。"
+        },
+        {
+          "step": 6,
+          "description": "将鸡蛋打到盆中，加入（面粉 / 20）克的盐，搅拌均匀。"
+        },
+        {
+          "step": 7,
+          "description": "将茄块倒入面糊中，搅拌使茄块的每一面都能沾上面糊。"
+        },
+        {
+          "step": 8,
+          "description": "开大火，热锅，加入 500 毫升的油，当能看到锅里的油冒出一丝烟时，调至小火，将茄块用筷子夹入到油锅，待所有的茄块下锅之后，调至中火，直到茄块变金黄色时捞出，将油倒出。"
+        },
+        {
+          "step": 9,
+          "description": "加入（份数 * 5）g 的油，放入大蒜、葱花，翻炒 15 秒，放入青辣椒块翻炒 30 秒，放入西红柿翻炒 30 秒。"
+        },
+        {
+          "step": 10,
+          "description": "放入炸好的茄块，加水面高度为锅内食材的 0.8 倍。"
+        },
+        {
+          "step": 11,
+          "description": "放入酱油和（份数 * 3）g 的盐。"
+        },
+        {
+          "step": 12,
+          "description": "等待，直到汤汁呈粘稠状（水位大概为剩余食材高度的 0.2-0.3 倍），开盖，盛出菜，关火。"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "53ef6ab6f1ac",
+      "name": "脆皮豆腐",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 3,
+      "ingredients": [
+        "老豆腐",
+        "鸡蛋",
+        "生抽",
+        "老抽",
+        "蚝油",
+        "白糖",
+        "玉米淀粉",
+        "平底锅"
+      ],
+      "portions": [
+        "老豆腐 1 块 （市场买 1.25 格 * 人）",
+        "鸡蛋 2 只 * 老豆腐块数",
+        "玉米淀粉 50 g * 老豆腐块数",
+        "生抽 20 g",
+        "蚝油 10 g",
+        "老抽 5 g",
+        "白糖 10 g"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "鸡蛋搅拌形成蛋液放置备用"
+        },
+        {
+          "step": 2,
+          "description": "配置酱料 （20 g 生抽+10 g 蚝油+5 g 老抽+10 g 白糖+10 g 玉米淀粉+200 ml 清水）"
+        },
+        {
+          "step": 3,
+          "description": "老豆腐切片 （个人建议，仅供参考  人 * 5 片，厚度 1.2 cm）"
+        },
+        {
+          "step": 4,
+          "description": "玉米淀粉倒入盘中，将老豆腐片粘上淀粉后，粘上蛋液，放置一旁"
+        },
+        {
+          "step": 5,
+          "description": "热锅，锅内放入 18ml 食用油。等待 10 秒让油温升高"
+        },
+        {
+          "step": 6,
+          "description": "将粘上蛋液的老豆腐片均匀放入锅中，铺好锅底，小火煎至金黄翻面"
+        },
+        {
+          "step": 7,
+          "description": "待两面煎至金黄后，倒入酱料，让每块豆腐都沐浴在酱料中，大火 3 分钟至酱汁浓稠"
+        },
+        {
+          "step": 8,
+          "description": "关火"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "3d9e5ae3e2a1",
+      "name": "芹菜拌茶树菇",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 2,
+      "ingredients": [
+        "闽星茶树菇",
+        "芹菜",
+        "香油",
+        "蚝油",
+        "味极鲜",
+        "食用盐"
+      ],
+      "portions": [
+        "闽星茶树菇 1 瓶",
+        "芹菜 250-300g（推荐 30cm 高的芹菜苗,没有芹菜苗可以用山芹或芹菜代替但是需要稍微焯水断生）",
+        "香油 5ml",
+        "蚝油 大约 7ml",
+        "味极鲜 3ml",
+        "食用盐 大约 2g"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "（如果是芹菜苗这一步略过）用热水壶烧一壶热水,备用"
+        },
+        {
+          "step": 2,
+          "description": "新鲜的芹菜苗或者芹菜摘去黄叶清洗,备用"
+        },
+        {
+          "step": 3,
+          "description": "（如果是芹菜苗这一步略过）将芹菜摘去叶子单独放一个盆中,将芹菜茎用刀划成 2-3 毫米宽的芹菜条备用,这一步的目的是让芹菜断生的更快更均匀,吃起来更脆更爽口"
+        },
+        {
+          "step": 4,
+          "description": "芹菜苗切成 4cm 的芹菜段,备用"
+        },
+        {
+          "step": 5,
+          "description": "（如果是芹菜苗这一步略过）起锅开火,将热水壶的开水倒入锅中待水起泡沸腾"
+        },
+        {
+          "step": 6,
+          "description": "（如果是芹菜苗这一步略过）将切好的芹菜条放入锅中焯水,大约 20 秒放入芹菜叶,5 秒后关火全部捞出过凉水,备用"
+        },
+        {
+          "step": 7,
+          "description": "将盆中焯好的芹菜或者芹菜苗撒上准备好的食盐,香油,耗油和味极鲜搅拌均匀"
+        },
+        {
+          "step": 8,
+          "description": "将茶树菇倒入盆中搅拌均匀"
+        },
+        {
+          "step": 9,
+          "description": "装盘"
+        },
+        {
+          "step": 10,
+          "description": "开吃"
+        }
+      ],
+      "tips": [
+        "焯水时的水位需要没过芹菜"
+      ],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "a69c649158c1",
+      "name": "茄子炖土豆",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 3,
+      "ingredients": [
+        "茄子",
+        "土豆",
+        "肉",
+        "辣椒（是青辣椒，而**不是辣椒面或辣椒油**）",
+        "酱油",
+        "盐",
+        "蒜"
+      ],
+      "portions": [
+        "茄子的数量 = 份数 * 1 个 （每个茄子约 150g）",
+        "土豆数量 = 份数 * 1 个（每个土豆约 150g）",
+        "肉量 = 份数 * 180 克",
+        "酱油量 = 份数 * 15 毫升",
+        "盐量 = 份数 * 5 克",
+        "辣椒量 = 50 克（调味，所以无论多少人都放这些。）",
+        "蒜量 = 3 瓣（调味，所以无论多少人都放这些。注意是里面的小瓣 3 瓣，而**不是3整头**） 使用上述条件，计算出计划使用的原材料比例。"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "将茄子、土豆、辣椒洗净，蒜扒皮并拍碎。"
+        },
+        {
+          "step": 2,
+          "description": "将茄子、土豆切成约 6 立方厘米的块，辣椒切成 5 克的小块，肉切成 3 厘米的丝。"
+        },
+        {
+          "step": 3,
+          "description": "开火，热锅，加入份数 * 13 毫升的油。"
+        },
+        {
+          "step": 4,
+          "description": "当能看到锅里的油冒出一丝烟时，放入辣椒。"
+        },
+        {
+          "step": 5,
+          "description": "煸出辣椒香气后，立刻放入肉，用铲子翻炒 30 秒。"
+        },
+        {
+          "step": 6,
+          "description": "放入土豆，翻炒 30 秒。"
+        },
+        {
+          "step": 7,
+          "description": "放入茄子，翻炒 30 秒。"
+        },
+        {
+          "step": 8,
+          "description": "放入酱油和盐，继续翻炒 5 分钟。"
+        },
+        {
+          "step": 9,
+          "description": "加入水，水面高度为锅内食材高度的 0.9 倍，并盖上锅盖。"
+        },
+        {
+          "step": 10,
+          "description": "等待，直到锅内水的高度剩余食材高度的 0.1 倍时，开盖，放入蒜，搅拌均匀，关火。"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "a02f6ff8e413",
+      "name": "莴笋叶煎饼",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 2,
+      "ingredients": [
+        "莴笋叶",
+        "鸡蛋",
+        "食用油",
+        "生抽",
+        "淀粉",
+        "鸡精"
+      ],
+      "portions": [
+        "莴笋叶 50 g",
+        "鸡蛋 2 个",
+        "食用油 30 ml",
+        "生抽 5 ml",
+        "淀粉 15 g",
+        "鸡精 2 g"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "莴笋叶剁碎，加入鸡蛋、生粉、生抽、鸡精搅拌均匀备用"
+        },
+        {
+          "step": 2,
+          "description": "起锅烧油，倒入莴笋叶浆汁，均匀平铺在锅面上"
+        },
+        {
+          "step": 3,
+          "description": "第一面炸 120 S 后，翻面再炸 60 S 后出锅"
+        }
+      ],
+      "tips": [
+        "选择莴笋叶是某省市买到的蔬菜包基本都包含莴笋，可以换成韭菜等"
+      ],
+      "source": "HowToCook",
+      "imageUrl": "file:///android_asset/images/a02f6ff8e413_1.jpeg"
+    },
+    {
+      "id": "b243f38ecbaf",
+      "name": "菠菜炒鸡蛋",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 2,
+      "ingredients": [
+        "菠菜",
+        "鸡蛋",
+        "食用油",
+        "食用盐"
+      ],
+      "portions": [
+        "菠菜 350g",
+        "鸡蛋 2 个",
+        "食用油 15ml",
+        "食用盐 5g"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "菠菜去根，洗净，放在篮子里，焯水"
+        },
+        {
+          "step": 2,
+          "description": "将鸡蛋打入碗中，搅匀"
+        },
+        {
+          "step": 3,
+          "description": "热锅，加入 10ml 油"
+        },
+        {
+          "step": 4,
+          "description": "油热后，倒入鸡蛋液，中火翻炒 15 秒，先煎成蛋饼，然后再用锅铲切成小块"
+        },
+        {
+          "step": 5,
+          "description": "关火，将鸡蛋块 盛到盘子中，不要洗锅"
+        },
+        {
+          "step": 6,
+          "description": "重新开火，倒入 5ml 油，油热后，放入菠菜，大火 翻炒 15 秒后，倒入鸡蛋块，翻炒均匀"
+        },
+        {
+          "step": 7,
+          "description": "加入 5g 盐、100ml 饮用水，大火 翻炒 10 秒"
+        },
+        {
+          "step": 8,
+          "description": "关火，盛盘"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "b8a6dbb78773",
+      "name": "葱煎豆腐",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 3,
+      "ingredients": [
+        "白豆腐",
+        "葱",
+        "青辣椒",
+        "盐",
+        "鸡精",
+        "平底锅"
+      ],
+      "portions": [
+        "白豆腐的数量 = 份数 * 0.8 向上取整。",
+        "辣椒的数量 = 1.5 只/三人。",
+        "葱的数量 = 2 根/三人。",
+        "盐量 = 份数 * 3g。",
+        "鸡精量 = 份数 * 1.5g。 使用上述条件，计算出计划使用的原材料比例，依口味调整。"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "豆腐洗净。切约 5 mm 厚度，置于碟中。"
+        },
+        {
+          "step": 2,
+          "description": "葱洗净，除去根部，切成葱花，备用。"
+        },
+        {
+          "step": 3,
+          "description": "辣椒洗净，切开，去籽，切成 1cm * 1cm 状，备用、"
+        },
+        {
+          "step": 4,
+          "description": "热锅，加入份数 * 9ml 油。"
+        },
+        {
+          "step": 5,
+          "description": "油入锅后，使其均匀布于锅底，均匀放入豆腐，小火煎至金黄翻面。"
+        },
+        {
+          "step": 6,
+          "description": "待两面金黄，盛入碟中备用。"
+        },
+        {
+          "step": 7,
+          "description": "补油至覆盖锅底，倒入辣椒大火翻炒，并铲碾 3 分钟。"
+        },
+        {
+          "step": 8,
+          "description": "倒入豆腐，翻炒，加入盐与鸡精，中火翻炒 1 分钟后倒入 10 ML 水，大火收汁。"
+        },
+        {
+          "step": 9,
+          "description": "出锅前撒上之前计算好的葱花，起锅盛盘。"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "c27a0f9b34eb",
+      "name": "蒜蓉空心菜",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 2,
+      "ingredients": [
+        "空心菜",
+        "蒜末",
+        "盐",
+        "生抽",
+        "筷子",
+        "铲子"
+      ],
+      "portions": [
+        "新鲜空心菜 250 g",
+        "大蒜半个，切碎为蒜末",
+        "食用油 45 ml",
+        "盐 2 g",
+        "白糖 3 g",
+        "生抽 8 ml"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "空心菜洗净，去掉烂叶或者老梗，均匀切成 2 段或者 3 段（防止过长不好炒）"
+        },
+        {
+          "step": 2,
+          "description": "锅里先倒少量油，烧至微微冒烟，此时拿起锅将国内的热油向四周浸润，让油均匀覆盖锅底，然后再倒入剩余的油([热锅凉油法](https://cook.aiursoft.com/tips/learn/%E5%AD%A6%E4%B9%A0%E7%82%92%E4%B8%8E%E7%85%8E/?h=%E7%83%AD%E9%94%85#_5))。"
+        },
+        {
+          "step": 3,
+          "description": "放入蒜末，小火炒 10 到 15 秒煸香"
+        },
+        {
+          "step": 4,
+          "description": "尽快均匀地放入空心菜，**开大火**，左手拿铲子，右手拿筷子，配合将空心菜不停翻动，**直至软化变绿**。"
+        },
+        {
+          "step": 5,
+          "description": "接着不需使用筷子，而是使用铲子快速翻炒已软化的空心菜 15 - 20 秒，使之受热更均匀，撒入盐 2 g ，白糖 3 g，生抽 8 ml。"
+        },
+        {
+          "step": 6,
+          "description": "继续大火翻炒 10 秒，即可出锅。"
+        }
+      ],
+      "tips": [
+        "空心菜尽量选择新鲜，鲜嫩的，否则炒出来口感可能会比较老",
+        "实际放入空心菜的量可以根据锅的大小决定，建议不超过一个锅，否则太多的话开始的翻动阶段和后续的翻炒，容易掉出少量空心菜到灶台"
+      ],
+      "source": "HowToCook",
+      "imageUrl": "file:///android_asset/images/c27a0f9b34eb_1.JPG"
+    },
+    {
+      "id": "bf4d235fd816",
+      "name": "蒜蓉西兰花",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 2,
+      "ingredients": [
+        "西兰花 1 个",
+        "大蒜 3-4 瓣",
+        "生抽",
+        "蚝油",
+        "白糖"
+      ],
+      "portions": [
+        "西兰花 约 200 g （约 1/2 中等大小的西兰花）",
+        "大蒜 3-4 瓣",
+        "生抽 10 ml",
+        "蚝油 5 ml",
+        "白糖 2 g"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "将 西兰花 切成小朵，清洗干净。"
+        },
+        {
+          "step": 2,
+          "description": "将 大蒜 去皮，切成蒜末，备用。"
+        },
+        {
+          "step": 3,
+          "description": "锅中加入 1000 ml 饮用水，大火烧开。"
+        },
+        {
+          "step": 4,
+          "description": "放入 西兰花，保持大火 **煮 2-3 分钟**，至 西兰花 颜色变翠绿，口感变软。"
+        },
+        {
+          "step": 5,
+          "description": "将 煮好的 西兰花 捞出，沥干水分，摆入盘中，备用。"
+        },
+        {
+          "step": 6,
+          "description": "热锅，加入 10 ml 食用油。油温升高后，放入 大蒜末，小火煸炒出香味。"
+        },
+        {
+          "step": 7,
+          "description": "加入 10 ml 生抽，5 ml 蚝油，2 g 白糖，加入 30 ml 饮用水。"
+        },
+        {
+          "step": 8,
+          "description": "将锅中汤汁烧开。"
+        },
+        {
+          "step": 9,
+          "description": "将烧好的蒜蓉汁 均匀淋在盘中的 西兰花 上。"
+        }
+      ],
+      "tips": [
+        "焯水时间不宜超过推荐时长，以免影响西兰花的口感和营养。"
+      ],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "07fb99c9d104",
+      "name": "蒲烧茄子",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 3,
+      "ingredients": [
+        "茄子",
+        "蒲烧汁",
+        "蜂蜜",
+        "白糖",
+        "生抽",
+        "老抽",
+        "料酒",
+        "水"
+      ],
+      "portions": [
+        "根据锅的类型决策不同量的油",
+        "不粘锅:油汇聚成滴后要散布在茄子的面积",
+        "铁锅:摊开后油可以刚好覆盖锅底",
+        "1 个长的上小下大的茄子（注意不要使用浙茄和圆茄）",
+        "1 份蒲烧汁",
+        "20 ml 蜂蜜",
+        "15 ml 白糖",
+        "40 ml 生抽",
+        "10 ml 老抽",
+        "20 ml 料酒",
+        "100 ml 水"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "茄子削皮、横着切成两段"
+        },
+        {
+          "step": 2,
+          "description": "蒸 5  分钟"
+        },
+        {
+          "step": 3,
+          "description": "纵向切开，不要切断，在两边切面各划 2~3 刀至可以摊平"
+        },
+        {
+          "step": 4,
+          "description": "煎至两面金黄"
+        },
+        {
+          "step": 5,
+          "description": "往茄子上浇蒲烧汁至没过 1/2 茄子高度"
+        },
+        {
+          "step": 6,
+          "description": "煎至背面上色，翻面"
+        },
+        {
+          "step": 7,
+          "description": "同时收汁，若无法收汁可以加入水淀粉（生粉和水的比例在 1:4 到 1:10 根据收汁情况而定）"
+        },
+        {
+          "step": 8,
+          "description": "把剩下的蒲烧汁浇在茄子上"
+        },
+        {
+          "step": 9,
+          "description": "出锅，一份茄子烧蒲烧汁就烧好了"
+        }
+      ],
+      "tips": [
+        "这个蒲焼き其实很中国，日式的蒲烧其实是烤的。",
+        "灵魂其实在于蒲烧汁？也可以买现成的蒲烧汁。",
+        "如果觉得腻可以在装盘后撒点切成 2~5 mm 的小葱，颜色搭配上也能不那么单调。"
+      ],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "add664b60225",
+      "name": "虎皮青椒",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 3,
+      "ingredients": [
+        "青椒",
+        "大蒜",
+        "白糖（灵魂）",
+        "醋",
+        "生抽",
+        "盐",
+        "砵或者有一定深度的碗"
+      ],
+      "portions": [
+        "青椒 5 个，长度在 10-15cm 的最为合适",
+        "大蒜 2-3 瓣",
+        "油 20ml",
+        "白糖 15g",
+        "生抽 15ml",
+        "香醋 15ml",
+        "盐 4g"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "去掉青椒蒂，用自来水冲洗干净。"
+        },
+        {
+          "step": 2,
+          "description": "青椒切长片，平均一个青椒纵向切成 3-4 片即可。"
+        },
+        {
+          "step": 3,
+          "description": "大蒜去皮，切成碎末，体积在 2mm x 2mm x 2mm 即可。"
+        },
+        {
+          "step": 4,
+          "description": "`调料 1`：拿一个小碗倒入 20ml 油，将大蒜末放入其中。"
+        },
+        {
+          "step": 5,
+          "description": "`调料 2`：白糖、生抽、醋、盐全部倒入砵（碗）等容器，搅拌。"
+        },
+        {
+          "step": 6,
+          "description": "将 `调料 1` 倒入锅中，开火加热 5 成放入青椒，青椒片不要叠在一起，单独成片放置锅中。"
+        },
+        {
+          "step": 7,
+          "description": "用锅铲不停的按压青椒，合适的时候翻面。"
+        },
+        {
+          "step": 8,
+          "description": "翻炒约 2 分钟，待青椒表皮出现褶皱时，倒入 `调料 2`。"
+        },
+        {
+          "step": 9,
+          "description": "加大火候继续翻炒 30s 后即可出锅盛入盘中。"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "52413e69fc01",
+      "name": "蚝油三鲜菇",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 3,
+      "ingredients": [
+        "香菇",
+        "蟹味菇",
+        "白玉菇",
+        "小米辣",
+        "菜椒",
+        "食用油",
+        "盐",
+        "料酒",
+        "淀粉",
+        "生抽",
+        "鸡精",
+        "香葱",
+        "姜末",
+        "蚝油",
+        "西蓝花"
+      ],
+      "portions": [
+        "鲜香菇 2 朵",
+        "蟹味菇 30 g",
+        "白玉菇 30 g",
+        "小米辣 1 根",
+        "菜椒 0.5 颗",
+        "食用油 10 ml",
+        "食用盐 5 g",
+        "料酒 2 ml",
+        "淀粉 10 g",
+        "生抽 10 ml",
+        "鸡精 3 g",
+        "香葱 0.5 根",
+        "姜末 1 粒",
+        "蚝油 5 ml",
+        "开水 350 ml",
+        "西蓝花 100 g"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "蟹味菇、白玉菇 去掉根部泥土，掰散菌朵"
+        },
+        {
+          "step": 2,
+          "description": "香菇切片（每片厚度 0.5-1 cm，厚点相对薄点更有嚼劲）"
+        },
+        {
+          "step": 3,
+          "description": "生粉倒入小碗中，加入 50ml 水，搅拌生粉直至融化没有颗粒（即水淀粉）备用"
+        },
+        {
+          "step": 4,
+          "description": "水开，放入西蓝花，清水煮 3 分钟，放入碗中备用"
+        },
+        {
+          "step": 5,
+          "description": "洗锅烧开水，加入 5 g 食用盐，倒入蟹味菇、白玉菇、香菇，水煮 1 分钟"
+        },
+        {
+          "step": 6,
+          "description": "1 分钟后，捞出沥干水分"
+        },
+        {
+          "step": 7,
+          "description": "起锅烧油，待油开始冒小泡，放入姜末、小米辣、菜椒 煸炒 30 S"
+        },
+        {
+          "step": 8,
+          "description": "倒入三鲜菇，然后依次倒入生抽、蚝油、鸡精，翻炒均匀后，倒入水淀粉"
+        },
+        {
+          "step": 9,
+          "description": "中火烧干汁，加入料酒、葱花 出锅"
+        },
+        {
+          "step": 10,
+          "description": "摆上西蓝花"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": "file:///android_asset/images/52413e69fc01_1.jpeg"
+    },
+    {
+      "id": "39767e60e9d6",
+      "name": "蚝油生菜",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 2,
+      "ingredients": [
+        "生菜",
+        "蚝油",
+        "大蒜",
+        "生抽",
+        "盐",
+        "白糖",
+        "食用油"
+      ],
+      "portions": [
+        "生菜 1 棵( 200 g ± 50 )",
+        "蚝油 6-8 ml",
+        "大蒜 4-5 瓣（做成蒜泥或切碎）",
+        "生抽 6 ml",
+        "盐 0.5 g",
+        "白糖 1 g",
+        "食用油 5-8 ml"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "生菜洗净并去掉烂菜叶。"
+        },
+        {
+          "step": 2,
+          "description": "热锅，先放 1 L 清水（凉），然后在锅内放入 2 ml - 3 ml 食用油和 0.5 g 盐，等待锅中的水煮沸。"
+        },
+        {
+          "step": 3,
+          "description": "水沸后，放入生菜，将**每一片**生菜叶都焯水 10 s。"
+        },
+        {
+          "step": 4,
+          "description": "捞出生菜，控干水份，摆盘 。"
+        },
+        {
+          "step": 5,
+          "description": "调汁：将生抽 10 ml 、蚝油 6-8 ml 、盐 0.5 g 、 白糖 1 g 放入碗中调匀，并加入 10-15 ml 清水（凉）搅拌均匀。"
+        },
+        {
+          "step": 6,
+          "description": "再开火，热锅，放入食用油 5-8 ml，油热放入蒜泥。"
+        },
+        {
+          "step": 7,
+          "description": "等待有蒜香飘出，倒入调好的汁，煮沸即可，立马关火。"
+        },
+        {
+          "step": 8,
+          "description": "将锅中的汤汁均匀地**浇**在生菜上。"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "78fa4eb9cf26",
+      "name": "西红柿炒鸡蛋",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 2,
+      "ingredients": [
+        "西红柿",
+        "鸡蛋",
+        "食用油",
+        "盐",
+        "糖（可选）",
+        "葱花（可选）"
+      ],
+      "portions": [
+        "西红柿 = 1 个（约 180g） * 份数",
+        "鸡蛋 = 1.5 个 * 份数，向上取整",
+        "食用油 = 4ml * 鸡蛋/个",
+        "盐 = 1.5-2g * 份数",
+        "糖 = 0-2g * 份数",
+        "葱花 = 0-10g * 份数"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "西红柿洗净"
+        },
+        {
+          "step": 2,
+          "description": "可选：去掉西红柿的外表皮"
+        },
+        {
+          "step": 3,
+          "description": "开水烫表皮，然后将西红柿放入冷水，剥去外皮"
+        },
+        {
+          "step": 4,
+          "description": "西红柿去蒂，切成边长不超过 4cm 的小块，即为 `西红柿块`"
+        },
+        {
+          "step": 5,
+          "description": "将鸡蛋打入碗中，加入 `1g * 份数` 的盐，搅匀，即为 `鸡蛋液`"
+        },
+        {
+          "step": 6,
+          "description": "可以考虑向鸡蛋中加入 1ml 醋，这可以去除腥味，令鸡蛋更蓬松"
+        },
+        {
+          "step": 7,
+          "description": "热锅，加入食用油"
+        },
+        {
+          "step": 8,
+          "description": "油热后，倒入 `鸡蛋液`。翻炒至鸡蛋结为固体且颜色微微发黄，即为 `半熟鸡蛋`"
+        },
+        {
+          "step": 9,
+          "description": "关火。将 `半熟鸡蛋` 盛盘，重新开火"
+        },
+        {
+          "step": 10,
+          "description": "注意：不要洗锅"
+        },
+        {
+          "step": 11,
+          "description": "加入 `西红柿块`，锅铲拍打并翻炒 20 秒，或至西红柿软烂"
+        },
+        {
+          "step": 12,
+          "description": "向锅中加入 `半熟鸡蛋`，翻炒均匀"
+        },
+        {
+          "step": 13,
+          "description": "可以考虑加入 10ml 番茄酱和 50ml 清水，增加汤汁"
+        },
+        {
+          "step": 14,
+          "description": "可以额外加入一些其它熟肉和材料"
+        },
+        {
+          "step": 15,
+          "description": "加入剩余的盐、糖（可选，如果倾向于甜味版本）、葱花（可选），翻炒均匀"
+        },
+        {
+          "step": 16,
+          "description": "关火，盛盘"
+        }
+      ],
+      "tips": [
+        "直接在有`半熟鸡蛋`的锅中加入 `西红柿块`，与鸡蛋一起翻炒直至西红柿软烂",
+        "继续 第 10 步"
+      ],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "b983f2171e45",
+      "name": "西红柿豆腐汤羹",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 2,
+      "ingredients": [
+        "西红柿",
+        "鸡蛋",
+        "豆腐",
+        "食用油",
+        "盐",
+        "淀粉",
+        "鸡精",
+        "香葱",
+        "姜",
+        "开水"
+      ],
+      "portions": [
+        "西红柿 1 个",
+        "鸡蛋 1 个",
+        "豆腐 100 g",
+        "食用油 5 ml",
+        "盐 2 g",
+        "淀粉 5 g",
+        "鸡精 2 g",
+        "香葱 0.5 根",
+        "姜 1 片",
+        "开水 350 ml"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "西红柿切成小丁、鸡蛋打入碗中搅拌、豆腐切块备用"
+        },
+        {
+          "step": 2,
+          "description": "起锅烧油，放入姜片 5 S 后倒入入西红柿翻炒 30 S"
+        },
+        {
+          "step": 3,
+          "description": "锅中加入开水，汤水烧开，60 S 后到入鸡蛋液、豆腐块"
+        },
+        {
+          "step": 4,
+          "description": "汤水重新烧开后，加入水淀粉，沿一个方向搅拌 2 圈"
+        },
+        {
+          "step": 5,
+          "description": "加入鸡精、盐、香葱，30 S 后起锅"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": "file:///android_asset/images/b983f2171e45_1.jpeg"
+    },
+    {
+      "id": "6ea76a178764",
+      "name": "西葫芦炒鸡蛋",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 2,
+      "ingredients": [
+        "西葫芦",
+        "鸡蛋",
+        "西红柿（可选）",
+        "食用盐",
+        "食用油"
+      ],
+      "portions": [
+        "西葫芦 500g",
+        "西红柿 100g",
+        "鸡蛋 3 个",
+        "食用油 10-20ml",
+        "食用盐 6g"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "西红柿洗净，切成小块，备用"
+        },
+        {
+          "step": 2,
+          "description": "西葫芦洗净，切成边长约为 4cm 的菱形，备用"
+        },
+        {
+          "step": 3,
+          "description": "打三个鸡蛋到碗里，打散搅匀，备用"
+        },
+        {
+          "step": 4,
+          "description": "热锅，锅内放入 5ml - 10ml 食用油"
+        },
+        {
+          "step": 5,
+          "description": "倒入鸡蛋，保持翻炒至鸡蛋成固体，用锅铲分成小块后盛到碗里，备用"
+        },
+        {
+          "step": 6,
+          "description": "锅内放入 5ml - 10ml 食用油，倒入西红柿，炒至变软"
+        },
+        {
+          "step": 7,
+          "description": "倒入西葫芦一起翻炒均匀，放入 6g 食用盐，将火调小然后**等待 4 - 5 分钟**"
+        },
+        {
+          "step": 8,
+          "description": "倒入备用的鸡蛋，中火翻炒 15 秒"
+        },
+        {
+          "step": 9,
+          "description": "关火，盛盘"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "9990de6551f5",
+      "name": "话梅煮毛豆",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 2,
+      "ingredients": [
+        "毛豆",
+        "话梅",
+        "食用盐"
+      ],
+      "portions": [
+        "毛豆 300 g",
+        "话梅 6 颗",
+        "食用盐 2 g"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "清水加入食用盐，毛豆浸泡 15 分钟"
+        },
+        {
+          "step": 2,
+          "description": "加入开水，倒入毛豆、话梅，水煮 20-30 分钟"
+        },
+        {
+          "step": 3,
+          "description": "起锅开吃"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": "file:///android_asset/images/9990de6551f5_1.jpeg"
+    },
+    {
+      "id": "7a53414f63a8",
+      "name": "酸辣土豆丝",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 2,
+      "ingredients": [
+        "土豆",
+        "大蒜",
+        "青椒",
+        "红椒",
+        "干辣椒",
+        "葱",
+        "生抽",
+        "陈醋",
+        "盐"
+      ],
+      "portions": [
+        "土豆 240g（越细越长更好）",
+        "大蒜 4 瓣",
+        "青椒 0.5 个",
+        "红椒 0.5 个",
+        "干辣椒 3 个",
+        "葱 1 根",
+        "生抽 5ml",
+        "陈醋 10ml",
+        "盐 2g",
+        "食用油 10-15ml"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "土豆去皮、切丝（或用刨丝器）。"
+        },
+        {
+          "step": 2,
+          "description": "切好的土豆丝用清水清洗，去除多余的淀粉，然后对土豆丝焯水 10 秒。沥干，备用。"
+        },
+        {
+          "step": 3,
+          "description": "葱切成葱花；大蒜拍碎切成蒜末（分为两等份备用）；干辣椒切小段；青红椒切丝。"
+        },
+        {
+          "step": 4,
+          "description": "热锅，小火热油，下入一半的葱花（葱白部分）、一半的蒜末和干辣椒爆香。"
+        },
+        {
+          "step": 5,
+          "description": "加入青红椒翻炒几下，加入土豆丝翻炒至变色。"
+        },
+        {
+          "step": 6,
+          "description": "加 5ml 生抽，10ml 陈醋，倒入剩下的一半蒜末和 2g 盐快速翻炒均匀。"
+        },
+        {
+          "step": 7,
+          "description": "出锅前撒上剩余的葱花，翻匀即可装盘。"
+        }
+      ],
+      "tips": [
+        "清洗土豆丝淀粉一定要去干净，不然会全黏在一起"
+      ],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "bf0383c36e91",
+      "name": "金针菇日本豆腐煲",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 2,
+      "ingredients": [
+        "金针菇",
+        "日本豆腐（玉子豆腐）",
+        "小米椒",
+        "生抽",
+        "蚝油",
+        "盐",
+        "糖",
+        "食用油"
+      ],
+      "portions": [
+        "金针菇 1-2 把",
+        "豆腐 2 袋",
+        "小米椒 3-5 根，切碎",
+        "蒜 2-3 瓣",
+        "生抽 15ml",
+        "蚝油 5ml",
+        "老抽 3ml",
+        "糖 3g",
+        "食用油 10-15ml"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "豆腐切片，小火煎到两面金黄出锅备用。"
+        },
+        {
+          "step": 2,
+          "description": "切蒜成蒜末；将生抽，蚝油，老抽，糖，100ml 水调汁备用。"
+        },
+        {
+          "step": 3,
+          "description": "热锅放油，油热放小米椒、蒜末爆香，先放金针菇，炒软，把煎好的豆腐平铺在金针菇上，倒入#2 配好的料汁，焖 5 分钟，大火收汁。"
+        }
+      ],
+      "tips": [
+        "金针菇一定要先炒软"
+      ],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "f54437631cf7",
+      "name": "金钱蛋",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 3,
+      "ingredients": [
+        "鸡蛋",
+        "线椒",
+        "小米辣",
+        "豆瓣酱",
+        "蒜",
+        "小葱",
+        "玉米淀粉（可选）",
+        "食用油",
+        "生抽",
+        "蚝油",
+        "糖"
+      ],
+      "portions": [
+        "鸡蛋 5 个",
+        "玉米淀粉 40 g",
+        "食用油 20-35 ml",
+        "线椒 15 g",
+        "小米辣 6-15 g（约 2-5 个）",
+        "豆瓣酱 15 ml",
+        "蒜 10 g（约 2-3 瓣）",
+        "小葱 3 g（约 1-2 根）",
+        "生抽 15 ml",
+        "蚝油 15 ml",
+        "糖 5 g"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "鸡蛋冷水下锅，大火煮开转小火煮 8 分钟"
+        },
+        {
+          "step": 2,
+          "description": "用自来水冲凉，方便剥皮"
+        },
+        {
+          "step": 3,
+          "description": "蒜切沫（粒径不大于 1 mm），线椒和小米辣切小粒（约 2-3 mm）"
+        },
+        {
+          "step": 4,
+          "description": "每个熟鸡蛋沿短轴切成体积类似的 4 份"
+        },
+        {
+          "step": 5,
+          "description": "如果打算沾淀粉，每片鸡蛋粘上淀粉，抖掉多余的淀粉"
+        },
+        {
+          "step": 6,
+          "description": "锅内放入 25 ml 油（如果不沾淀粉，放 20 ml），放入熟鸡蛋片"
+        },
+        {
+          "step": 7,
+          "description": "煎至微焦黄后，补 10 ml 油（如果不沾淀粉，补 10 ml），翻面"
+        },
+        {
+          "step": 8,
+          "description": "第二面微黄后，加入线椒、小米辣、蒜末煎制约一分钟，翻面"
+        },
+        {
+          "step": 9,
+          "description": "接着加豆瓣酱煎制约几十秒，翻面"
+        },
+        {
+          "step": 10,
+          "description": "生抽、耗油、糖调成汁，轻轻颠锅后即可出锅"
+        }
+      ],
+      "tips": [
+        "原汁原味的做法建议放 15 g，不能吃辣的减少到 6 g，还可以剔除辣椒籽",
+        "推荐使用不粘锅，使用不粘锅时初次放油可以减少 5 ml",
+        "应确保鸡蛋剥皮时已经完全凝固",
+        "不宜过度翻炒，容易散"
+      ],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "8221586402f7",
+      "name": "陕北熬豆角",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 2,
+      "ingredients": [
+        "豆角",
+        "土豆",
+        "西红柿",
+        "螺丝椒（可选）",
+        "盐",
+        "生抽",
+        "五香粉",
+        "蚝油",
+        "葱",
+        "姜",
+        "蒜"
+      ],
+      "portions": [
+        "豆角 300g * 2 人",
+        "土豆 1 个 * 2 人",
+        "西红柿 1 个 * 2 人",
+        "螺丝椒（可选）2 个 * 2 人",
+        "盐 6g * 2 人",
+        "生抽 6ml * 2 人",
+        "五香粉 3g * 2 人",
+        "蚝油 6ml * 2 人",
+        "葱 3 圈",
+        "姜 2g",
+        "蒜 2 颗",
+        "香菜碎（可选）根据口味加"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "葱切花，蒜切沫，姜切丝，备用。"
+        },
+        {
+          "step": 2,
+          "description": "豆角去筋，切*2-10cm*小段，备用。"
+        },
+        {
+          "step": 3,
+          "description": "土豆去皮，切*1cm³*小块，备用。"
+        },
+        {
+          "step": 4,
+          "description": "西红柿去皮，切*1cm³*小块，备用。"
+        },
+        {
+          "step": 5,
+          "description": "辣椒去仔，切*0.15cm 宽*条，备用。"
+        },
+        {
+          "step": 6,
+          "description": "起锅烧油(10ml - 15ml)，冒烟后放入葱姜蒜，翻炒至闻到葱姜蒜香味；"
+        },
+        {
+          "step": 7,
+          "description": "加入豆角，翻炒至变色（青绿色变为翠绿色）；"
+        },
+        {
+          "step": 8,
+          "description": "加入土豆块，翻炒 30s；"
+        },
+        {
+          "step": 9,
+          "description": "加入热水（水面刚刚漫过菜），盖上锅盖熬至土豆*变软*（可以用筷子确认）；"
+        },
+        {
+          "step": 10,
+          "description": "加入西红柿块，加入盐，生抽，蚝油，五香粉，辣椒，熬至西红柿成汁（注意搅拌，防止糊锅）；"
+        },
+        {
+          "step": 11,
+          "description": "加入香菜碎，出锅。"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "6f1658fac55a",
+      "name": "雷椒皮蛋",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 2,
+      "ingredients": [
+        "皮蛋",
+        "长条青椒（有些叫线椒，后面介绍以“青椒”代替）",
+        "葱",
+        "蒜",
+        "小米辣(可选)",
+        "食用油",
+        "生抽",
+        "陈醋",
+        "白糖",
+        "香油",
+        "深一点的小铁盆"
+      ],
+      "portions": [
+        "皮蛋 2 个",
+        "青椒 4 根 （长 10-15cm，宽 2-4cm）",
+        "葱 （大约 10cm 即可，葱绿最佳）",
+        "蒜 3-4 瓣",
+        "食用油 10-20ml",
+        "生抽 15-20ml",
+        "陈醋 15-20ml",
+        "白糖 6-10g",
+        "香油 5-7ml",
+        "小米辣 3-4 颗"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "青椒清洗，去除根部，侧面切开，去除内部的子后在案板压平，备用（一定要去除青椒子，否则会在锅里炸开）"
+        },
+        {
+          "step": 2,
+          "description": "葱切成半厘米小段，备用"
+        },
+        {
+          "step": 3,
+          "description": "蒜去皮，切成碎末，备用"
+        },
+        {
+          "step": 4,
+          "description": "皮蛋去皮，备用"
+        },
+        {
+          "step": 5,
+          "description": "小米辣，切成 5-10mm 的小段，备用"
+        },
+        {
+          "step": 6,
+          "description": "热锅，锅内放入 10ml - 20ml 食用油"
+        },
+        {
+          "step": 7,
+          "description": "放入全部青椒，改小火保持锅子温度，煎至青椒变软（可以用筷子试一下，插入即透即可）"
+        },
+        {
+          "step": 8,
+          "description": "关火，将皮蛋和青椒放入小铁盆中"
+        },
+        {
+          "step": 9,
+          "description": "方法 1： 有擀面杖且砸东西不会吵到邻居：用擀面杖的一头在小盆中砸击皮蛋和青椒，至皮蛋与青椒混合（选项）"
+        },
+        {
+          "step": 10,
+          "description": "方法 2：将青椒用手撕开，撕成大约半厘米的条状，用叉子将皮蛋压碎（选项）"
+        },
+        {
+          "step": 11,
+          "description": "小米辣"
+        },
+        {
+          "step": 12,
+          "description": "倒入生抽，陈醋，白糖，香油，以及其他未使用的备用食材"
+        },
+        {
+          "step": 13,
+          "description": "均匀搅拌"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "20c37df5bd29",
+      "name": "鸡蛋火腿炒黄瓜",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 2,
+      "ingredients": [
+        "黄瓜",
+        "鸡蛋",
+        "火腿肠",
+        "盐",
+        "生抽",
+        "红尖椒（可选）"
+      ],
+      "portions": [
+        "黄瓜 1 根（约 200g）",
+        "鸡蛋 2 个",
+        "火腿肠 1 根（约 40g）",
+        "红尖椒 1 个（可选）",
+        "食用油 10ml",
+        "生抽 3ml",
+        "盐 2g"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "黄瓜洗净，切半圆形片，备用"
+        },
+        {
+          "step": 2,
+          "description": "火腿切半圆形片，备用"
+        },
+        {
+          "step": 3,
+          "description": "红尖椒（可选）切碎，备用"
+        },
+        {
+          "step": 4,
+          "description": "将鸡蛋打入碗中，搅匀，即为 `鸡蛋液`"
+        },
+        {
+          "step": 5,
+          "description": "热锅里倒 5ml 食用油"
+        },
+        {
+          "step": 6,
+          "description": "油热后转小火，倒入打散的`鸡蛋液`，用筷子划散，翻炒至鸡蛋结为固体且颜色微微发黄，即为 `半熟鸡蛋`，盛出备用"
+        },
+        {
+          "step": 7,
+          "description": "**不用洗锅**，往锅内倒入 5ml 食用油，倒入黄瓜片大火**翻炒 1 分钟**"
+        },
+        {
+          "step": 8,
+          "description": "把 `半熟鸡蛋` 倒入锅中，调入 2g 盐、3ml 生抽，立刻倒入火腿片和辣椒碎（可选）翻炒均匀"
+        },
+        {
+          "step": 9,
+          "description": "关火，盛盘"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "40a77a003e5e",
+      "name": "微波炉鸡蛋羹",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 2,
+      "ingredients": [
+        "鸡蛋",
+        "水"
+      ],
+      "portions": [
+        "鸡蛋 2 个 * 份数",
+        "水 200ml * 份数",
+        "虾皮 10 个 * 份数（可选）",
+        "葱 5g *份数（可选）",
+        "盐 3g * 份数",
+        "酱油（可选）",
+        "芝麻油（香油） 1ml（可选）"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "将鸡蛋打入可使用微波炉加热的陶瓷碗中，使用筷子将其打散。"
+        },
+        {
+          "step": 2,
+          "description": "加入水和盐，搅拌均匀。"
+        },
+        {
+          "step": 3,
+          "description": "将虾皮放入碗中，搅拌均匀，保证所有虾皮不会堆积在一起。"
+        },
+        {
+          "step": 4,
+          "description": "葱切碎至边长 0.6±3mm 状，放入碗中搅拌均匀。"
+        },
+        {
+          "step": 5,
+          "description": "将此碗及内容物放入微波炉中，容器表面覆盖保鲜膜或以可微波瓷盘加盖（注意：不得密封，必须留有涨缩量）加热 2 分钟(500W)。"
+        },
+        {
+          "step": 6,
+          "description": "小心地取下保鲜膜或其他覆盖物，然后继续加热 2 分钟。"
+        },
+        {
+          "step": 7,
+          "description": "若微波炉不带旋转式加热盘，将碗缓慢的水平旋转 180 度，以确保内容物加热均匀。"
+        },
+        {
+          "step": 8,
+          "description": "放入芝麻油。"
+        },
+        {
+          "step": 9,
+          "description": "小心地从微波炉中拿出碗（真的很烫）。"
+        },
+        {
+          "step": 10,
+          "description": "如果选择放入酱油，则确保酱油在鸡蛋羹表面流动后能以最薄的形式沾满鸡蛋羹表面即可。"
+        },
+        {
+          "step": 11,
+          "description": "开心的享受鸡蛋羹"
+        }
+      ],
+      "tips": [
+        "鸡蛋 1 个约为 50±5g。若使用其他品种蛋品可按比例增减水量。",
+        "一定要确保将鸡蛋打散，否则可能会发生轻度鸡蛋爆炸。"
+      ],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "608be1f1b034",
+      "name": "蒸箱鸡蛋羹",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 3,
+      "ingredients": [
+        "鸡蛋",
+        "食用盐",
+        "食用油",
+        "生抽（可选）",
+        "蒸箱"
+      ],
+      "portions": [
+        "鸡蛋 1 个",
+        "食用盐 1g",
+        "食用油 5ml",
+        "生抽 / 味极鲜 6ml（可选调味）"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "一个鸡蛋放入碗中打散"
+        },
+        {
+          "step": 2,
+          "description": "向碗中加入鸡蛋体积 1.0-1.5 倍 60 度纯净水，并且搅拌均匀"
+        },
+        {
+          "step": 3,
+          "description": "正确范围内水越少弹，水越多越嫩"
+        },
+        {
+          "step": 4,
+          "description": "注意：超出范围后，水越少会口感变得太弹，水越多会变得太稀"
+        },
+        {
+          "step": 5,
+          "description": "加入食用盐 1g"
+        },
+        {
+          "step": 6,
+          "description": "盐起到了重要的增加底味和凝固作用"
+        },
+        {
+          "step": 7,
+          "description": "加入食用油 5ml"
+        },
+        {
+          "step": 8,
+          "description": "过滤蛋液，去掉蛋液中的浮沫（可选，不过滤蒸出来的蛋会有气泡导致不好看）"
+        },
+        {
+          "step": 9,
+          "description": "确认蒸箱的水源已经补充至足够（若不确定，可把水槽补满）"
+        },
+        {
+          "step": 10,
+          "description": "将已经完全搅拌均匀的鸡蛋液碗放入蒸箱"
+        },
+        {
+          "step": 11,
+          "description": "调节至**100摄氏度**蒸 **10 分钟**"
+        },
+        {
+          "step": 12,
+          "description": "打开蒸箱 （注意：蒸箱在开启时会有蒸气瞬间喷出，注意缓慢开启）"
+        },
+        {
+          "step": 13,
+          "description": "出锅（可加入生抽调味）"
+        },
+        {
+          "step": 14,
+          "description": "享用"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "20290ba22487",
+      "name": "鸡蛋羹",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 2,
+      "ingredients": [
+        "鸡蛋",
+        "食用盐",
+        "香油",
+        "生抽 / 味极鲜",
+        "白醋（可选）",
+        "藤椒油（可选）"
+      ],
+      "portions": [
+        "鸡蛋 2 个",
+        "食用盐 3g",
+        "香油（或芝麻油） 2-4ml",
+        "生抽 / 味极鲜 8ml",
+        "白醋（或料酒） 2ml（可选）"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "两个鸡蛋放入碗中打散"
+        },
+        {
+          "step": 2,
+          "description": "加入食用盐 3g"
+        },
+        {
+          "step": 3,
+          "description": "盐起到了重要的增加底味和凝固作用"
+        },
+        {
+          "step": 4,
+          "description": "加入 2ml 白醋，去除鸡蛋的腥味（可选）"
+        },
+        {
+          "step": 5,
+          "description": "加入米醋也行，但米醋的颜色会使鸡蛋微微发黑"
+        },
+        {
+          "step": 6,
+          "description": "还可以加入料酒，同样具有去腥的作用，且没有醋的酸味"
+        },
+        {
+          "step": 7,
+          "description": "向碗中加入鸡蛋体积 1-1.5 倍的 70 度纯净水，并且搅拌均匀"
+        },
+        {
+          "step": 8,
+          "description": "1 倍的水鸡蛋更弹，1.5 倍的水鸡蛋更嫩"
+        },
+        {
+          "step": 9,
+          "description": "过滤蛋液，去掉蛋液中的浮沫（可选，不过滤蒸出来的蛋会有气泡导致不好看）"
+        },
+        {
+          "step": 10,
+          "description": "向任意一口锅中加入 50ml 清水，水烧开后，放入盛有鸡蛋液的碗"
+        },
+        {
+          "step": 11,
+          "description": "蒸碗要盖上一个盖子，倒扣一个有凹槽的铁碟子，或者使用保鲜膜来减少水汽进入，这是为了避免其变成蜂窝状"
+        },
+        {
+          "step": 12,
+          "description": "蒸煮步骤（二选一）"
+        },
+        {
+          "step": 13,
+          "description": "开**中火**蒸**10 分钟**, 10 分钟之后关火再闷上**5 分钟**。"
+        },
+        {
+          "step": 14,
+          "description": "开**大火**蒸**5 分钟**，要保持锅中水一直处于沸腾状态，否则要延长时间。每隔**2 分钟**开盖一次释放水蒸气，开盖过晚蛋羹容易变成蜂窝状；开盖太早/频繁蒸的时间需要久一些。"
+        },
+        {
+          "step": 15,
+          "description": "如何判断已经熟了？"
+        },
+        {
+          "step": 16,
+          "description": "晃动碗，蛋羹不再处于液体状态，拥有类似果冻的 Q 弹状态即可出锅。"
+        },
+        {
+          "step": 17,
+          "description": "出锅"
+        },
+        {
+          "step": 18,
+          "description": "加入香油和生抽即可享用"
+        },
+        {
+          "step": 19,
+          "description": "也可用藤椒油代替香油，增加麻爽口感"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": null
+    },
+    {
+      "id": "c5c333a25b8d",
+      "name": "鸡蛋花",
+      "category": "vegetable_dish",
+      "categoryName": "素菜",
+      "difficulty": 1,
+      "ingredients": [
+        "鸡蛋",
+        "白糖 （可选，制作甜口）",
+        "食盐 （可选，制作咸口）",
+        "搅拌器 （可选）"
+      ],
+      "portions": [
+        "鸡蛋 1 个 （去壳后约 50 g）",
+        "沸水 100 - 150 ml",
+        "白糖 5 - 10 g （如制作甜口）",
+        "食盐 1 - 2 g （如制作咸口）"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "description": "将鸡蛋打入碗中。"
+        },
+        {
+          "step": 2,
+          "description": "使用筷子或搅拌器，顺着一个方向搅打蛋液，直至蛋清与蛋黄完全混合均匀，颜色一致。（此过程约需 1 - 2 分钟）"
+        },
+        {
+          "step": 3,
+          "description": "将糖或盐等调味料加入蛋液中，略微搅匀。"
+        },
+        {
+          "step": 4,
+          "description": "准备刚烧开的、100 ℃ 的沸水。"
+        },
+        {
+          "step": 5,
+          "description": "**一边用筷子快速搅拌碗中的蛋液，一边将沸水以细流状冲入蛋液中**。确保沸水与蛋液充分混合。"
+        },
+        {
+          "step": 6,
+          "description": "持续搅拌片刻，直至蛋液被完全烫熟，形成均匀的淡黄色蛋花。"
+        }
+      ],
+      "tips": [],
+      "source": "HowToCook",
+      "imageUrl": null
+    }
+  ]
+}
