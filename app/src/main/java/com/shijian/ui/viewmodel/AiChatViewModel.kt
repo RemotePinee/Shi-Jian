@@ -225,15 +225,16 @@ class AiChatViewModel(
                     ### 菜谱结构化输出（极重要）：
                     - 当你给出一个完整的菜谱时，必须在回复的末尾附带一个结构化的 JSON 数据块，并用 [RECIPE] 和 [/RECIPE] 标签包裹。
                     - JSON 格式必须严格符合以下结构：
-                      "id": "一串唯一的字符串（如 UUID）",
-                      "name": "菜品名称",
-                      "cuisine": "菜系名称",
-                      "ingredients": ["食材1", "食材2"],
-                      "steps": [{"step": 1, "description": "步骤描述"}, {"step": 2, "description": "步骤描述"}],
-                      "cookingTime": 20,
-                      "difficulty": "medium",
-                      "tips": ["小贴士1", "小贴士2"]
-                    }
+                      {
+                        "id": "一串唯一的字符串",
+                        "name": "菜品名称",
+                        "cuisine": "菜系名称",
+                        "ingredients": ["主要食材 300g", "配料/调料 适量"],
+                        "steps": [{"step": 1, "description": "步骤描述"}, {"step": 2, "description": "步骤描述"}],
+                        "cookingTime": 20,
+                        "difficulty": "medium",
+                        "tips": ["小贴士1", "小贴士2"]
+                      }
                     - 注意：JSON 块必须隐藏在标签内，用户不需要直接看到原始 JSON。
                 """.trimIndent()
             )

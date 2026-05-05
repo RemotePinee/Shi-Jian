@@ -43,3 +43,6 @@ screenshots/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Developer Tools
+/tools/

@@ -34,7 +34,8 @@ data class SelectionItem(
 class TodayEatViewModel(
     private val aiRepository: AiRepository,
     private val favoriteRepository: FavoriteRepository,
-    private val galleryRepository: com.shijian.data.repository.GalleryRepository
+    private val galleryRepository: com.shijian.data.repository.GalleryRepository,
+    private val cookbookRepository: com.shijian.data.repository.CookbookRepository
 ) : ViewModel() {
 
     private var generateJob: Job? = null
@@ -175,7 +176,18 @@ class TodayEatViewModel(
         generateJob = viewModelScope.launch {
             _isGenerating.value = true
             _errorMessage.value = null
-            val result = aiRepository.generateRecipe(_selectedDishes.value, _selectedMaster.value!!, "")
+            
+            // Step 1: Find reference recipes from local database based on ingredients
+            val references = cookbookRepository.matchByIngredients(_selectedDishes.value).take(3)
+            
+            // Step 2: Pass references to AI for real benchmarking
+            val result = aiRepository.generateRecipe(
+                ingredients = _selectedDishes.value, 
+                cuisine = _selectedMaster.value!!, 
+                customPrompt = "",
+                referenceRecipes = references
+            )
+            
             result.onSuccess {
                 _recipe.value = it
             }.onFailure { e ->

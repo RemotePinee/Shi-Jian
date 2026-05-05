@@ -1301,7 +1301,24 @@ fun ChatRecipeLayout(
         }
         Column(modifier = Modifier.padding(12.dp)) {
             Text("🥗 所需食材", fontWeight = FontWeight.Bold, fontSize = 12.sp); Spacer(modifier = Modifier.height(6.dp))
-            FlowRow(spacing = 4.dp) { recipe.ingredients.forEach { Surface(color = Color(0xFFFEF9C3), shape = RoundedCornerShape(4.dp), border = BorderStroke(1.dp, NeoBlack.copy(alpha = 0.2f))) { Text(it, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp), fontSize = 11.sp) } } }
+            val displayIngredients = recipe.ingredients
+            FlowRow(spacing = 6.dp) { 
+                displayIngredients.forEach { item -> 
+                    Surface(
+                        color = Color(0xFFFFFAEC), 
+                        shape = RoundedCornerShape(6.dp), 
+                        border = BorderStroke(1.dp, NeoBlack),
+                    ) { 
+                        Text(
+                            text = item, 
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp), 
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = NeoBlack
+                        ) 
+                    } 
+                } 
+            }
             Spacer(modifier = Modifier.height(12.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text("👨‍🍳 制作步骤", fontWeight = FontWeight.Bold, fontSize = 12.sp)

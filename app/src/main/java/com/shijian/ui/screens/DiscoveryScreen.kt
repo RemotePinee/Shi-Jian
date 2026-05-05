@@ -1,7 +1,6 @@
 package com.shijian.ui.screens
 
 import androidx.compose.foundation.layout.*
-
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
@@ -35,26 +34,26 @@ fun DiscoveryScreen(
     onSettingsClick: () -> Unit
 ) {
     val tools = listOf(
-        DiscoveryTool("随机盲盒", "不知道吃什么？让上天决定！", "🎲", "mystery", Color(0xFFFACC15)),
-        DiscoveryTool("酱料设计", "定制你的专属灵魂蘸料", "🍯", "sauce", Color(0xFFF472B6)),
-        DiscoveryTool("料理占卜", "看看今天的烹饪运势如何", "🔮", "fortune", Color(0xFFC084FC))
+        DiscoveryTool("烹饪教程", "从入门到精通的厨艺百科", "🎓", "tips", Color(0xFF818CF8)), // Indigo
+        DiscoveryTool("随机盲盒", "不知道吃什么？让上天决定！", "🎲", "mystery", Color(0xFF3B82F6)), // Blue
+        DiscoveryTool("食谱百科", "357道经典菜谱，随时翻阅", "📖", "cookbook", Color(0xFF34D399)), // Green
+        DiscoveryTool("酱料设计", "定制你的专属灵魂蘸料", "🍯", "sauce", Color(0xFFFB923C)), // Orange
+        DiscoveryTool("料理占卜", "看看今天的烹饪运势如何", "🔮", "fortune", Color(0xFFF472B6)) // Pink
     )
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Deep Background Layer: Sticker Bombing
         FoodStickerBombing(modifier = Modifier.fillMaxSize())
 
-        // Foreground Layer: Content
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             NeoHeader(
                 title = "百宝箱",
                 subtitle = "探索更多有趣的功能",
-                backgroundColor = Color(0xFFA78BFA), // NeoViolet
+                backgroundColor = Color(0xFF818CF8),
                 heroEmoji = "🧰",
                 actions = {
                     IconButton(onClick = onSettingsClick) {
@@ -68,41 +67,70 @@ fun DiscoveryScreen(
                 }
             )
 
-            // Large Feature (Top)
-            tools.getOrNull(0)?.let { tool ->
-                ToolCardSophisticated(
-                    id = "22-A",
-                    tool = tool,
-                    onClick = { onNavigate(tool.route) },
-                    modifier = Modifier.fillMaxWidth().height(180.dp),
-                    backgroundColor = Color(0xFF3B82F6) // Electric Blue
-                )
-            }
-
-            // Gap reduced (removed 16dp spacer)
-
-            // Asymmetric Row (Middle)
+            // Dynamic Bento Grid Layout
             Row(
-                modifier = Modifier.fillMaxWidth().height(280.dp),
+                modifier = Modifier.fillMaxWidth().height(320.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                tools.getOrNull(1)?.let { tool ->
+                // Large Hero Column (Left)
+                tools.getOrNull(0)?.let { tool ->
                     ToolCardSophisticated(
-                        id = "07-X",
+                        id = "HERO-01",
                         tool = tool,
                         onClick = { onNavigate(tool.route) },
-                        modifier = Modifier.weight(1.1f).fillMaxHeight(),
-                        backgroundColor = Color(0xFF22C55E) // Laser Green
+                        modifier = Modifier.weight(1.2f).fillMaxHeight(),
+                        iconSize = 140.sp
                     )
                 }
 
-                tools.getOrNull(2)?.let { tool ->
+                // Stacked Column (Right)
+                Column(
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    tools.getOrNull(1)?.let { tool ->
+                        ToolCardSophisticated(
+                            id = "BOX-02",
+                            tool = tool,
+                            onClick = { onNavigate(tool.route) },
+                            modifier = Modifier.weight(1f).fillMaxWidth(),
+                            iconSize = 80.sp
+                        )
+                    }
+                    tools.getOrNull(2)?.let { tool ->
+                        ToolCardSophisticated(
+                            id = "BOOK-03",
+                            tool = tool,
+                            onClick = { onNavigate(tool.route) },
+                            modifier = Modifier.weight(1f).fillMaxWidth(),
+                            iconSize = 80.sp
+                        )
+                    }
+                }
+            }
+
+            // Bottom Row: Symmetric Balanced pair
+            Row(
+                modifier = Modifier.fillMaxWidth().height(140.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                tools.getOrNull(3)?.let { tool ->
                     ToolCardSophisticated(
-                        id = "99-S",
+                        id = "DIP-04",
                         tool = tool,
                         onClick = { onNavigate(tool.route) },
-                        modifier = Modifier.weight(0.9f).fillMaxHeight(),
-                        backgroundColor = Color(0xFFF43F5E) // Hot Pink
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
+                        iconSize = 90.sp
+                    )
+                }
+
+                tools.getOrNull(4)?.let { tool ->
+                    ToolCardSophisticated(
+                        id = "DIV-05",
+                        tool = tool,
+                        onClick = { onNavigate(tool.route) },
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
+                        iconSize = 90.sp
                     )
                 }
             }
@@ -115,34 +143,12 @@ fun DiscoveryScreen(
 @Composable
 private fun FoodStickerBombing(modifier: Modifier = Modifier) {
     Box(modifier = modifier.clipToBounds()) {
-        // Balanced Screen-Wide "Sticker Bomb" (approx 16-18 items, no clustering)
-        
-        // --- TOP ROW ---
-        Text("🍕", fontSize = 80.sp, modifier = Modifier.align(Alignment.TopStart).offset(x = 10.dp, y = 20.dp).graphicsLayer { rotationZ = -15f; alpha = 0.12f })
-        Text("🥨", fontSize = 65.sp, modifier = Modifier.align(Alignment.TopCenter).offset(x = (-30).dp, y = 30.dp).graphicsLayer { rotationZ = 10f; alpha = 0.08f })
-        Text("🍩", fontSize = 75.sp, modifier = Modifier.align(Alignment.TopEnd).offset(x = (-20).dp, y = 15.dp).graphicsLayer { rotationZ = -20f; alpha = 0.1f })
-
-        // --- UPPER-MIDDLE ---
-        Text("🥐", fontSize = 70.sp, modifier = Modifier.align(Alignment.TopStart).offset(x = 120.dp, y = 160.dp).graphicsLayer { rotationZ = 45f; alpha = 0.08f })
-        Text("🍔", fontSize = 95.sp, modifier = Modifier.align(Alignment.TopEnd).offset(x = (-100).dp, y = 200.dp).graphicsLayer { rotationZ = -10f; alpha = 0.11f })
-        Text("🌮", fontSize = 85.sp, modifier = Modifier.align(Alignment.TopCenter).offset(x = 20.dp, y = 280.dp).graphicsLayer { rotationZ = 20f; alpha = 0.1f })
-
-        // --- MIDDLE ---
-        Text("🍳", fontSize = 80.sp, modifier = Modifier.align(Alignment.CenterStart).offset(x = 20.dp, y = (-20).dp).graphicsLayer { rotationZ = 35f; alpha = 0.09f })
-        Text("🥓", fontSize = 75.sp, modifier = Modifier.align(Alignment.CenterEnd).offset(x = (-30).dp, y = 40.dp).graphicsLayer { rotationZ = -20f; alpha = 0.11f })
-        Text("🍰", fontSize = 85.sp, modifier = Modifier.align(Alignment.Center).offset(x = 0.dp, y = 100.dp).graphicsLayer { rotationZ = 15f; alpha = 0.1f })
-
-        // --- LOWER-MIDDLE ---
-        Text("🥞", fontSize = 90.sp, modifier = Modifier.align(Alignment.BottomStart).offset(x = 60.dp, y = (-320).dp).graphicsLayer { rotationZ = 5f; alpha = 0.14f })
-        Text("🍣", fontSize = 80.sp, modifier = Modifier.align(Alignment.BottomEnd).offset(x = (-80).dp, y = (-280).dp).graphicsLayer { rotationZ = -30f; alpha = 0.15f })
-        Text("🍟", fontSize = 90.sp, modifier = Modifier.align(Alignment.BottomCenter).offset(x = 0.dp, y = (-240).dp).graphicsLayer { rotationZ = 10f; alpha = 0.18f })
-
-        // --- BOTTOM ROW ---
-        Text("🌭", fontSize = 85.sp, modifier = Modifier.align(Alignment.BottomStart).offset(x = 10.dp, y = (-120).dp).graphicsLayer { rotationZ = -15f; alpha = 0.12f })
-        Text("🌯", fontSize = 105.sp, modifier = Modifier.align(Alignment.BottomStart).offset(x = 5.dp, y = 15.dp).graphicsLayer { rotationZ = -10f; alpha = 0.18f })
-        Text("🍜", fontSize = 100.sp, modifier = Modifier.align(Alignment.BottomCenter).offset(x = (-30).dp, y = (-40).dp).graphicsLayer { rotationZ = 20f; alpha = 0.15f })
-        Text("🍦", fontSize = 80.sp, modifier = Modifier.align(Alignment.BottomEnd).offset(x = (-20).dp, y = (-100).dp).graphicsLayer { rotationZ = 15f; alpha = 0.1f })
-        Text("🍗", fontSize = 90.sp, modifier = Modifier.align(Alignment.BottomCenter).offset(x = 120.dp, y = (-10).dp).graphicsLayer { rotationZ = -10f; alpha = 0.13f })
+        Text("🍕", fontSize = 80.sp, modifier = Modifier.align(Alignment.TopStart).offset(x = 10.dp, y = 20.dp).graphicsLayer { rotationZ = -15f; alpha = 0.05f })
+        Text("🥨", fontSize = 65.sp, modifier = Modifier.align(Alignment.TopCenter).offset(x = (-30).dp, y = 30.dp).graphicsLayer { rotationZ = 10f; alpha = 0.04f })
+        Text("🍩", fontSize = 75.sp, modifier = Modifier.align(Alignment.TopEnd).offset(x = (-20).dp, y = 15.dp).graphicsLayer { rotationZ = -20f; alpha = 0.04f })
+        Text("🍔", fontSize = 95.sp, modifier = Modifier.align(Alignment.TopEnd).offset(x = (-100).dp, y = 200.dp).graphicsLayer { rotationZ = -10f; alpha = 0.05f })
+        Text("🍟", fontSize = 90.sp, modifier = Modifier.align(Alignment.BottomCenter).offset(x = 0.dp, y = (-240).dp).graphicsLayer { rotationZ = 10f; alpha = 0.06f })
+        Text("🍜", fontSize = 100.sp, modifier = Modifier.align(Alignment.BottomCenter).offset(x = (-30).dp, y = (-40).dp).graphicsLayer { rotationZ = 20f; alpha = 0.06f })
     }
 }
 
@@ -152,71 +158,70 @@ private fun ToolCardSophisticated(
     tool: DiscoveryTool,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    backgroundColor: Color = Color.White
+    iconSize: androidx.compose.ui.unit.TextUnit = 110.sp
 ) {
     NeoCard(
         modifier = modifier.neoClickable(onClick = onClick),
-        backgroundColor = backgroundColor,
-        shadowOffset = 8.dp,
-        cornerRadius = 20.dp,
+        backgroundColor = tool.color,
+        shadowOffset = 6.dp,
+        cornerRadius = 24.dp,
         padding = 0.dp
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             // Massive background icon (Hero)
             Text(
                 text = tool.icon,
-                fontSize = 110.sp,
+                fontSize = iconSize,
                 modifier = Modifier
                     .align(Alignment.Center)
-                    .offset(x = 20.dp, y = 10.dp)
-                    .graphicsLayer { alpha = 0.5f }
+                    .offset(x = 15.dp, y = 10.dp)
+                    .graphicsLayer { alpha = 0.35f }
             )
 
             // Content Overlay
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.SpaceBetween
+                    .padding(16.dp)
             ) {
-                Column {
-                    Text(
-                        text = tool.name,
-                        fontWeight = FontWeight.Black,
-                        fontSize = 22.sp,
-                        color = Color.White,
-                        lineHeight = 24.sp
-                    )
-                    Text(
-                        text = tool.description,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White.copy(alpha = 0.8f)
-                    )
-                }
-
-                // Unique "Price Tag" Label
-                Box(
-                    modifier = Modifier
-                        .background(Color.Yellow)
-                        .border(2.dp, NeoBlack)
-                        .padding(horizontal = 8.dp, vertical = 2.dp)
-                ) {
-                    Text(
-                        "DISC-ID:$id",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Black,
-                        color = NeoBlack
-                    )
-                }
+                Text(
+                    text = tool.name,
+                    fontWeight = FontWeight.Black,
+                    fontSize = 18.sp,
+                    color = Color.White,
+                    lineHeight = 20.sp
+                )
+                Text(
+                    text = tool.description,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White.copy(alpha = 0.8f),
+                    lineHeight = 12.sp
+                )
             }
 
-            // Decorative Crosshair
+            // Price Tag Label
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(start = 12.dp, bottom = 12.dp)
+                    .background(Color.Yellow)
+                    .border(1.5.dp, NeoBlack)
+                    .padding(horizontal = 6.dp, vertical = 2.dp)
+            ) {
+                Text(
+                    "ID:$id",
+                    fontSize = 8.sp,
+                    fontWeight = FontWeight.Black,
+                    color = NeoBlack
+                )
+            }
+
             Text(
                 "⊕",
-                modifier = Modifier.align(Alignment.TopEnd).padding(8.dp),
+                modifier = Modifier.align(Alignment.TopEnd).padding(10.dp),
                 color = Color.White,
-                fontSize = 20.sp
+                fontSize = 16.sp
             )
         }
     }

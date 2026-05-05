@@ -256,40 +256,65 @@ class AiRepository(private val context: Context, private val settings: SettingsR
         }
     }
 
-    suspend fun generateRecipe(ingredients: List<String>, cuisine: CuisineType, customPrompt: String? = null): Result<Recipe> {
+    suspend fun generateRecipe(
+        ingredients: List<String>, 
+        cuisine: CuisineType, 
+        customPrompt: String? = null,
+        referenceRecipes: List<CookbookRecipe> = emptyList()
+    ): Result<Recipe> {
         val prompt = buildString {
             append("${cuisine.prompt}\n\n用户提供的食材：${ingredients.joinToString("、")}")
             if (customPrompt != null) {
                 append("\n\n用户的特殊要求：$customPrompt")
             }
+            
+            if (referenceRecipes.isNotEmpty()) {
+                append("\n\n【参考《时间食谱百科》中的真实案例】：")
+                referenceRecipes.forEach { ref ->
+                    append("\n- 菜名：${ref.name}")
+                    append("\n  原料配比：${ref.portions.joinToString("、")}")
+                    append("\n  关键步骤摘要：${ref.steps.take(3).joinToString { it.description }}...")
+                }
+                append("\n\n【特别注意】：参考案例仅用于风格、步骤逻辑和深度对标。严禁将参考案例中的无关食材强行塞入当前生成的菜谱中，生成的内容必须严格基于用户提供的食材清单。")
+            }
+
             append("""
                 
-                请生成一份详细实用的菜谱，要求：
-                1. 食材清单要包含具体用量（如：猪肉300g、生抽2勺、盐1茶匙）
-                2. 每个食材/调料必须是独立的数组项，严禁将多种调料用逗号或顿号合并成一个字符串（如：不要出现"调料：盐、生抽"这种合并项）。
-                3. 制作步骤要详细具体，包含具体的操作方法、准确的时间控制、火候掌握及关键判断标准。
-                4. 烹饪技巧要实用。
+                请生成一份专业、严谨且详细的菜谱，**这是你的最高指令**：
+                1. **精确配比（MANDATORY）**：
+                   - 你必须在 `ingredients` 列表中直接包含食材名称及**精确数值与单位**。
+                   - **格式要求**：每一个字符串必须为 "食材名 数量"（如：["五花肉 500g", "生抽 15ml", "大蒜 3瓣"]）。
+                   - **禁止**使用“适量”、“少许”等模糊词汇，哪怕是盐也必须给出参考克数。
+                2. **对标专业**：你的菜谱必须达到《时间食谱百科》的出版级水准。
                 
-                请按照以下JSON格式返回菜谱：
+                请严格按照以下JSON格式返回，**严禁**在Markdown代码块外添加任何解释说明：
                 {
                   "name": "菜品名称",
-                  "ingredients": ["猪肉 300g", "生抽 2勺", "青椒 100g"],
+                  "ingredients": ["主要食材A 300g", "调料B 15ml"],
                   "steps": [
                     {
                       "step": 1,
-                      "description": "详细的操作描述",
+                      "description": "详细描述，必须包含火候和状态判断（如：炒至变色、炸至金黄）",
                       "time": 5,
-                      "temperature": "中火"
+                      "temperature": "大火"
                     }
                   ],
-                  "cookingTime": 30,
+                  "cookingTime": 25,
                   "difficulty": "medium",
-                  "tips": ["技巧1"]
+                  "tips": ["专业技巧1", "专业技巧2"]
                 }
             """.trimIndent())
         }
         
-        val systemMsg = "你是一位经验丰富的专业厨师。请严格按照JSON格式返回，不要包含任何其他文字。"
+        val systemMsg = """
+            你是一位游历四方、极其博学的顶级主厨。你深谙《时间食谱百科》中 356 道经典料理的精髓。
+            
+            【你的知识库背景】：
+            - 分类架构：素菜、荤菜、水产、早餐、主食、半成品、汤与粥、饮品、酱料、甜品。
+            - 核心代表作：麻婆豆腐、东坡肉、咖喱炒蟹、杨枝甘露、莫吉托、冬瓜茶、农家一碗香、地三鲜、红烧狮子头、西湖牛肉羹等。
+            
+            你的创作必须对标上述经典菜系的口味逻辑与专业水准，追求口味的和谐。请严格按照JSON格式返回，严禁任何暗黑料理幻想。
+        """.trimIndent()
         val res = callAi(systemMsg, prompt, Recipe::class.java)
         
         return res.map { recipe ->
@@ -412,10 +437,14 @@ class AiRepository(private val context: Context, private val settings: SettingsR
         }
     }
 
-    @Suppress("unused")
     suspend fun generateDishRecipeByName(dishName: String): Result<Recipe> {
         val prompt = """
             请为'$dishName'这道菜生成详细的制作教程。
+            
+            【核心准则】：
+            1. **禁止幻想**：如果 '$dishName' 是一个胡编乱造的暗黑料理名（如：韭菜冰淇淋），请拒绝生成并返回一个空菜谱，或将其修正为最接近的正常菜肴。
+            2. **专业对标**：对标《时间食谱百科》中 356 道经典菜品的专业水准。
+            
             请按照以下JSON格式返回：
             {
               "name": "$dishName",
@@ -434,7 +463,7 @@ class AiRepository(private val context: Context, private val settings: SettingsR
             }
         """.trimIndent()
         
-        val systemMsg = "你是一位经验丰富的专业厨师。请严格按照JSON格式返回，不要包含任何其他文字。"
+        val systemMsg = "你是一位执着于美食艺术的顶级主厨。你眼中只有科学的搭配和极致的味蕾体验。请严格按照JSON格式返回，严禁任何废话。"
         val res = callAi(systemMsg, prompt, Recipe::class.java)
         return res.map { it.copy(
             id = "dish-recipe-${System.currentTimeMillis()}", 

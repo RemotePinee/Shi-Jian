@@ -79,13 +79,20 @@ fun RecipeCard(
                                 fontWeight = FontWeight.Bold
                             )
                         }
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "⏱️ ${recipe.cookingTime} min",
-                            color = NeoBlack,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                        if (recipe.cookingTime > 0) {
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(text = "⏱️", fontSize = 12.sp)
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = "${recipe.cookingTime} min",
+                                    modifier = Modifier.padding(top = 2.dp), // Nudge down for perfect alignment with emoji
+                                    color = NeoBlack,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
                     }
                 }
                 // Action Buttons
@@ -166,7 +173,7 @@ fun RecipeCard(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(if (isContentScrollable) PaddingValues(top = 0.dp, bottom = 16.dp, start = 16.dp, end = 16.dp) else PaddingValues(16.dp))
+                    .padding(if (isContentScrollable) PaddingValues(top = 12.dp, bottom = 16.dp, start = 16.dp, end = 16.dp) else PaddingValues(16.dp))
                     .then(contentModifier)
             ) {
             // Ingredients

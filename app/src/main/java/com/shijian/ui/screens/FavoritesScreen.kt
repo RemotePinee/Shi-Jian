@@ -155,10 +155,11 @@ fun FavoritesScreen(viewModel: FavoritesViewModel) {
                     color = Color.White
                 ) {
                     // WRAPPER: Scrollable Column to let focus bubble up
-                    Column(
+                    // WRAPPER: Fixed height box to allow RecipeCard internal scroll to work
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .verticalScroll(rememberScrollState())
+                            .heightIn(max = 680.dp)
                     ) {
                         RecipeCard(
                             recipe = selectedRecipe.value!!,
@@ -174,13 +175,13 @@ fun FavoritesScreen(viewModel: FavoritesViewModel) {
                                     if (url != null) {
                                         android.widget.Toast.makeText(context, "创作成功！已收录至 GALLERY", android.widget.Toast.LENGTH_LONG).show()
                                     } else {
-                                        android.widget.Toast.makeText(context, "创作失败，请检查设置或重试", android.widget.Toast.LENGTH_SHORT).show()
+                                        android.widget.Toast.makeText(context, "创作失败，请检查设置所重试", android.widget.Toast.LENGTH_SHORT).show()
                                     }
                                 }
                             },
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth().wrapContentHeight(),
                             isFlat = true,
-                            isContentScrollable = false, // SIGNAL BUBBLING ENABLED: Bubbles up to Column
+                            isContentScrollable = true, // ENABLE INTERNAL SCROLL: Makes header sticky
                             isGenerating = viewModel.isGeneratingImage.value,
                             isAnalyzingDeepInsights = viewModel.isAnalyzingDeepInsights.value,
                             onUnlockDeepInsights = {
@@ -287,12 +288,19 @@ fun FavoriteCompactCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically // Perfect vertical centering
             ) {
-                Text(
-                    text = "⏱️ ${recipe.cookingTime}m",
-                    fontSize = 12.sp, // Slightly bigger for readability
-                    fontWeight = FontWeight.ExtraBold,
-                    color = NeoBlack.copy(alpha = 0.6f)
-                )
+                if (recipe.cookingTime > 0) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(text = "⏱️", fontSize = 11.sp)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "${recipe.cookingTime}m",
+                            modifier = Modifier.padding(top = 1.5.dp), // Nudge down
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = NeoBlack.copy(alpha = 0.6f)
+                        )
+                    }
+                }
                 Spacer(modifier = Modifier.weight(1f))
                 Surface(
                     color = NeoBlack,
