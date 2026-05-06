@@ -110,21 +110,44 @@ fun FavoritesScreen(viewModel: FavoritesViewModel) {
                             .fillMaxWidth()
                             .fadingEdge(top = 10.dp, bottom = 16.dp)
                     ) {
-                        LazyVerticalStaggeredGrid(
-                        columns = StaggeredGridCells.Fixed(2),
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        verticalItemSpacing = 12.dp,
-                        contentPadding = PaddingValues(top = 10.dp, bottom = 16.dp)
-                    ) {
-                        items(favorites, key = { it.recipe.id }) { fav ->
-                            FavoriteCompactCard(
-                                recipe = fav.recipe,
-                                onClick = { selectedRecipe.value = fav.recipe },
-                                onRemove = { viewModel.removeFavorite(fav.recipe.id) }
-                            )
+                        // Strict Column Split: Force 1-L, 2-R, 3-L...
+                        val leftItems = favorites.filterIndexed { index, _ -> index % 2 == 0 }
+                        val rightItems = favorites.filterIndexed { index, _ -> index % 2 != 0 }
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .verticalScroll(rememberScrollState())
+                                .padding(top = 10.dp, bottom = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            // Left Column
+                            Column(
+                                modifier = Modifier.weight(1f),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                leftItems.forEach { fav ->
+                                    FavoriteCompactCard(
+                                        recipe = fav.recipe,
+                                        onClick = { selectedRecipe.value = fav.recipe },
+                                        onRemove = { viewModel.removeFavorite(fav.recipe.id) }
+                                    )
+                                }
+                            }
+                            // Right Column
+                            Column(
+                                modifier = Modifier.weight(1f),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                rightItems.forEach { fav ->
+                                    FavoriteCompactCard(
+                                        recipe = fav.recipe,
+                                        onClick = { selectedRecipe.value = fav.recipe },
+                                        onRemove = { viewModel.removeFavorite(fav.recipe.id) }
+                                    )
+                                }
+                            }
                         }
-                    }
                 }
             } else if (searchQuery.isNotEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

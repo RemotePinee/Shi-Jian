@@ -43,9 +43,9 @@ fun GalleryScreen(
     val images by viewModel.images
     val isLoading by viewModel.isLoading
     val selectedImageState = remember { mutableStateOf<GalleryImage?>(null) }
-    val selectedImage by selectedImageState
+    val selectedImage = selectedImageState.value
     val showClearConfirmState = remember { mutableStateOf(false) }
-    val showClearConfirm by showClearConfirmState
+    val showClearConfirm = showClearConfirmState.value
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     
@@ -58,7 +58,7 @@ fun GalleryScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFFACC15)) // Yellow-400
-            .padding(start = 16.dp, end = 12.dp, top = 16.dp, bottom = 0.dp), // Compensate for 4dp card shadows
+            .padding(start = 16.dp, end = 12.dp, top = 16.dp, bottom = 0.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         // Header
@@ -127,29 +127,27 @@ fun GalleryScreen(
                         }
                     }
                 }
+            }
         }
     }
-}
 
     // Image Preview Dialog
     selectedImage?.let { image ->
         Dialog(onDismissRequest = { selectedImageState.value = null }) {
+            val screenHeight = androidx.compose.ui.platform.LocalConfiguration.current.screenHeightDp.dp
             NeoCard(
-                modifier = Modifier.fillMaxWidth(0.95f).wrapContentHeight(),
+                modifier = Modifier
+                    .fillMaxWidth(0.95f)
+                    .wrapContentHeight(),
                 padding = 0.dp,
                 shadowOffset = 6.dp
             ) {
-                Box(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f, fill = false)
-                        .fadingEdge(top = 0.dp, bottom = 16.dp)
+                        .heightIn(max = screenHeight * 0.85f)
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .verticalScroll(rememberScrollState())
-                            .padding(top = 0.dp, bottom = 16.dp)
-                    ) {
+                    // 1. Fixed Top: Image Area
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -168,7 +166,14 @@ fun GalleryScreen(
                         )
                     }
                     HorizontalDivider(thickness = 3.dp, color = NeoBlack)
-                    Column(modifier = Modifier.padding(16.dp)) {
+
+                    // 2. Scrollable Content: Title and Ingredients
+                    Column(
+                        modifier = Modifier
+                            .weight(1f, fill = false)
+                            .verticalScroll(rememberScrollState())
+                            .padding(horizontal = 16.dp, vertical = 12.dp)
+                    ) {
                         Text(
                             text = image.recipeName,
                             fontWeight = FontWeight.Black,
@@ -217,9 +222,12 @@ fun GalleryScreen(
                                 }
                             }
                         }
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
 
-                        Spacer(modifier = Modifier.height(20.dp))
-                        
+                    // 3. Fixed Bottom: Action Buttons
+                    HorizontalDivider(thickness = 1.dp, color = NeoBlack.copy(alpha = 0.1f))
+                    Column(modifier = Modifier.padding(16.dp)) {
                         Row(
                             modifier = Modifier.fillMaxWidth(), 
                             horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -274,7 +282,6 @@ fun GalleryScreen(
                     }
                 }
             }
-        }
         }
     }
 

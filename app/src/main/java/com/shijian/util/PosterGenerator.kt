@@ -40,6 +40,13 @@ object PosterGenerator {
             val imgRatio = originalBitmap.width.toFloat() / originalBitmap.height.toFloat()
             val imgH = contentWidth / imgRatio
             
+            // 0. Clean Ingredients for Poster
+            val cleanIngredients = image.ingredients.map { 
+                it.replace(Regex("""\s?\*\*?.*部分：?\*\*?"""), "")
+                  .replace(Regex("""\s?.*部分："""), "")
+                  .trim()
+            }.filter { it.isNotEmpty() }
+
             // Title pre-calc
             val titlePaint = TextPaint().apply { color = Color.BLACK; textSize = 78f; typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD); isAntiAlias = true }
             val titleLayout = StaticLayout.Builder.obtain(image.recipeName, 0, image.recipeName.length, titlePaint, (contentWidth - 110f).toInt())
@@ -47,9 +54,16 @@ object PosterGenerator {
                 .setAlignment(Layout.Alignment.ALIGN_NORMAL)
                 .build()
             
-            val ingredientRows = (image.ingredients.size + 1) / 2
-            val rowHeight = 65f
-            val ingredientsSectionHeight = (ingredientRows * rowHeight) + 120f
+            // Ingredients pre-calc (Using StaticLayout for wrapping support)
+            val iPaint = TextPaint().apply { color = Color.BLACK; textSize = 34f; typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL); isAntiAlias = true }
+            val ingredientsText = cleanIngredients.chunked(2).joinToString("\n") { pair ->
+                pair.joinToString("   |   ") { "▪ $it" }
+            }
+            val ingredientsLayout = StaticLayout.Builder.obtain(ingredientsText, 0, ingredientsText.length, iPaint, (contentWidth - 110f).toInt())
+                .setLineSpacing(15f, 1f)
+                .build()
+
+            val ingredientsSectionHeight = ingredientsLayout.height + 140f
             
             val cardTop = 280f
             val cardPadding = 55f
@@ -69,23 +83,23 @@ object PosterGenerator {
             
             // 4. --- MINIMALIST HEADER ---
             val headerPaint = TextPaint().apply { color = Color.BLACK; textSize = 48f; typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD); isAntiAlias = true }
-            canvas.drawText("食见 / AI VISUAL RECIPE", padding, 140f, headerPaint) // Moved down (was 100f)
+            canvas.drawText("食见 / AI VISUAL RECIPE", padding, 140f, headerPaint) 
             canvas.drawLine(padding, 165f, padding + 400f, 165f, Paint().apply { color = Color.BLACK; strokeWidth = 8f })
             
             // 5. --- UNIFIED MAIN CARD ---
-            // Shadow (offset slightly more for better brutalist depth)
+            // Shadow
             canvas.drawRect(padding + 22f, cardTop + 22f, padding + contentWidth + 22f, cardBottom + 22f, Paint().apply { color = Color.BLACK })
             
             // Main Card Box (Fill)
             val cardRect = RectF(padding, cardTop, padding + contentWidth, cardBottom)
             canvas.drawRect(cardRect, Paint().apply { color = Color.WHITE })
             
-            // 5.1 Processed Image Section (DRAW BEFORE STROKE to be framed by it)
+            // 5.1 Processed Image Section
             val imgRect = RectF(padding, cardTop, padding + contentWidth, cardTop + imgH)
             canvas.withClip(imgRect) {
                 canvas.drawBitmap(originalBitmap, null, imgRect, null)
                 
-                // Image Processing Overlays (Technical Look)
+                // Image Processing Overlays
                 val overlayPaint = Paint().apply { color = Color.BLACK; alpha = 20; style = Paint.Style.FILL }
                 for (y in cardTop.toInt()..(cardTop + imgH).toInt() step 12) {
                     canvas.drawRect(padding, y.toFloat(), padding + contentWidth, y + 2f, overlayPaint)
@@ -103,7 +117,7 @@ object PosterGenerator {
                 canvas.drawText("SOURCE: AI_GENERATED_RENDER // SCALE 1:1", padding + 45f, cardTop + imgH - 45f, imgLabelPaint)
             }
             
-            // Main Card Box (THICK STROKE DRAWN LAST for unified framing)
+            // Main Card Box (THICK STROKE)
             canvas.drawRect(cardRect, Paint().apply { color = Color.BLACK; style = Paint.Style.STROKE; strokeWidth = 14f })
             
             // 5.2 Dish Details Area
@@ -115,16 +129,13 @@ object PosterGenerator {
                 val lineY = titleLayout.height + 40f
                 canvas.drawLine(-10f, lineY, contentWidth - 100f, lineY, Paint().apply { color = Color.BLACK; strokeWidth = 6f })
                 
-                // Ingredients
+                // Ingredients Section
                 val iLabelPaint = TextPaint().apply { color = Color.BLACK; textSize = 36f; typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD); alpha = 180 }
                 canvas.drawText("主要食材 | INGREDIENTS", 0f, lineY + 70f, iLabelPaint)
                 
-                var cY = lineY + 140f
-                val iPaint = TextPaint().apply { color = Color.BLACK; textSize = 34f; typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL); isAntiAlias = true }
-                image.ingredients.chunked(2).forEach { pair ->
-                    val line = pair.joinToString("   |   ") { it }
-                    canvas.drawText("▪ $line", 5f, cY, iPaint)
-                    cY += rowHeight
+                // Draw Ingredients with wrapping support
+                canvas.withTranslation(0f, lineY + 110f) {
+                    ingredientsLayout.draw(canvas)
                 }
             }
             
